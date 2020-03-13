@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<root>
+	<map>
+		<width>16</width>
+		<height>16</height>
+		<grid>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+		</grid>
+	</map>
+	<options>
+      <algorithm>cbs</algorithm>
+      <agents_file>empty-16-16-random</agents_file>
+      <tasks_count>1</tasks_count>
+      <agents_range min="1" max="16"/>
+      <maxtime>1000</maxtime>
+      <with_cat>true</with_cat>
+      <with_perfect_h>false</with_perfect_h>
+      <logpath />
+      <logfilename />
+  </options>
+</root>
