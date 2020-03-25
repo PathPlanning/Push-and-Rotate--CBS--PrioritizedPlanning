@@ -30,6 +30,9 @@
         <maxtime>1000</maxtime>
         <with_cat>true</with_cat>
         <with_perfect_h>false</with_perfect_h>
+        <pp_order>2</pp_order>
+        <parallelize_paths>true</parallelize_paths>
+        <single_execution>false</single_execution>
         <logpath/>
         <logfilename/>
     </options>
@@ -42,16 +45,16 @@
             <result agents_count="4" success_count="1" makespan="21" flowtime="51" time="0"/>
             <result agents_count="5" success_count="1" makespan="21" flowtime="60" time="0"/>
             <result agents_count="6" success_count="1" makespan="21" flowtime="78" time="0.001"/>
-            <result agents_count="7" success_count="1" makespan="21" flowtime="85" time="0.001"/>
-            <result agents_count="8" success_count="1" makespan="21" flowtime="92" time="0"/>
-            <result agents_count="9" success_count="1" makespan="21" flowtime="101" time="0"/>
+            <result agents_count="7" success_count="1" makespan="21" flowtime="85" time="0.002"/>
+            <result agents_count="8" success_count="1" makespan="21" flowtime="92" time="0.001"/>
+            <result agents_count="9" success_count="1" makespan="21" flowtime="101" time="0.001"/>
             <result agents_count="10" success_count="1" makespan="21" flowtime="112" time="0.001"/>
             <result agents_count="11" success_count="1" makespan="21" flowtime="119" time="0.001"/>
             <result agents_count="12" success_count="1" makespan="21" flowtime="128" time="0.001"/>
             <result agents_count="13" success_count="1" makespan="21" flowtime="133" time="0.002"/>
-            <result agents_count="14" success_count="1" makespan="21" flowtime="140" time="0.002"/>
-            <result agents_count="15" success_count="1" makespan="21" flowtime="150" time="0.0030000000000000001"/>
-            <result agents_count="16" success_count="1" makespan="21" flowtime="168" time="0.0040000000000000001"/>
+            <result agents_count="14" success_count="1" makespan="21" flowtime="140" time="0.0030000000000000001"/>
+            <result agents_count="15" success_count="1" makespan="21" flowtime="150" time="0.0040000000000000001"/>
+            <result agents_count="16" success_count="1" makespan="21" flowtime="168" time="0.0030000000000000001"/>
         </aggregated_results>
     </log>
 </root>

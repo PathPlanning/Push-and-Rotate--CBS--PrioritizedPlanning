@@ -28,7 +28,8 @@ int main(int argc, char* argv[])
                 std::cout << "Log OK!" << std::endl << "Start searching" << std::endl;
                 mission.createSearch();
                 mission.createAlgorithm();
-                for (int i = 0; i < mission.getTasksCount(); ++i) {
+                int tasksCount = mission.getSingleExecution() ? 1 : mission.getTasksCount();
+                for (int i = 0; i < tasksCount; ++i) {
                     std::string agentsFile = mission.getAgentsFile() + "-" + std::to_string(i + 1) + ".xml";
                     if (!mission.getAgents(agentsFile.c_str()))
                         std::cout << "Agent set has not been created! Program halted!" << std::endl;
@@ -37,7 +38,9 @@ int main(int argc, char* argv[])
                         mission.startSearch(agentsFile);
                     }
                 }
-                mission.saveAggregatedResultsToLog();
+                if (!mission.getSingleExecution()) {
+                    mission.saveAggregatedResultsToLog();
+                }
                 std::cout << "All searches are finished!" << std::endl;
             }
         }

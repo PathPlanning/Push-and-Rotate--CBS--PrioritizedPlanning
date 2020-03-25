@@ -30,6 +30,9 @@
       <maxtime>1000</maxtime>
       <with_cat>true</with_cat>
       <with_perfect_h>false</with_perfect_h>
+      <pp_order>2</pp_order>
+      <parallelize_paths>true</parallelize_paths>
+      <single_execution>false</single_execution>
       <logpath />
       <logfilename />
   </options>

@@ -318,6 +318,9 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_TASKS_COUNT)->QueryIntText(&tasksCount);
     options->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
     options->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
+    options->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
+    options->FirstChildElement(CNS_TAG_PAR_PATHS)->QueryBoolText(&parallelizePaths);
+    options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
 
     return true;
 }

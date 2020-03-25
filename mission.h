@@ -45,6 +45,7 @@ class Mission
         std::pair<int, int> getCosts();
         int getTasksCount();
         std::string getAgentsFile();
+        bool getSingleExecution();
 
     private:
         const char* getAlgorithmName();

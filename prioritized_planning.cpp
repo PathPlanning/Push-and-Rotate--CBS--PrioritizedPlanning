@@ -21,15 +21,39 @@ void PrioritizedPlanning::clear() {
 }
 
 MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::cout << agentSet.getAgentCount() << std::endl;
+
+    if (config.withPerfectHeuristic) {
+        search->getPerfectHeuristic(map, agentSet);
+    }
+
+    std::vector<int> order;
+    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+        order.push_back(i);
+    }
+
+    if (config.ppOrder == 1 || config.ppOrder == 2) {
+        Astar astar(false);
+        std::vector<int> pathLength;
+        for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+            Agent agent = agentSet.getAgent(i);
+            SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
+                                                            agent.getGoal_i(), agent.getGoal_j());
+            pathLength.push_back(searchResult.pathlength);
+        }
+
+        std::sort(order.begin(), order.end(), [&pathLength, &config](int i, int j) {
+            return (pathLength[i] < pathLength[j] && config.ppOrder == 1) ||
+                   (pathLength[i] > pathLength[j] && config.ppOrder == 2);
+        });
+    }
+
     MultiagentSearchResult result(false);
     ConstraintsSet constraints;
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    // std::cout << agentSet.getAgentCount() << std::endl;
-
-    search->getPerfectHeuristic(map, agentSet);
-
+    agentsPaths.resize(agentSet.getAgentCount());
     size_t maxDepth = 0;
-    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+    for (int i : order) {
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
             result.pathfound = false;
@@ -45,7 +69,7 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
         }
         auto path = *searchResult.lppath;
         maxDepth = std::max(maxDepth, path.size());
-        agentsPaths.push_back(std::vector<Node>(path.begin(), path.end()));
+        agentsPaths[i] = std::vector<Node>(path.begin(), path.end());
         for (auto it = path.begin(); it != path.end(); ++it) {
             if (std::next(it) == path.end()) {
                 constraints.addGoalNodeConstraint(it->i, it->j, it->depth, i);

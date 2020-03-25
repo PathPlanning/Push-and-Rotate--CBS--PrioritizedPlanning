@@ -274,7 +274,7 @@ bool PushAndRotate::rotate(const Map &map, AgentSet &agentSet, std::vector<Node>
     return false;
 }
 
-void PushAndRotate::getAgentPaths(AgentSet &agentSet) {
+void PushAndRotate::getPaths(AgentSet &agentSet) {
     agentsPaths.resize(agentSet.getAgentCount());
     std::vector<Node> agentPositions;
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
@@ -819,7 +819,11 @@ MultiagentSearchResult PushAndRotate::startSearch(const Map &map, const Config &
         result.pathfound = false;
     }
     if (result.pathfound) {
-        getParallelPaths(agentSet);
+        if (config.parallelizePaths) {
+            getParallelPaths(agentSet);
+        } else {
+            getPaths(agentSet);
+        }
         result.agentsMoves = &agentsMoves;
         result.agentsPaths = &agentsPaths;
         result.time = static_cast<double>(elapsedMilliseconds) / 1000;

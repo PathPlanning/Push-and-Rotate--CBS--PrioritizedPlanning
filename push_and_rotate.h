@@ -31,7 +31,7 @@ class PushAndRotate
                      int firstAgentId, int secondAgentId, AgentSet &agentSet);
         bool swap(const Map &map, AgentSet &agentSet, Node& first, Node& second);
         bool rotate(const Map &map, AgentSet &agentSet, std::vector<Node> &qPath, int cycleBeg);
-        void getAgentPaths(AgentSet &agentSet);
+        void getPaths(AgentSet &agentSet);
         void getParallelPaths(AgentSet &agentSet);
         void getComponent(AgentSet &agentSet, std::pair<Node, Node> &startEdge,
                                          std::vector<std::pair<Node, Node>> &edgeStack,

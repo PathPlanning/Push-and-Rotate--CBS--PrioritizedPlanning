@@ -5,6 +5,7 @@
 #include "agent_set.h"
 #include "map.h"
 #include "isearch.h"
+#include "astar.h"
 #include "multiagent_search_result.h"
 #include <vector>
 

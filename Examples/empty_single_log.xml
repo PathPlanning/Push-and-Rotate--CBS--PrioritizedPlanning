@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<root>
+    <map>
+        <width>16</width>
+        <height>16</height>
+        <grid>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        </grid>
+    </map>
+    <options>
+        <algorithm>cbs</algorithm>
+        <agents_file>empty-16-16-random</agents_file>
+        <tasks_count>1</tasks_count>
+        <agents_range min="1" max="16"/>
+        <maxtime>1000</maxtime>
+        <with_cat>true</with_cat>
+        <with_perfect_h>false</with_perfect_h>
+        <pp_order>2</pp_order>
+        <parallelize_paths>true</parallelize_paths>
+        <single_execution>true</single_execution>
+        <logpath/>
+        <logfilename/>
+    </options>
+    <log>
+        <mapfilename>empty_single.xml</mapfilename>
+        <paths agents_count="16" makespan="21" flowtime="168" agents_file="empty-16-16-random-1.xml">
+            <agent number="0">I13,I12,I11,I10,H10,H9,H8,</agent>
+            <agent number="1">C15,C14,C13,C12,C11,C10,C9,C8,C7,C6,C5,C4,D4,D3,D2,E2,F2,G2,H2,I2,J2,</agent>
+            <agent number="2">E5,D5,C5,B5,B6,B7,B8,B9,B10,B11,B12,</agent>
+            <agent number="3">I3,H3,G3,F3,E3,D3,C3,B3,B4,B5,B6,B7,</agent>
+            <agent number="4">L8,K8,K9,K10,K11,K12,K13,K14,K15,</agent>
+            <agent number="5">P3,O3,N3,M3,L3,K3,J3,I3,I4,I5,I6,I7,I8,I9,H9,H10,H11,H12,</agent>
+            <agent number="6">N14,M14,L14,L13,L12,L11,L10,</agent>
+            <agent number="7">A8,A9,B9,C9,D9,E9,F9,</agent>
+            <agent number="8">B6,B7,B8,B9,B10,B11,B12,B13,B14,</agent>
+            <agent number="9">D12,C12,C11,C10,C9,C8,C7,C6,C5,C4,C3,</agent>
+            <agent number="10">C2,B2,A2,A3,A4,A5,A6,</agent>
+            <agent number="11">I10,I9,I8,I7,J7,K7,L7,M7,N7,</agent>
+            <agent number="12">F12,F11,G11,H11,I11,</agent>
+            <agent number="13">H13,H12,H11,I11,J11,K11,L11,</agent>
+            <agent number="14">J7,J8,J9,J10,K10,L10,M10,M11,M12,M13,</agent>
+            <agent number="15">G10,G9,G8,G7,G6,G5,G4,G3,G2,G1,H1,I1,J1,K1,L1,M1,N1,O1,</agent>
+        </paths>
+    </log>
+</root>

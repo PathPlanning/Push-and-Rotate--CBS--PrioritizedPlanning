@@ -81,7 +81,8 @@ void Mission::createAlgorithm()
 
 void Mission::startSearch(const std::string &agentsFile)
 {
-    for (int i = config.minAgents; i <= config.maxAgents; ++i) {
+    int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
+    for (int i = minAgents; i <= config.maxAgents; ++i) {
         AgentSet curAgentSet;
         for (int j = 0; j < i; ++j) {
             Agent agent = agentSet.getAgent(j);
@@ -109,7 +110,9 @@ void Mission::startSearch(const std::string &agentsFile)
         timeflows[i].push_back(timeflow);
         times[i].push_back(sr.time);
 
-        //saveAgentsPathsToLog(agentsFile, makespan, timeflow);
+        if (config.singleExecution) {
+            saveAgentsPathsToLog(agentsFile, makespan, timeflow);
+        }
         if (!checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
             break;
@@ -235,4 +238,8 @@ int Mission::getTasksCount() {
 
 std::string Mission::getAgentsFile() {
     return config.agentsFile;
+}
+
+bool Mission::getSingleExecution() {
+    return config.singleExecution;
 }

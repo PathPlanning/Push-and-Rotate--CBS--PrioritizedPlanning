@@ -67,4 +67,5 @@ HEADERS += \
     environmentoptions.h
 
 DISTFILES += \
+    CMakeLists.txt \
     README.md

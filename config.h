@@ -22,6 +22,9 @@ class Config
         int             tasksCount;
         bool            withCAT;
         bool            withPerfectHeuristic;
+        int             ppOrder;
+        bool            parallelizePaths;
+        bool            singleExecution;
 };
 
 #endif
