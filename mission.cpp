@@ -212,7 +212,7 @@ void Mission::saveAggregatedResultsToLog() {
 
 void Mission::saveAgentsPathsToLog(const std::string &agentsFile, int makespan, int flowtime)
 {
-    logger->writeToLogAgentsPaths(agentsPaths, agentsFile, makespan, flowtime);
+    logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, makespan, flowtime);
     logger->saveLog();
 }
 

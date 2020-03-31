@@ -31,7 +31,8 @@ public:
                                      std::map<int, double> timeflows,
                                      std::map<int, double> times);
 
-    void writeToLogAgentsPaths(const std::vector<std::vector<Node>>& agentsPaths,
+    void writeToLogAgentsPaths(const AgentSet& agentSet,
+                               const std::vector<std::vector<Node>>& agentsPaths,
                                const std::string &agentsFile, int makespan, int flowtime);
 
     void writeToLogNotFound();

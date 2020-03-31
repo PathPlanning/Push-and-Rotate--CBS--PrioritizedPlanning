@@ -144,28 +144,46 @@ void XmlLogger::writeToLogMap(const Map &map, const std::list<Node> &path)
     }
 }
 
-void XmlLogger::writeToLogAgentsPaths(const std::vector<std::vector<Node>>& agentsPaths,
+void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
+                                      const std::vector<std::vector<Node>>& agentsPaths,
                                       const std::string &agentsFile, int makespan, int flowtime) {
     XMLElement *log = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG);
 
-    XMLElement *pathsTag = doc.NewElement(CNS_TAG_PATHS);
-    pathsTag->SetAttribute(CNS_TAG_ATTR_COUNT, int(agentsPaths.size()));
-    pathsTag->SetAttribute(CNS_TAG_ATTR_MAKESPAN, makespan);
-    pathsTag->SetAttribute(CNS_TAG_ATTR_FLOWTIME, flowtime);
-    pathsTag->SetAttribute(CNS_TAG_AGENTS_FILE, agentsFile.c_str());
-    for (int i = 0; i < agentsPaths.size(); ++i) {
-        XMLElement *element = doc.NewElement(CNS_TAG_AGENT);
-        element->SetAttribute(CNS_TAG_ATTR_NUM, i);
-        std::stringstream stream;
-        for (Node node: agentsPaths[i]) {
-            stream << static_cast<char>('A' + node.i) << std::setfill('0') <<
-                      std::setw(1) << node.j << CNS_OTHER_POSITIONSEPARATOR;
-        }
-        element->InsertEndChild(doc.NewText(stream.str().c_str()));
-        pathsTag->InsertEndChild(element);
-    }
+    XMLElement *taskFileElement = doc.NewElement(CNS_TAG_TASKFN);
+    taskFileElement->SetText(agentsFile.c_str());
+    log->InsertEndChild(taskFileElement);
 
-    log->InsertEndChild(pathsTag);
+    XMLElement *summaryElement = doc.NewElement(CNS_TAG_SUMMARY);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_COUNT, int(agentsPaths.size()));
+    summaryElement->SetAttribute(CNS_TAG_ATTR_MAKESPAN, makespan);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_FLOWTIME, flowtime);
+    log->InsertEndChild(summaryElement);
+
+    for (int i = 0; i < agentsPaths.size(); ++i) {
+        Agent agent = agentSet.getAgent(i);
+        XMLElement *agentElement = doc.NewElement(CNS_TAG_AGENT);
+        agentElement->SetAttribute(CNS_TAG_ATTR_ID, i);
+        agentElement->SetAttribute(CNS_TAG_ATTR_STARTX, agent.getStart_i());
+        agentElement->SetAttribute(CNS_TAG_ATTR_STARTY, agent.getStart_j());
+        agentElement->SetAttribute(CNS_TAG_ATTR_GOALX, agent.getGoal_i());
+        agentElement->SetAttribute(CNS_TAG_ATTR_GOALY, agent.getGoal_j());
+
+        XMLElement *pathElement = doc.NewElement(CNS_TAG_PATH);
+        pathElement->SetAttribute(CNS_TAG_ATTR_PATH_FOUND, "true");
+
+        for (int j = 0; j < agentsPaths[i].size() - 1; ++j) {
+            XMLElement *sectionElement = doc.NewElement(CNS_TAG_SECTION);
+            Node curNode = agentsPaths[i][j], nextNode = agentsPaths[i][j + 1];
+            sectionElement->SetAttribute(CNS_TAG_ATTR_ID, j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTX, curNode.i);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTY, curNode.j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALX, nextNode.i);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALY, nextNode.j);
+            pathElement->InsertEndChild(sectionElement);
+        }
+        agentElement->InsertEndChild(pathElement);
+        log->InsertEndChild(agentElement);
+    }
 }
 
 void XmlLogger::writeToLogAggregatedResults(std::map<int, int> successCount,

@@ -38,23 +38,223 @@
     </options>
     <log>
         <mapfilename>empty_single.xml</mapfilename>
-        <paths agents_count="16" makespan="21" flowtime="168" agents_file="empty-16-16-random-1.xml">
-            <agent number="0">I13,I12,I11,I10,H10,H9,H8,</agent>
-            <agent number="1">C15,C14,C13,C12,C11,C10,C9,C8,C7,C6,C5,C4,D4,D3,D2,E2,F2,G2,H2,I2,J2,</agent>
-            <agent number="2">E5,D5,C5,B5,B6,B7,B8,B9,B10,B11,B12,</agent>
-            <agent number="3">I3,H3,G3,F3,E3,D3,C3,B3,B4,B5,B6,B7,</agent>
-            <agent number="4">L8,K8,K9,K10,K11,K12,K13,K14,K15,</agent>
-            <agent number="5">P3,O3,N3,M3,L3,K3,J3,I3,I4,I5,I6,I7,I8,I9,H9,H10,H11,H12,</agent>
-            <agent number="6">N14,M14,L14,L13,L12,L11,L10,</agent>
-            <agent number="7">A8,A9,B9,C9,D9,E9,F9,</agent>
-            <agent number="8">B6,B7,B8,B9,B10,B11,B12,B13,B14,</agent>
-            <agent number="9">D12,C12,C11,C10,C9,C8,C7,C6,C5,C4,C3,</agent>
-            <agent number="10">C2,B2,A2,A3,A4,A5,A6,</agent>
-            <agent number="11">I10,I9,I8,I7,J7,K7,L7,M7,N7,</agent>
-            <agent number="12">F12,F11,G11,H11,I11,</agent>
-            <agent number="13">H13,H12,H11,I11,J11,K11,L11,</agent>
-            <agent number="14">J7,J8,J9,J10,K10,L10,M10,M11,M12,M13,</agent>
-            <agent number="15">G10,G9,G8,G7,G6,G5,G4,G3,G2,G1,H1,I1,J1,K1,L1,M1,N1,O1,</agent>
-        </paths>
+        <taskfilename>empty-16-16-random-1.xml</taskfilename>
+        <summary agents_count="16" makespan="21" flowtime="168"/>
+        <agent id="0" start.x="8" start.y="13" goal.x="7" goal.y="8">
+            <path pathfound="true">
+                <section id="0" start.x="8" start.y="13" goal.x="8" goal.y="12"/>
+                <section id="1" start.x="8" start.y="12" goal.x="8" goal.y="11"/>
+                <section id="2" start.x="8" start.y="11" goal.x="8" goal.y="10"/>
+                <section id="3" start.x="8" start.y="10" goal.x="7" goal.y="10"/>
+                <section id="4" start.x="7" start.y="10" goal.x="7" goal.y="9"/>
+                <section id="5" start.x="7" start.y="9" goal.x="7" goal.y="8"/>
+            </path>
+        </agent>
+        <agent id="1" start.x="2" start.y="15" goal.x="9" goal.y="2">
+            <path pathfound="true">
+                <section id="0" start.x="2" start.y="15" goal.x="2" goal.y="14"/>
+                <section id="1" start.x="2" start.y="14" goal.x="2" goal.y="13"/>
+                <section id="2" start.x="2" start.y="13" goal.x="2" goal.y="12"/>
+                <section id="3" start.x="2" start.y="12" goal.x="2" goal.y="11"/>
+                <section id="4" start.x="2" start.y="11" goal.x="2" goal.y="10"/>
+                <section id="5" start.x="2" start.y="10" goal.x="2" goal.y="9"/>
+                <section id="6" start.x="2" start.y="9" goal.x="2" goal.y="8"/>
+                <section id="7" start.x="2" start.y="8" goal.x="2" goal.y="7"/>
+                <section id="8" start.x="2" start.y="7" goal.x="2" goal.y="6"/>
+                <section id="9" start.x="2" start.y="6" goal.x="2" goal.y="5"/>
+                <section id="10" start.x="2" start.y="5" goal.x="2" goal.y="4"/>
+                <section id="11" start.x="2" start.y="4" goal.x="3" goal.y="4"/>
+                <section id="12" start.x="3" start.y="4" goal.x="3" goal.y="3"/>
+                <section id="13" start.x="3" start.y="3" goal.x="3" goal.y="2"/>
+                <section id="14" start.x="3" start.y="2" goal.x="4" goal.y="2"/>
+                <section id="15" start.x="4" start.y="2" goal.x="5" goal.y="2"/>
+                <section id="16" start.x="5" start.y="2" goal.x="6" goal.y="2"/>
+                <section id="17" start.x="6" start.y="2" goal.x="7" goal.y="2"/>
+                <section id="18" start.x="7" start.y="2" goal.x="8" goal.y="2"/>
+                <section id="19" start.x="8" start.y="2" goal.x="9" goal.y="2"/>
+            </path>
+        </agent>
+        <agent id="2" start.x="4" start.y="5" goal.x="1" goal.y="12">
+            <path pathfound="true">
+                <section id="0" start.x="4" start.y="5" goal.x="3" goal.y="5"/>
+                <section id="1" start.x="3" start.y="5" goal.x="2" goal.y="5"/>
+                <section id="2" start.x="2" start.y="5" goal.x="1" goal.y="5"/>
+                <section id="3" start.x="1" start.y="5" goal.x="1" goal.y="6"/>
+                <section id="4" start.x="1" start.y="6" goal.x="1" goal.y="7"/>
+                <section id="5" start.x="1" start.y="7" goal.x="1" goal.y="8"/>
+                <section id="6" start.x="1" start.y="8" goal.x="1" goal.y="9"/>
+                <section id="7" start.x="1" start.y="9" goal.x="1" goal.y="10"/>
+                <section id="8" start.x="1" start.y="10" goal.x="1" goal.y="11"/>
+                <section id="9" start.x="1" start.y="11" goal.x="1" goal.y="12"/>
+            </path>
+        </agent>
+        <agent id="3" start.x="8" start.y="3" goal.x="1" goal.y="7">
+            <path pathfound="true">
+                <section id="0" start.x="8" start.y="3" goal.x="7" goal.y="3"/>
+                <section id="1" start.x="7" start.y="3" goal.x="6" goal.y="3"/>
+                <section id="2" start.x="6" start.y="3" goal.x="5" goal.y="3"/>
+                <section id="3" start.x="5" start.y="3" goal.x="4" goal.y="3"/>
+                <section id="4" start.x="4" start.y="3" goal.x="3" goal.y="3"/>
+                <section id="5" start.x="3" start.y="3" goal.x="2" goal.y="3"/>
+                <section id="6" start.x="2" start.y="3" goal.x="1" goal.y="3"/>
+                <section id="7" start.x="1" start.y="3" goal.x="1" goal.y="4"/>
+                <section id="8" start.x="1" start.y="4" goal.x="1" goal.y="5"/>
+                <section id="9" start.x="1" start.y="5" goal.x="1" goal.y="6"/>
+                <section id="10" start.x="1" start.y="6" goal.x="1" goal.y="7"/>
+            </path>
+        </agent>
+        <agent id="4" start.x="11" start.y="8" goal.x="10" goal.y="15">
+            <path pathfound="true">
+                <section id="0" start.x="11" start.y="8" goal.x="10" goal.y="8"/>
+                <section id="1" start.x="10" start.y="8" goal.x="10" goal.y="9"/>
+                <section id="2" start.x="10" start.y="9" goal.x="10" goal.y="10"/>
+                <section id="3" start.x="10" start.y="10" goal.x="10" goal.y="11"/>
+                <section id="4" start.x="10" start.y="11" goal.x="10" goal.y="12"/>
+                <section id="5" start.x="10" start.y="12" goal.x="10" goal.y="13"/>
+                <section id="6" start.x="10" start.y="13" goal.x="10" goal.y="14"/>
+                <section id="7" start.x="10" start.y="14" goal.x="10" goal.y="15"/>
+            </path>
+        </agent>
+        <agent id="5" start.x="15" start.y="3" goal.x="7" goal.y="12">
+            <path pathfound="true">
+                <section id="0" start.x="15" start.y="3" goal.x="14" goal.y="3"/>
+                <section id="1" start.x="14" start.y="3" goal.x="13" goal.y="3"/>
+                <section id="2" start.x="13" start.y="3" goal.x="12" goal.y="3"/>
+                <section id="3" start.x="12" start.y="3" goal.x="11" goal.y="3"/>
+                <section id="4" start.x="11" start.y="3" goal.x="10" goal.y="3"/>
+                <section id="5" start.x="10" start.y="3" goal.x="9" goal.y="3"/>
+                <section id="6" start.x="9" start.y="3" goal.x="8" goal.y="3"/>
+                <section id="7" start.x="8" start.y="3" goal.x="8" goal.y="4"/>
+                <section id="8" start.x="8" start.y="4" goal.x="8" goal.y="5"/>
+                <section id="9" start.x="8" start.y="5" goal.x="8" goal.y="6"/>
+                <section id="10" start.x="8" start.y="6" goal.x="8" goal.y="7"/>
+                <section id="11" start.x="8" start.y="7" goal.x="8" goal.y="8"/>
+                <section id="12" start.x="8" start.y="8" goal.x="8" goal.y="9"/>
+                <section id="13" start.x="8" start.y="9" goal.x="7" goal.y="9"/>
+                <section id="14" start.x="7" start.y="9" goal.x="7" goal.y="10"/>
+                <section id="15" start.x="7" start.y="10" goal.x="7" goal.y="11"/>
+                <section id="16" start.x="7" start.y="11" goal.x="7" goal.y="12"/>
+            </path>
+        </agent>
+        <agent id="6" start.x="13" start.y="14" goal.x="11" goal.y="10">
+            <path pathfound="true">
+                <section id="0" start.x="13" start.y="14" goal.x="12" goal.y="14"/>
+                <section id="1" start.x="12" start.y="14" goal.x="11" goal.y="14"/>
+                <section id="2" start.x="11" start.y="14" goal.x="11" goal.y="13"/>
+                <section id="3" start.x="11" start.y="13" goal.x="11" goal.y="12"/>
+                <section id="4" start.x="11" start.y="12" goal.x="11" goal.y="11"/>
+                <section id="5" start.x="11" start.y="11" goal.x="11" goal.y="10"/>
+            </path>
+        </agent>
+        <agent id="7" start.x="0" start.y="8" goal.x="5" goal.y="9">
+            <path pathfound="true">
+                <section id="0" start.x="0" start.y="8" goal.x="0" goal.y="9"/>
+                <section id="1" start.x="0" start.y="9" goal.x="1" goal.y="9"/>
+                <section id="2" start.x="1" start.y="9" goal.x="2" goal.y="9"/>
+                <section id="3" start.x="2" start.y="9" goal.x="3" goal.y="9"/>
+                <section id="4" start.x="3" start.y="9" goal.x="4" goal.y="9"/>
+                <section id="5" start.x="4" start.y="9" goal.x="5" goal.y="9"/>
+            </path>
+        </agent>
+        <agent id="8" start.x="1" start.y="6" goal.x="1" goal.y="14">
+            <path pathfound="true">
+                <section id="0" start.x="1" start.y="6" goal.x="1" goal.y="7"/>
+                <section id="1" start.x="1" start.y="7" goal.x="1" goal.y="8"/>
+                <section id="2" start.x="1" start.y="8" goal.x="1" goal.y="9"/>
+                <section id="3" start.x="1" start.y="9" goal.x="1" goal.y="10"/>
+                <section id="4" start.x="1" start.y="10" goal.x="1" goal.y="11"/>
+                <section id="5" start.x="1" start.y="11" goal.x="1" goal.y="12"/>
+                <section id="6" start.x="1" start.y="12" goal.x="1" goal.y="13"/>
+                <section id="7" start.x="1" start.y="13" goal.x="1" goal.y="14"/>
+            </path>
+        </agent>
+        <agent id="9" start.x="3" start.y="12" goal.x="2" goal.y="3">
+            <path pathfound="true">
+                <section id="0" start.x="3" start.y="12" goal.x="2" goal.y="12"/>
+                <section id="1" start.x="2" start.y="12" goal.x="2" goal.y="11"/>
+                <section id="2" start.x="2" start.y="11" goal.x="2" goal.y="10"/>
+                <section id="3" start.x="2" start.y="10" goal.x="2" goal.y="9"/>
+                <section id="4" start.x="2" start.y="9" goal.x="2" goal.y="8"/>
+                <section id="5" start.x="2" start.y="8" goal.x="2" goal.y="7"/>
+                <section id="6" start.x="2" start.y="7" goal.x="2" goal.y="6"/>
+                <section id="7" start.x="2" start.y="6" goal.x="2" goal.y="5"/>
+                <section id="8" start.x="2" start.y="5" goal.x="2" goal.y="4"/>
+                <section id="9" start.x="2" start.y="4" goal.x="2" goal.y="3"/>
+            </path>
+        </agent>
+        <agent id="10" start.x="2" start.y="2" goal.x="0" goal.y="6">
+            <path pathfound="true">
+                <section id="0" start.x="2" start.y="2" goal.x="1" goal.y="2"/>
+                <section id="1" start.x="1" start.y="2" goal.x="0" goal.y="2"/>
+                <section id="2" start.x="0" start.y="2" goal.x="0" goal.y="3"/>
+                <section id="3" start.x="0" start.y="3" goal.x="0" goal.y="4"/>
+                <section id="4" start.x="0" start.y="4" goal.x="0" goal.y="5"/>
+                <section id="5" start.x="0" start.y="5" goal.x="0" goal.y="6"/>
+            </path>
+        </agent>
+        <agent id="11" start.x="8" start.y="10" goal.x="13" goal.y="7">
+            <path pathfound="true">
+                <section id="0" start.x="8" start.y="10" goal.x="8" goal.y="9"/>
+                <section id="1" start.x="8" start.y="9" goal.x="8" goal.y="8"/>
+                <section id="2" start.x="8" start.y="8" goal.x="8" goal.y="7"/>
+                <section id="3" start.x="8" start.y="7" goal.x="9" goal.y="7"/>
+                <section id="4" start.x="9" start.y="7" goal.x="10" goal.y="7"/>
+                <section id="5" start.x="10" start.y="7" goal.x="11" goal.y="7"/>
+                <section id="6" start.x="11" start.y="7" goal.x="12" goal.y="7"/>
+                <section id="7" start.x="12" start.y="7" goal.x="13" goal.y="7"/>
+            </path>
+        </agent>
+        <agent id="12" start.x="5" start.y="12" goal.x="8" goal.y="11">
+            <path pathfound="true">
+                <section id="0" start.x="5" start.y="12" goal.x="5" goal.y="11"/>
+                <section id="1" start.x="5" start.y="11" goal.x="6" goal.y="11"/>
+                <section id="2" start.x="6" start.y="11" goal.x="7" goal.y="11"/>
+                <section id="3" start.x="7" start.y="11" goal.x="8" goal.y="11"/>
+            </path>
+        </agent>
+        <agent id="13" start.x="7" start.y="13" goal.x="11" goal.y="11">
+            <path pathfound="true">
+                <section id="0" start.x="7" start.y="13" goal.x="7" goal.y="12"/>
+                <section id="1" start.x="7" start.y="12" goal.x="7" goal.y="11"/>
+                <section id="2" start.x="7" start.y="11" goal.x="8" goal.y="11"/>
+                <section id="3" start.x="8" start.y="11" goal.x="9" goal.y="11"/>
+                <section id="4" start.x="9" start.y="11" goal.x="10" goal.y="11"/>
+                <section id="5" start.x="10" start.y="11" goal.x="11" goal.y="11"/>
+            </path>
+        </agent>
+        <agent id="14" start.x="9" start.y="7" goal.x="12" goal.y="13">
+            <path pathfound="true">
+                <section id="0" start.x="9" start.y="7" goal.x="9" goal.y="8"/>
+                <section id="1" start.x="9" start.y="8" goal.x="9" goal.y="9"/>
+                <section id="2" start.x="9" start.y="9" goal.x="9" goal.y="10"/>
+                <section id="3" start.x="9" start.y="10" goal.x="10" goal.y="10"/>
+                <section id="4" start.x="10" start.y="10" goal.x="11" goal.y="10"/>
+                <section id="5" start.x="11" start.y="10" goal.x="12" goal.y="10"/>
+                <section id="6" start.x="12" start.y="10" goal.x="12" goal.y="11"/>
+                <section id="7" start.x="12" start.y="11" goal.x="12" goal.y="12"/>
+                <section id="8" start.x="12" start.y="12" goal.x="12" goal.y="13"/>
+            </path>
+        </agent>
+        <agent id="15" start.x="6" start.y="10" goal.x="14" goal.y="1">
+            <path pathfound="true">
+                <section id="0" start.x="6" start.y="10" goal.x="6" goal.y="9"/>
+                <section id="1" start.x="6" start.y="9" goal.x="6" goal.y="8"/>
+                <section id="2" start.x="6" start.y="8" goal.x="6" goal.y="7"/>
+                <section id="3" start.x="6" start.y="7" goal.x="6" goal.y="6"/>
+                <section id="4" start.x="6" start.y="6" goal.x="6" goal.y="5"/>
+                <section id="5" start.x="6" start.y="5" goal.x="6" goal.y="4"/>
+                <section id="6" start.x="6" start.y="4" goal.x="6" goal.y="3"/>
+                <section id="7" start.x="6" start.y="3" goal.x="6" goal.y="2"/>
+                <section id="8" start.x="6" start.y="2" goal.x="6" goal.y="1"/>
+                <section id="9" start.x="6" start.y="1" goal.x="7" goal.y="1"/>
+                <section id="10" start.x="7" start.y="1" goal.x="8" goal.y="1"/>
+                <section id="11" start.x="8" start.y="1" goal.x="9" goal.y="1"/>
+                <section id="12" start.x="9" start.y="1" goal.x="10" goal.y="1"/>
+                <section id="13" start.x="10" start.y="1" goal.x="11" goal.y="1"/>
+                <section id="14" start.x="11" start.y="1" goal.x="12" goal.y="1"/>
+                <section id="15" start.x="12" start.y="1" goal.x="13" goal.y="1"/>
+                <section id="16" start.x="13" start.y="1" goal.x="14" goal.y="1"/>
+            </path>
+        </agent>
     </log>
 </root>
