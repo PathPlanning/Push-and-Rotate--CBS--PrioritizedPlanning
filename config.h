@@ -25,6 +25,7 @@ class Config
         int             ppOrder;
         bool            parallelizePaths;
         bool            singleExecution;
+        bool            withCardinalConflicts;
 };
 
 #endif

@@ -321,6 +321,7 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
     options->FirstChildElement(CNS_TAG_PAR_PATHS)->QueryBoolText(&parallelizePaths);
     options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
+    options->FirstChildElement(CNS_TAG_CARD_CONF)->QueryBoolText(&withCardinalConflicts);
 
     return true;
 }

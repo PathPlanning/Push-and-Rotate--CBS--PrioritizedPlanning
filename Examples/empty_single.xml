@@ -29,6 +29,7 @@
       <agents_range min="1" max="16"/>
       <maxtime>1000</maxtime>
       <with_cat>true</with_cat>
+      <with_card_conf>true</with_card_conf>
       <with_perfect_h>false</with_perfect_h>
       <pp_order>2</pp_order>
       <parallelize_paths>true</parallelize_paths>

@@ -179,6 +179,7 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
             sectionElement->SetAttribute(CNS_TAG_ATTR_STARTY, curNode.j);
             sectionElement->SetAttribute(CNS_TAG_ATTR_GOALX, nextNode.i);
             sectionElement->SetAttribute(CNS_TAG_ATTR_GOALY, nextNode.j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_DUR, 1);
             pathElement->InsertEndChild(sectionElement);
         }
         agentElement->InsertEndChild(pathElement);

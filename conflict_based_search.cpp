@@ -22,7 +22,7 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
                                         const std::vector<int> &costs, ConstraintsSet &constraints, int agentId,
                                         const Node &pos1, const Node &pos2,
                                         std::list<Node>::iterator pathStart, std::list<Node>::iterator pathEnd,
-                                        ConflictAvoidanceTable& CAT, bool withCAT,
+                                        ConflictAvoidanceTable& CAT, bool withCAT, bool withCardinalConflicts,
                                         CBSNode *parentPtr) {
     Constraint constraint(pos1.i, pos1.j, conflict.time, agentId);
     if (conflict.edgeConflict) {
@@ -54,11 +54,14 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
     }
     node.constraint = constraint;
     node.parent = parentPtr;
+    if (withCardinalConflicts) {
+        node.mdds[agentId] = MDD(map, agentSet, search, agentId, searchResult.pathlength, agentConstraints);
+    }
     return node;
 }
 
 MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
-    // std::cout << agentSet.getAgentCount() << std::endl;
+    std::cout << agentSet.getAgentCount() << std::endl;
 
     CBSNode root;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -76,6 +79,9 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         }
         root.cost += searchResult.pathlength;
         root.paths[i] = *searchResult.lppath;
+        if (config.withCardinalConflicts) {
+            root.mdds[i] = MDD(map, agentSet, search, i, searchResult.pathlength);
+        }
     }
 
     MultiagentSearchResult result(false);
@@ -99,6 +105,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         std::vector<std::list<Node>::iterator> starts(agentCount), ends(agentCount);
         ConstraintsSet constraints;
         ConflictAvoidanceTable CAT;
+        std::vector<MDD> mdds(agentCount);
         for (CBSNode *ptr = &cur; ptr != nullptr; ptr = ptr->parent) {
             for (auto it = ptr->paths.begin(); it != ptr->paths.end(); ++it) {
                 if (!agentFound[it->first]) {
@@ -110,6 +117,10 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
                     if (config.withCAT) {
                         CAT.addAgentPath(starts[it->first], ends[it->first], map);
                     }
+
+                    if (config.withCardinalConflicts) {
+                        mdds[it->first] = ptr->mdds.find(it->first)->second;
+                    }
                 }
             }
             if (ptr->id != 0) {
@@ -117,7 +128,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
             }
         }
 
-        Conflict conflict = Conflict::findConflict<std::list<Node>::iterator>(starts, ends);
+        Conflict conflict = findConflict<std::list<Node>::iterator>(starts, ends, config.withCardinalConflicts, mdds);
         if (!conflict.conflictFound) {
             agentsPaths.resize(agentCount);
             for (int i = 0; i < agentCount; ++i) {
@@ -135,10 +146,13 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         }
 
         open.insert(createNode(map, agentSet, conflict, costs, constraints, conflict.id1, conflict.pos2, conflict.pos1,
-                               starts[conflict.id1], ends[conflict.id1], CAT, config.withCAT, &close.back()));
+                               starts[conflict.id1], ends[conflict.id1], CAT, config.withCAT,
+                               config.withCardinalConflicts, &close.back()));
         open.insert(createNode(map, agentSet, conflict, costs, constraints, conflict.id2, conflict.pos1, conflict.pos2,
-                               starts[conflict.id2], ends[conflict.id2], CAT, config.withCAT, &close.back()));
+                               starts[conflict.id2], ends[conflict.id2], CAT, config.withCAT,
+                               config.withCardinalConflicts, &close.back()));
     }
+    // std::cout << close.size() << std::endl;
     return result;
 }
 

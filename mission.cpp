@@ -168,7 +168,7 @@ bool Mission::checkCorrectness() {
             }
         }
     }
-    Conflict conflict = Conflict::findConflict<std::vector<Node>::iterator>(starts, ends);
+    Conflict conflict = ConflictBasedSearch::findConflict<std::vector<Node>::iterator>(starts, ends);
     if (conflict.conflictFound) {
         if (conflict.edgeConflict) {
             std::cout << "Incorrect result: two agents swap positions!" << std::endl;

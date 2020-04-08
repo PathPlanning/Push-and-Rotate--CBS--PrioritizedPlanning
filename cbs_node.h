@@ -6,6 +6,7 @@
 #include <list>
 #include "node.h"
 #include "constraint.h"
+#include "mdd.h"
 
 struct CBSNode
 {
@@ -13,6 +14,7 @@ struct CBSNode
 
     Constraint                                  constraint;
     std::unordered_map<int, std::list<Node>>    paths;
+    std::unordered_map<int, MDD>                mdds;
     CBSNode*                                    parent;
     int                                         cost;
     int                                         id;

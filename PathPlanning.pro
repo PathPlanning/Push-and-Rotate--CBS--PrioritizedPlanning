@@ -26,6 +26,7 @@ SOURCES += \
     conflict_avoidance_table.cpp \
     conflict_based_search.cpp \
     constraints_set.cpp \
+    mdd.cpp \
     prioritized_planning.cpp \
     push_and_rotate.cpp \
     tinyxml2.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     conflict_based_search.h \
     constraint.h \
     constraints_set.h \
+    mdd.h \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \
