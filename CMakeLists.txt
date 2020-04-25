@@ -14,6 +14,7 @@ set(SOURCE_FILES
         isearch.cpp
         mission.cpp
         map.cpp
+        mdd.cpp
         dijkstra.cpp
         config.cpp
         astar.cpp
