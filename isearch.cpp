@@ -19,13 +19,16 @@ bool Node::breakingties;
 SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
                                   int start_i, int start_j, int goal_i, int goal_j,
                                   bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&),
-                                  bool freshStart, bool returnPath, int maxDepth,
+                                  bool freshStart, bool returnPath, int startDepth, int goalDepth, int maxDepth,
                                   const std::unordered_set<Node> &occupiedNodes,
                                   const ConstraintsSet &constraints,
                                   const ConflictAvoidanceTable &CAT)
 {
     sresult.pathfound = false;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    if (goalDepth != -1) {
+        maxDepth = goalDepth;
+    }
     Node cur;
     int fin_i, fin_j, fin_depth;
     int agentId = -1;
@@ -40,19 +43,28 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
         Node::breakingties = breakingties;
         sresult.numberofsteps = 0;
         cur = Node(start_i, start_j, nullptr, 0,
-                 computeHFromCellToCell(start_i, start_j, goal_i, goal_j));
-        sortByIndex[convolution(cur.i, cur.j, map)] = cur;
+                 computeHFromCellToCell(start_i, start_j, goal_i, goal_j), startDepth);
+        sortByIndex[convolution(cur.i, cur.j, map, cur.depth, withTime)] = cur;
         open.insert(cur);
     }
 
     while(!open.empty()) {
         ++sresult.numberofsteps;
+        if (sresult.numberofsteps % 100000 == 0) {
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+            if (elapsedMilliseconds > 10000) {
+                break;
+            }
+        }
+
         auto curIt = open.begin();
         cur = *open.begin();
         close[convolution(cur.i, cur.j, map, cur.depth, withTime)] = cur;
         Node *curPtr = &(close.find(convolution(cur.i, cur.j, map, cur.depth, withTime))->second);
         if ((isGoal != nullptr && isGoal(Node(start_i, start_j), cur, map, agentSet)) ||
-            (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j)) {
+            (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j) &&
+             (goalDepth == -1 || cur.depth == goalDepth)) {
             if (!constraints.hasFutureConstraint(cur.i, cur.j, cur.depth, agentId)) {
                 if (!freshStart) {
                     freshStart = true;

@@ -25,6 +25,7 @@ SOURCES += \
     agent_set.cpp \
     conflict_avoidance_table.cpp \
     conflict_based_search.cpp \
+    conflict_set.cpp \
     constraints_set.cpp \
     mdd.cpp \
     prioritized_planning.cpp \
@@ -48,6 +49,7 @@ HEADERS += \
     conflict.h \
     conflict_avoidance_table.h \
     conflict_based_search.h \
+    conflict_set.h \
     constraint.h \
     constraints_set.h \
     mdd.h \

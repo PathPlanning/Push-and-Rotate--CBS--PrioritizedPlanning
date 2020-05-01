@@ -113,7 +113,7 @@ void Mission::startSearch(const std::string &agentsFile)
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, makespan, timeflow);
         }
-        if (!checkCorrectness()) {
+        if (false && !checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
             break;
         }
@@ -168,8 +168,9 @@ bool Mission::checkCorrectness() {
             }
         }
     }
-    Conflict conflict = ConflictBasedSearch::findConflict<std::vector<Node>::iterator>(starts, ends);
-    if (conflict.conflictFound) {
+    ConflictSet conflictSet = ConflictBasedSearch::findConflict<std::vector<Node>::iterator>(starts, ends);
+    if (!conflictSet.empty()) {
+        Conflict conflict = conflictSet.getBestConflict();
         if (conflict.edgeConflict) {
             std::cout << "Incorrect result: two agents swap positions!" << std::endl;
         } else {

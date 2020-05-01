@@ -31,8 +31,12 @@
       <with_cat>true</with_cat>
       <with_perfect_h>false</with_perfect_h>
       <with_card_conf>true</with_card_conf>
+      <with_bypassing>true</with_bypassing>
+      <with_matching_h>true</with_matching_h>
+      <with_disjoint_splitting>true</with_disjoint_splitting>
       <pp_order>2</pp_order>
-      <parallelize_paths>true</parallelize_paths>
+      <parallelize_paths_1>true</parallelize_paths_1>
+      <parallelize_paths_2>true</parallelize_paths_2>
       <single_execution>false</single_execution>
       <logpath />
       <logfilename />

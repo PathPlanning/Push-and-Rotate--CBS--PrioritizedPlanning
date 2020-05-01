@@ -319,9 +319,16 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
     options->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
     options->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
-    options->FirstChildElement(CNS_TAG_PAR_PATHS)->QueryBoolText(&parallelizePaths);
+    options->FirstChildElement(CNS_TAG_PAR_PATHS_1)->QueryBoolText(&parallelizePaths1);
+    options->FirstChildElement(CNS_TAG_PAR_PATHS_2)->QueryBoolText(&parallelizePaths2);
     options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
     options->FirstChildElement(CNS_TAG_CARD_CONF)->QueryBoolText(&withCardinalConflicts);
+    options->FirstChildElement(CNS_TAG_BYPASSING)->QueryBoolText(&withBypassing);
+    options->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
+    options->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
 
+    parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
+    storeConflicts = withBypassing || withMatchingHeuristic || withDisjointSplitting;
+    withCardinalConflicts = withCardinalConflicts || withMatchingHeuristic || withDisjointSplitting;
     return true;
 }

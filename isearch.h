@@ -25,7 +25,8 @@ class ISearch
         SearchResult startSearch(const Map &map, const AgentSet &agentSet,
                                  int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
-                                 bool freshStart = true, bool returnPath = true, int maxDepth = -1,
+                                 bool freshStart = true, bool returnPath = true,
+                                 int startDepth = 0, int goalDepth = -1, int maxDepth = -1,
                                  const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
                                  const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());

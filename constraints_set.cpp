@@ -12,8 +12,14 @@ void ConstraintsSet::addEdgeConstraint(int i, int j, int time, int agentId, int 
     edgeConstraints.insert(Constraint(i, j, time, agentId, prevI, prevJ));
 }
 
+void ConstraintsSet::addPositiveConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) {
+    positiveConstraints.push_back(Constraint(i, j, time, agentId, prevI, prevJ));
+}
+
 void ConstraintsSet::addConstraint(Constraint &constraint) {
-    if (constraint.prev_i == -1) {
+    if (constraint.positive) {
+        positiveConstraints.push_back(constraint);
+    } else if (constraint.prev_i == -1) {
         if (constraint.goalNode) {
             goalNodeConstraints.insert(constraint);
         } else {
@@ -22,6 +28,18 @@ void ConstraintsSet::addConstraint(Constraint &constraint) {
     } else {
         edgeConstraints.insert(constraint);
     }
+}
+
+void ConstraintsSet::removeNodeConstraint(int i, int j, int time, int agentId) {
+    nodeConstraints.erase(Constraint(i, j, time, agentId));
+}
+
+void ConstraintsSet::removeGoalNodeConstraint(int i, int j, int time, int agentId) {
+    goalNodeConstraints.erase(Constraint(i, j, time, agentId, -1, -1, true));
+}
+
+void ConstraintsSet::removeEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) {
+    edgeConstraints.erase(Constraint(i, j, time, agentId, prevI, prevJ));
 }
 
 ConstraintsSet ConstraintsSet::getAgentConstraints(int agentId) const {
@@ -39,6 +57,11 @@ ConstraintsSet ConstraintsSet::getAgentConstraints(int agentId) const {
     for (auto constraint : goalNodeConstraints) {
         if (constraint.agentId == agentId) {
             res.goalNodeConstraints.insert(constraint);
+        }
+    }
+    for (auto constraint : positiveConstraints) {
+        if (constraint.agentId == agentId) {
+            res.positiveConstraints.push_back(constraint);
         }
     }
     return res;
@@ -63,4 +86,8 @@ bool ConstraintsSet::hasFutureConstraint(int i, int j, int time, int agentId) co
 
 bool ConstraintsSet::hasEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) const {
     return edgeConstraints.find(Constraint(i, j, time, agentId, prevI, prevJ)) != edgeConstraints.end();
+}
+
+std::vector<Constraint> ConstraintsSet::getPositiveConstraints() const {
+    return positiveConstraints;
 }

@@ -28,7 +28,7 @@ bool PushAndRotate::clearNode(const Map &map, AgentSet &agentSet, Node &nodeToCl
 
     Dijkstra dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, nodeToClear.i, nodeToClear.j, 0, 0,
-                                                    isGoal, true, true, -1, occupiedNodes);
+                                                    isGoal, true, true, 0, -1, -1, occupiedNodes);
     if (!searchResult.pathfound) {
         return false;
     }
@@ -291,7 +291,7 @@ void PushAndRotate::getPaths(AgentSet &agentSet) {
     }
 }
 
-void PushAndRotate::getParallelPaths(AgentSet &agentSet) {
+void PushAndRotate::getParallelPaths(AgentSet &agentSet, const Config &config) {
     int agentCount = agentSet.getAgentCount();
     std::vector<std::vector<Node>> agentsPositions(agentCount);
     std::vector<int> agentInd(agentCount, 0);
@@ -340,6 +340,11 @@ void PushAndRotate::getParallelPaths(AgentSet &agentSet) {
             if (hasMoved[i] || finished[i]) {
                 continue;
             }
+            if (agentsPositions[i].size() == 1) {
+                agentsPaths[i].push_back(agentsPositions[i][0]);
+                finished[i] = true;
+                continue;
+            }
 
             std::vector<int> path;
             int curAgent = i;
@@ -384,6 +389,55 @@ void PushAndRotate::getParallelPaths(AgentSet &agentSet) {
 
         if (!std::any_of(hasMoved.begin(), hasMoved.end(), [](const bool x) {return x;})) {
             break;
+        }
+    }
+
+    if (config.parallelizePaths2) {
+        ConstraintsSet constraints;
+        for (int i = 0; i < agentCount; ++i) {
+            constraints.addAgentPath<std::vector<Node>::iterator>(agentsPaths[i].begin(), agentsPaths[i].end(), i);
+        }
+        for (int i = 0; i < agentCount; ++i) {
+            constraints.removeAgentPath<std::vector<Node>::iterator>(agentsPaths[i].begin(), agentsPaths[i].end(), i);
+            std::vector<std::vector<bool>> dp(agentsPaths[i].size()), move(agentsPaths[i].size());
+            dp[0] = {true};
+            move[0] = {false};
+            int last = agentsPositions[i].size() - 2;
+            for (size_t time = 1; time < agentsPaths[i].size(); ++time) {
+                for (int j = 0; j <= time && j < agentsPositions[i].size(); ++j) {
+                    dp[time].push_back(false);
+                    move[time].push_back(false);
+                    Node curPos = agentsPositions[i][j];
+                    if (!constraints.hasNodeConstraint(curPos.i, curPos.j, time, i) &&
+                        (j < agentsPositions[i].size() - 1 || !constraints.hasFutureConstraint(curPos.i, curPos.j, time, i))) {
+                        if (j < time && dp[time - 1][j]) {
+                            dp[time][j] = true;
+                        } else if (j > 0) {
+                            Node prevPos = agentsPositions[i][j - 1];
+                            if (dp[time - 1][j - 1] &&
+                                    !constraints.hasEdgeConstraint(curPos.i, curPos.j, time, i, prevPos.i, prevPos.j)) {
+                                dp[time][j] = true;
+                                move[time][j] = true;
+                            }
+                        }
+                    }
+                }
+
+                if (dp[time].size() >= agentsPositions[i].size() && !dp[time][agentsPositions[i].size() - 1]) {
+                    last = time;
+                }
+            }
+
+            agentsPaths[i].clear();
+            int posInd = agentsPositions[i].size() - 1;
+            for (int j = last + 1; j >= 0; --j) {
+                agentsPaths[i].push_back(agentsPositions[i][posInd]);
+                if (move[j][posInd]) {
+                    --posInd;
+                }
+            }
+            std::reverse(agentsPaths[i].begin(), agentsPaths[i].end());
+            constraints.addAgentPath<std::vector<Node>::iterator>(agentsPaths[i].begin(), agentsPaths[i].end(), i);
         }
     }
 }
@@ -443,7 +497,7 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
         SearchResult searchResult = search->startSearch(map, agentSet,
                                                         curAgent.getCur_i(), curAgent.getCur_j(),
                                                         curAgent.getGoal_i(), curAgent.getGoal_j(),
-                                                        nullptr, true, true, -1,
+                                                        nullptr, true, true, 0, -1, -1,
                                                         isPolygon ? finishedPositions : std::unordered_set<Node>());
 
         if (!searchResult.pathfound) {
@@ -478,7 +532,9 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
                     qPath.pop_back();
                 }
             } else if (!push(map, agentSet, *it, *std::next(it), finishedPositions)) {
-                swap(map, agentSet, *it, *std::next(it));
+                if (!swap(map, agentSet, *it, *std::next(it))) {
+                    return false;
+                }
                 if (finished.find(agentSet.getAgentId(it->i, it->j)) != finished.end()) {
                     finishedPositions.erase(*std::next(it));
                     finishedPositions.insert(*it);
@@ -642,7 +698,7 @@ void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
                 combineNodeSubgraphs(agentSet, components, start, i);
                 Dijkstra dijkstraSearch;
                 SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                                       isGoal, true, true, m - 2, components[i]);
+                                                                       isGoal, true, true, 0, -1, m - 2, components[i]);
                 while (searchResult.pathfound) {
                     auto path = *searchResult.lppath;
                     for (auto it = std::next(path.begin()); std::next(it) != path.end(); ++it) {
@@ -665,11 +721,11 @@ int PushAndRotate::getReachableNodesCount(const Map &map, AgentSet &agentSet, No
     int res = 0;
     Dijkstra dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                           condition, true, false, -1, occupiedNodes);
+                                                           condition, true, false, 0, -1, -1, occupiedNodes);
     while (searchResult.pathfound) {
         ++res;
         searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                               condition, false, false, -1, occupiedNodes);
+                                                               condition, false, false, 0, -1, -1, occupiedNodes);
     }
     return res;
 }
@@ -716,7 +772,7 @@ void PushAndRotate::assignToSubgraphs(const Map &map, AgentSet &agentSet) {
                     };
                     Dijkstra dijkstraSearch;
                     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j,
-                                                                           0, 0, isGoal, true, true, -1, {pos});
+                                                                           0, 0, isGoal, true, true, 0, -1, -1, {pos});
                     auto path = *searchResult.lppath;
                     int agentCount = 0;
                     for (auto node : path) {
@@ -764,7 +820,7 @@ void PushAndRotate::getPriorities(const Map &map, AgentSet &agentSet) {
                 if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {
                     Dijkstra dijkstraSearch;
                     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j,
-                                                                           0, 0, isGoal, true, true, -1, {Node(i, j)});
+                                                                           0, 0, isGoal, true, true, 0, -1, -1, {Node(i, j)});
                     if (!searchResult.pathfound) {
                         continue;
                     }
@@ -792,7 +848,7 @@ void PushAndRotate::getPriorities(const Map &map, AgentSet &agentSet) {
 
 
 MultiagentSearchResult PushAndRotate::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
-    //std::cout << agentSet.getAgentCount() << std::endl;
+    std::cout << agentSet.getAgentCount() << std::endl;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     getSubgraphs(map, agentSet);
@@ -813,17 +869,19 @@ MultiagentSearchResult PushAndRotate::startSearch(const Map &map, const Config &
     getPriorities(map, agentSet);
 
     result.pathfound = solve(map, config, agentSet, begin);
+    if (result.pathfound) {
+        if (config.parallelizePaths1) {
+            getParallelPaths(agentSet, config);
+        } else {
+            getPaths(agentSet);
+        }
+    }
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     if (elapsedMilliseconds > config.maxTime) {
         result.pathfound = false;
     }
     if (result.pathfound) {
-        if (config.parallelizePaths) {
-            getParallelPaths(agentSet);
-        } else {
-            getPaths(agentSet);
-        }
         result.agentsMoves = &agentsMoves;
         result.agentsPaths = &agentsPaths;
         result.time = static_cast<double>(elapsedMilliseconds) / 1000;

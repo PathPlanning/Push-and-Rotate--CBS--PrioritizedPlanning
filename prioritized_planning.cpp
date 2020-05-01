@@ -22,7 +22,7 @@ void PrioritizedPlanning::clear() {
 
 MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    std::cout << agentSet.getAgentCount() << std::endl;
+    // std::cout << agentSet.getAgentCount() << std::endl;
 
     if (config.withPerfectHeuristic) {
         search->getPerfectHeuristic(map, agentSet);
@@ -63,7 +63,7 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
         Agent agent = agentSet.getAgent(i);
         SearchResult searchResult = search->startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
                                                         agent.getGoal_i(), agent.getGoal_j(), nullptr,
-                                                        true, true, maxDepth + map.getEmptyCellCount(), {}, constraints);
+                                                        true, true, 0, -1, maxDepth + map.getEmptyCellCount(), {}, constraints);
         if (!searchResult.pathfound) {
             return result;
         }
