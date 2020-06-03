@@ -72,4 +72,5 @@ HEADERS += \
 
 DISTFILES += \
     CMakeLists.txt \
+    README-EN.md \
     README.md
