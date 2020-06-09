@@ -16,6 +16,9 @@ struct CBSNode
     Constraint                                  constraint, positiveConstraint;
     std::unordered_map<int, std::list<Node>>    paths;
     std::unordered_map<int, MDD>                mdds;
+    std::unordered_map<int, double>             lb;
+    double                                      sumLb;
+    int                                         hc;
     CBSNode*                                    parent;
     ConflictSet                                 conflictSet;
     int                                         cost;
@@ -31,6 +34,8 @@ struct CBSNode
         H = 0;
         hasPositiveConstraint = false;
         pathFound = true;
+        hc = 0;
+        sumLb = 0;
     }
 
     CBSNode(bool PathFound) {

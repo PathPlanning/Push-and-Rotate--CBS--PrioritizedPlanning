@@ -113,7 +113,7 @@ void Mission::startSearch(const std::string &agentsFile)
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, makespan, timeflow);
         }
-        if (false && !checkCorrectness()) {
+        if (!checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
             break;
         }

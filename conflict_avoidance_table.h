@@ -5,6 +5,7 @@
 #include <list>
 #include "node.h"
 #include "map.h"
+#include "search_queue.h"
 
 class ConflictAvoidanceTable
 {

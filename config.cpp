@@ -301,8 +301,11 @@ bool Config::getConfig(const char *FileName)
 
     algorithm = options->FirstChildElement(CNS_TAG_ALG);
     value = algorithm->GetText();
-    if (value == CNS_ST_CBS) {
+    if (value == CNS_ST_CBS || value == CNS_ST_ECBS) {
         searchType = CN_ST_CBS;
+        if (value == CNS_ST_ECBS) {
+            withFocalSearch = true;
+        }
     } else if (value == CNS_ST_PR) {
         searchType = CN_ST_PR;
     } else if (value == CNS_ST_PP) {
@@ -326,9 +329,11 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_BYPASSING)->QueryBoolText(&withBypassing);
     options->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
     options->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
+    options->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
-    storeConflicts = withBypassing || withMatchingHeuristic || withDisjointSplitting;
+    storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;
     withCardinalConflicts = withCardinalConflicts || withMatchingHeuristic || withDisjointSplitting;
+    withCAT = withCAT || withFocalSearch;
     return true;
 }

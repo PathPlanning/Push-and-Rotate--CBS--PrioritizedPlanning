@@ -64,4 +64,20 @@ int ConflictSet::getMatchingHeuristic() {
     return res;
 }
 
+int ConflictSet::getConflictingPairsCount() {
+    std::set<std::pair<int, int>> conflictingPairs;
+    std::vector<std::vector<Conflict>::iterator> begins = {nonCardinal.begin(), semiCardinal.begin(), cardinal.begin()};
+    std::vector<std::vector<Conflict>::iterator> ends = {nonCardinal.end(), semiCardinal.end(), cardinal.end()};
+    for (int i = 0; i < 3; ++i) {
+        for (auto it = begins[i]; it != ends[i]; ++it) {
+            auto pair = std::make_pair(it->id1, it->id2);
+            if (pair.first > pair.second) {
+                std::swap(pair.first, pair.second);
+            }
+            conflictingPairs.insert(std::make_pair(it->id1, it->id2));
+        }
+    }
+    return conflictingPairs.size();
+}
+
 

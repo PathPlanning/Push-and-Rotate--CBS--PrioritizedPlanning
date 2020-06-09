@@ -6,6 +6,7 @@
 #include "constraint.h"
 #include "constraints_set.h"
 #include "conflict_avoidance_table.h"
+#include "search_queue.h"
 #include <list>
 #include <vector>
 #include <math.h>
@@ -27,6 +28,7 @@ class ISearch
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
                                  bool freshStart = true, bool returnPath = true,
                                  int startDepth = 0, int goalDepth = -1, int maxDepth = -1,
+                                 bool withFocal = false, double focalW = 1.0,
                                  const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
                                  const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
@@ -36,7 +38,7 @@ class ISearch
                                                const ConstraintsSet &constraints = ConstraintsSet(),
                                                const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
-        static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
+        //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
         void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
 
     protected:
@@ -68,8 +70,7 @@ class ISearch
         std::list<Node>                 lppath, hppath;
         double                          hweight;//weight of h-value
         bool                            breakingties;//flag that sets the priority of nodes in addOpen function when their F-values is equal
-        std::set<Node>                  open;
-        std::unordered_map<int, Node>   sortByIndex;
+        SearchQueue                     open;
         std::unordered_map<int, Node>   close;
         bool                            withTime;
         std::unordered_map<std::pair<Node, Node>, int> perfectHeuristic;

@@ -41,6 +41,7 @@ struct SearchResult
         unsigned int numberofsteps; //number of iterations (expansions) made by algorithm to find a solution
         double time; //runtime of the search algorithm (expanding nodes + reconstructing the path)
         Node lastNode;
+        double minF;
         SearchResult()
         {
             pathfound = false;

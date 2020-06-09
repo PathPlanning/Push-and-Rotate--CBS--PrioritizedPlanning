@@ -4,7 +4,9 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
+#include <set>
 #include "conflict.h"
+#include "node.h"
 
 class ConflictSet
 {
@@ -19,6 +21,7 @@ public:
     int getCardinalConflictCount();
     std::vector<Conflict> getCardinalConflicts();
     int getMatchingHeuristic();
+    int getConflictingPairsCount();
 private:
     std::vector<Conflict> cardinal, semiCardinal, nonCardinal;
 };

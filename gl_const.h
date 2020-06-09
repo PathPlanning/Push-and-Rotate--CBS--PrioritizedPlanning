@@ -40,6 +40,7 @@
         #define CNS_TAG_BYPASSING   "with_bypassing"
         #define CNS_TAG_WITH_MH     "with_matching_h"
         #define CNS_TAG_WITH_DS     "with_disjoint_splitting"
+        #define CNS_TAG_FOCAL_W     "focal_w"
         #define CNS_TAG_PP_ORDER    "pp_order"
         #define CNS_TAG_PAR_PATHS_1 "parallelize_paths_1"
         #define CNS_TAG_PAR_PATHS_2 "parallelize_paths_2"
@@ -102,6 +103,7 @@
     #define CNS_ST_CBS                  "cbs"
     #define CNS_ST_PR                   "push_and_rotate"
     #define CNS_ST_PP                   "prioritized_planning"
+    #define CNS_ST_ECBS                 "ecbs"
 
     #define CN_ST_CBS                   0
     #define CN_ST_PR                    1

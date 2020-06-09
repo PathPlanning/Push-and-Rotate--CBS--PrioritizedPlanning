@@ -34,6 +34,7 @@
       <with_bypassing>true</with_bypassing>
       <with_matching_h>true</with_matching_h>
       <with_disjoint_splitting>true</with_disjoint_splitting>
+      <focal_w>1.5</focal_w>
       <pp_order>2</pp_order>
       <parallelize_paths_1>true</parallelize_paths_1>
       <parallelize_paths_2>true</parallelize_paths_2>

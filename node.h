@@ -23,9 +23,10 @@ struct Node
     int     subgraph = -1;
     int     depth;
     int     conflictsCount;
+    int     hc;
     static bool breakingties;
 
-    Node(int x = 0, int y = 0, Node *p = nullptr, double g_ = 0, double H_ = 0, int Depth = 0, int ConflictsCount = 0) {
+    Node(int x = 0, int y = 0, Node *p = nullptr, double g_ = 0, double H_ = 0, int Depth = 0, int ConflictsCount = 0, int hc_ = 0) {
         i = x;
         j = y;
         parent = p;
@@ -34,6 +35,7 @@ struct Node
         F = g_ + H_;
         depth = Depth;
         conflictsCount = ConflictsCount;
+        hc = hc_;
     }
 
     bool operator== (const Node &other) const {

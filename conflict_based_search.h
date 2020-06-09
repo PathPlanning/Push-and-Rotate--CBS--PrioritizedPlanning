@@ -27,7 +27,8 @@ class ConflictBasedSearch
                                    const Constraint &constraint, const ConstraintsSet &constraints,
                                    const std::list<Node>::iterator pathStart,
                                    const std::list<Node>::iterator pathEnd,
-                                   const ConflictAvoidanceTable &CAT);
+                                   const ConflictAvoidanceTable &CAT,
+                                   bool withFocal, double focalW, std::vector<double> &lb);
         CBSNode createNode(const Map &map, const AgentSet &agentSet, const Config &config,
                            const Conflict &conflict, const std::vector<int> &costs,
                            ConstraintsSet &constraints, int id1, int id2,
@@ -35,7 +36,7 @@ class ConflictBasedSearch
                            std::vector<std::list<Node>::iterator> &starts,
                            std::vector<std::list<Node>::iterator> &ends,
                            ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
-                           std::vector<MDD> &mdds,
+                           std::vector<MDD> &mdds, std::vector<double> &lb,
                            CBSNode *parentPtr);
 
 

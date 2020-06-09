@@ -30,6 +30,7 @@ SOURCES += \
     mdd.cpp \
     prioritized_planning.cpp \
     push_and_rotate.cpp \
+    search_queue.cpp \
     tinyxml2.cpp \
     xmllogger.cpp \
     isearch.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \
+    search_queue.h \
     tinyxml2.h \
     node.h \
     gl_const.h \

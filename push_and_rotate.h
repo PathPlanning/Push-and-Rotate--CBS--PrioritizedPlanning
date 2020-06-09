@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "isearch.h"
 #include "dijkstra.h"
+#include "astar.h"
 #include "agent_set.h"
 #include "agent_move.h"
 #include "config.h"
