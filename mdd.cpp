@@ -2,8 +2,8 @@
 
 MDD::MDD() {};
 
-MDD::MDD(const Map& map, const AgentSet& agentSet, ISearch* search, int agentId, int cost,
-         const ConstraintsSet& constraints) {
+MDD::MDD(const Map& map, const AgentSet& agentSet, int agentId, int cost, const ConstraintsSet& constraints) {
+    Astar search = Astar(true);
     Agent agent = agentSet.getAgent(agentId);
     Node start = agent.getStartPosition(), goal = agent.getGoalPosition();
     std::vector<std::unordered_set<Node>> layers;
@@ -11,7 +11,7 @@ MDD::MDD(const Map& map, const AgentSet& agentSet, ISearch* search, int agentId,
     for (int i = 0; i < cost - 1; ++i) {
         layers.push_back({});
         for (auto node : layers[i]) {
-            std::list<Node> successors = search->findSuccessors(node, map, goal.i, goal.j, agentId, {}, constraints);
+            std::list<Node> successors = search.findSuccessors(node, map, goal.i, goal.j, agentId, {}, constraints);
             for (auto neigh : successors) {
                 if (neigh.H <= cost - i - 1) {
                     layers.back().insert(neigh);
@@ -26,7 +26,7 @@ MDD::MDD(const Map& map, const AgentSet& agentSet, ISearch* search, int agentId,
     for (int i = cost - 1; i >= 0; --i) {
         std::unordered_set<Node> newLastLayer;
         for (auto node : layers[i]) {
-            std::list<Node> successors = search->findSuccessors(node, map, goal.i, goal.j, agentId, {}, constraints);
+            std::list<Node> successors = search.findSuccessors(node, map, goal.i, goal.j, agentId, {}, constraints);
             for (auto neigh : successors) {
                 if (lastLayer.find(neigh) != lastLayer.end()) {
                     newLastLayer.insert(node);

@@ -91,3 +91,57 @@ bool ConstraintsSet::hasEdgeConstraint(int i, int j, int time, int agentId, int 
 std::vector<Constraint> ConstraintsSet::getPositiveConstraints() const {
     return positiveConstraints;
 }
+
+int ConstraintsSet::getFirstConstraintTime(int i, int j, int startTime, int agentId) const {
+    int res = CN_INFINITY;
+    std::set<Constraint>::iterator constraint = nodeConstraints.lower_bound(Constraint(i, j, startTime));
+    if (constraint != nodeConstraints.end() && constraint->i == i && constraint->j == j) {
+        res = constraint->time;
+    }
+    constraint = goalNodeConstraints.lower_bound(Constraint(i, j, startTime));
+    if (constraint != goalNodeConstraints.end() && constraint->i == i &&
+            constraint->j == j && constraint->time < res) {
+        res = constraint->time;
+    }
+    return res;
+}
+
+std::vector<std::pair<int, int>> ConstraintsSet::getSafeIntervals(int i, int j, int agentId,
+                                                                  int startTime, int endTime) const {
+    auto it = goalNodeConstraints.lower_bound(Constraint(i, j, 0));
+    if (it != goalNodeConstraints.end() && it->i == i && it->j == j && it->time <= endTime) {
+        endTime = it->time - 1;
+        if (endTime < startTime) {
+            return {};
+        }
+    }
+
+    int beg = 0;
+    it = nodeConstraints.upper_bound(Constraint(i, j, startTime, agentId));
+    if (it != nodeConstraints.begin()) {
+        auto pr = std::prev(it);
+        if (pr->i == i && pr->j == j) {
+            beg = pr->time + pr->dur;
+        }
+    }
+
+    std::vector<std::pair<int, int>> res;
+    auto end = nodeConstraints.upper_bound(Constraint(i, j, endTime, agentId));
+    for (it; it != end; ++it) {
+        if (it->time > beg) {
+            res.push_back(std::make_pair(beg, it->time - 1));
+        }
+        beg = it->time + it->dur;
+    }
+
+    if (beg < endTime) {
+        if (end != nodeConstraints.end() && end->i == i && end->j == j) {
+            endTime = end->time;
+        } else {
+            endTime = CN_INFINITY;
+        }
+        res.push_back(std::make_pair(beg, endTime));
+    }
+    return res;
+}
+

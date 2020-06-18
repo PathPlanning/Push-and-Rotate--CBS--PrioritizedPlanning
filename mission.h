@@ -48,8 +48,6 @@ class Mission
         bool getSingleExecution();
 
     private:
-        const char* getAlgorithmName();
-
         Map                                   map;
         AgentSet                              agentSet;
         Config                                config;

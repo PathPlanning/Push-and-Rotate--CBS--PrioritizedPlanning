@@ -15,6 +15,7 @@ class Config
         std::string*    LogParams;
         unsigned int    N;
         int             searchType;
+        int             lowLevel;
         int             minAgents;
         int             maxAgents;
         int             maxTime;

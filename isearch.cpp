@@ -9,17 +9,13 @@ ISearch::ISearch(bool WithTime)
 
 ISearch::~ISearch(void) {}
 
-/*int ISearch::convolution(int i, int j, const Map &map, int time, bool withTime) {
-    int res = withTime ? map.getMapWidth() * map.getMapHeight() * time : 0;
-    return res + i * map.getMapWidth() + j;
-}*/
-
 bool Node::breakingties;
+int ISearch::T = 0;
 
 SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
                                   int start_i, int start_j, int goal_i, int goal_j,
                                   bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&),
-                                  bool freshStart, bool returnPath, int startDepth, int goalDepth, int maxDepth,
+                                  bool freshStart, bool returnPath, int startTime, int goalTime, int maxTime,
                                   bool withFocal, double focalW,
                                   const std::unordered_set<Node> &occupiedNodes,
                                   const ConstraintsSet &constraints,
@@ -27,11 +23,10 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
 {
     sresult.pathfound = false;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    if (goalDepth != -1) {
-        maxDepth = goalDepth;
+    if (goalTime != -1) {
+        maxTime = goalTime;
     }
     Node cur;
-    int fin_i, fin_j, fin_depth;
     int agentId = -1;
     if (agentSet.isOccupied(start_i, start_j)) {
         agentId = agentSet.getAgentId(start_i, start_j);
@@ -49,9 +44,15 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
         Node::breakingties = breakingties;
         sresult.numberofsteps = 0;
         cur = Node(start_i, start_j, nullptr, 0,
-                 computeHFromCellToCell(start_i, start_j, goal_i, goal_j), startDepth);
+                 computeHFromCellToCell(start_i, start_j, goal_i, goal_j), startTime);
+        if (withIntervals) {
+            cur.endTime = constraints.getFirstConstraintTime(start_i, start_j, startTime, agentId);
+            if (cur.endTime < CN_INFINITY) {
+                --cur.endTime;
+            }
+        }
 
-        open.insert(map, cur, withTime);
+        open.insert(map, cur, withTime, withIntervals);
     }
 
     while(!open.empty() || !focal.empty()) {
@@ -70,50 +71,47 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
                 if (!focalF.empty()) {
                     minF = std::min(minF, *focalF.begin());
                 }
-                open.moveByThreshold(focal, minF * focalW, map, withTime, focalF);
+                open.moveByThreshold(focal, minF * focalW, map, focalF, withTime, withIntervals);
             }
             cur = focal.getFront();
-            focal.erase(map, cur, withTime);
+            focal.erase(map, cur, withTime, withIntervals);
             focalF.erase(cur.F);
         } else {
             cur = open.getFront();
-            open.erase(map, cur, withTime);
+            open.erase(map, cur, withTime, withIntervals);
         }
-        close[SearchQueue::convolution(cur.i, cur.j, map, cur.depth, withTime)] = cur;
+        close[SearchQueue::convolution(cur, map, withTime, withIntervals)] = cur;
 
-        Node *curPtr = &(close.find(SearchQueue::convolution(cur.i, cur.j, map, cur.depth, withTime))->second);
+        Node *curPtr = &(close.find(SearchQueue::convolution(cur, map, withTime, withIntervals))->second);
         if ((isGoal != nullptr && isGoal(Node(start_i, start_j), cur, map, agentSet)) ||
             (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j) &&
-             (goalDepth == -1 || cur.depth == goalDepth)) {
-            if (!constraints.hasFutureConstraint(cur.i, cur.j, cur.depth, agentId)) {
+             (goalTime == -1 || cur.time == goalTime || (cur.time <= goalTime && cur.endTime == CN_INFINITY))) {
+            if (cur.endTime == CN_INFINITY || !constraints.hasFutureConstraint(cur.i, cur.j, cur.time, agentId)) {
                 if (!freshStart) {
                     freshStart = true;
                 } else {
                     sresult.pathfound = true;
-                    fin_i = cur.i;
-                    fin_j = cur.j;
-                    fin_depth = cur.depth;
                     break;
                 }
             }
         }
 
-        if (maxDepth == -1 || cur.depth < maxDepth) {
+        if (maxTime == -1 || cur.time < maxTime) {
             std::list<Node> successors = findSuccessors(cur, map, goal_i, goal_j, agentId, occupiedNodes,
                                                         constraints, CAT);
             for (auto neigh : successors) {
-                if (close.find(SearchQueue::convolution(neigh.i, neigh.j, map, neigh.depth, withTime)) == close.end()) {
+                if (close.find(SearchQueue::convolution(neigh, map, withTime, withIntervals)) == close.end()) {
                     neigh.parent = curPtr;
                     if (withFocal) {
-                        Node old = focal.getByIndex(map, neigh, withTime);
+                        Node old = focal.getByIndex(map, neigh, withTime, withIntervals);
                         if (old.i != -1) {
                             focalF.erase(old.F);
                             focalF.insert(neigh.F);
-                            focal.insert(map, neigh, withTime, true, old);
+                            focal.insert(map, neigh, withTime, withIntervals, true, old);
                             continue;
                         }
                     }
-                    open.insert(map, neigh, withTime);
+                    open.insert(map, neigh, withTime, withIntervals);
                 }
             }
         }
@@ -122,20 +120,24 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 
+    T += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+
     sresult.time = static_cast<double>(elapsedMilliseconds) / 1000;
     sresult.nodescreated = open.size() + close.size();
+
+    //std::cout << sresult.nodescreated << std::endl;
+
     if (sresult.pathfound) {
-        auto it = close.find(SearchQueue::convolution(fin_i, fin_j, map, fin_depth, withTime));
-        sresult.pathlength = it->second.g;
-        sresult.minF = it->second.F;
+        sresult.pathlength = cur.g;
+        sresult.minF = cur.F;
         if (!focalF.empty()) {
             sresult.minF = std::min(sresult.minF, *focalF.begin());
         }
-        sresult.lastNode = it->second;
+        sresult.lastNode = cur;
         if (returnPath) {
             lppath.clear();
             hppath.clear();
-            makePrimaryPath(it->second);
+            makePrimaryPath(cur, goalTime == -1 ? -1 : goalTime + 1);
             makeSecondaryPath(map);
             sresult.hppath = &hppath; //Here is a constant pointer
             sresult.lppath = &lppath;
@@ -154,27 +156,57 @@ std::list<Node> ISearch::findSuccessors(const Node &curNode, const Map &map,
     for (int di = -1; di <= 1; ++di) {
         for (int dj = -1; dj <= 1; ++dj) {
             int newi = curNode.i + di, newj = curNode.j + dj;
-            int depth = curNode.depth;
-            if ((di == 0 || dj == 0) && (withTime || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
-                    map.CellIsTraversable(newi, newj, occupiedNodes) &&
-                    !constraints.hasNodeConstraint(newi, newj, curNode.depth + 1, agentId) &&
-                    !constraints.hasEdgeConstraint(newi, newj, curNode.depth + 1, agentId, curNode.i, curNode.j)) {
+            int depth = curNode.time;
+            if ((di == 0 || dj == 0) && ((withTime && !withIntervals) || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
+                    map.CellIsTraversable(newi, newj, occupiedNodes)) {
                 int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
-                int conflictsCount = CAT.getAgentsCount(newi, newj, curNode.depth + 1, map);
-                Node neigh(newi, newj, nullptr, curNode.g + 1,
-                           newh, curNode.depth + 1, conflictsCount, curNode.hc + conflictsCount);
-                successors.push_back(neigh);
+                Node neigh(newi, newj, nullptr, curNode.g + 1, newh, curNode.time + 1);
+                int conflictsCount = CAT.getAgentsCount(neigh, map);
+                neigh.conflictsCount = conflictsCount;
+                neigh.hc = curNode.hc + conflictsCount;
+                std::vector<std::pair<int, int>> safeIntervals;
+
+                if (withIntervals) {
+                    safeIntervals = constraints.getSafeIntervals(neigh.i, neigh.j, agentId, curNode.time + 1,
+                                                                 curNode.endTime + (curNode.endTime != CN_INFINITY));
+                } else if (!constraints.hasNodeConstraint(newi, newj, curNode.time + 1, agentId)) {
+                    safeIntervals = {std::make_pair(neigh.time, neigh.time)};
+                } else {
+                    continue;
+                }
+
+                for (auto interval : safeIntervals) {
+                    neigh.startTime = interval.first;
+                    neigh.endTime = interval.second;
+
+                    for (neigh.time = std::max(neigh.startTime, curNode.time + 1); neigh.time <= neigh.endTime; ++neigh.time) {
+                        if (!constraints.hasEdgeConstraint(newi, newj, neigh.time, agentId, curNode.i, curNode.j)) {
+                            break;
+                        }
+                    }
+                    if (neigh.time <= neigh.endTime) {
+                        neigh.g = neigh.time;
+                        neigh.F = neigh.g + neigh.H;
+                        successors.push_back(neigh);
+                    }
+                }
             }
         }
     }
     return successors;
 }
 
-void ISearch::makePrimaryPath(const Node &curNode)
+void ISearch::makePrimaryPath(Node &curNode, int endTime)
 {
+    if (withTime && endTime != -1) {
+        int startTime = curNode.time;
+        for (curNode.time = endTime - 1; curNode.time > startTime; --curNode.time) {
+            lppath.push_front(curNode);
+        }
+    }
     lppath.push_front(curNode);
     if (curNode.parent != nullptr) {
-        makePrimaryPath(*(curNode.parent));
+        makePrimaryPath(*(curNode.parent), curNode.time);
     }
 }
 
@@ -208,10 +240,10 @@ void ISearch::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
         while (!queue.empty()) {
             Node cur = queue.front();
             queue.pop();
-            if (close.find(SearchQueue::convolution(cur.i, cur.j, map)) != close.end()) {
+            if (close.find(SearchQueue::convolution(cur, map)) != close.end()) {
                 continue;
             }
-            close[SearchQueue::convolution(cur.i, cur.j, map)] = cur;
+            close[SearchQueue::convolution(cur, map)] = cur;
             perfectHeuristic[std::make_pair(cur, goal)] = cur.g;
             std::list<Node> successors = findSuccessors(cur, map);
             for (auto neigh : successors) {

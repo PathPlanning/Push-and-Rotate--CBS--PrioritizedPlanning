@@ -3,7 +3,7 @@
 
 #define CN_PI_CONSTANT 3.14159265359
 #define CN_SQRT_TWO    1.41421356237
-#define CN_INFINITY    1e12
+#define CN_INFINITY    1000000000
 
 //XML tags
 #define CNS_TAG_ROOT "root"
@@ -41,6 +41,7 @@
         #define CNS_TAG_WITH_MH     "with_matching_h"
         #define CNS_TAG_WITH_DS     "with_disjoint_splitting"
         #define CNS_TAG_FOCAL_W     "focal_w"
+        #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"
         #define CNS_TAG_PAR_PATHS_1 "parallelize_paths_1"
         #define CNS_TAG_PAR_PATHS_2 "parallelize_paths_2"
@@ -111,17 +112,11 @@
 
     #define CN_SP_ST 0
 
-        #define CNS_SP_ST_BFS           "bfs"
-        #define CNS_SP_ST_DIJK          "dijkstra"
         #define CNS_SP_ST_ASTAR         "astar"
-        #define CNS_SP_ST_JP_SEARCH     "jp_search"
-        #define CNS_SP_ST_TH            "theta"
+        #define CNS_SP_ST_SIPP          "sipp"
 
-        #define CN_SP_ST_BFS            0
-        #define CN_SP_ST_DIJK           1
-        #define CN_SP_ST_ASTAR          2
-        #define CN_SP_ST_JP_SEARCH      3
-        #define CN_SP_ST_TH             4
+        #define CN_SP_ST_ASTAR          0
+        #define CN_SP_ST_SIPP           1
 
     #define CN_SP_AD 1 //AllowDiagonal
 

@@ -5,33 +5,34 @@ SearchQueue::SearchQueue(bool (*_cmp)(const Node&, const Node&)) {
     sortByKey = std::set<Node, decltype (cmp)>(cmp);
 }
 
-int SearchQueue::convolution(int i, int j, const Map &map, int time, bool withTime) {
+int SearchQueue::convolution(const Node &node, const Map &map, bool withTime, bool withIntervals) {
+    int time = withIntervals ? node.startTime : node.time;
     int res = withTime ? map.getMapWidth() * map.getMapHeight() * time : 0;
-    return res + i * map.getMapWidth() + j;
+    return res + node.i * map.getMapWidth() + node.j;
 }
 
-bool SearchQueue::insert(const Map& map, Node node, bool withTime, bool withOld, Node old) {
+bool SearchQueue::insert(const Map& map, Node node, bool withTime, bool withIntervals, bool withOld, Node old) {
     if (!withOld) {
-        old = getByIndex(map, node, withTime);
+        old = getByIndex(map, node, withTime, withIntervals);
     }
     if (old.i == -1 || cmp(node, old)) {
         if (old.i != -1) {
             sortByKey.erase(old);
         }
-        sortByIndex[convolution(node.i, node.j, map, node.depth, withTime)] = node;
+        sortByIndex[convolution(node, map, withTime, withIntervals)] = node;
         sortByKey.insert(node);
         return true;
     }
     return false;
 }
 
-void SearchQueue::erase(const Map& map, Node node, bool withTime) {
+void SearchQueue::erase(const Map& map, Node node, bool withTime, bool withIntervals) {
     sortByKey.erase(node);
-    sortByIndex.erase(convolution(node.i, node.j, map, node.depth, withTime));
+    sortByIndex.erase(convolution(node, map, withTime, withIntervals));
 }
 
-Node SearchQueue::getByIndex(const Map& map, Node node, bool withTime) {
-    auto it = sortByIndex.find(convolution(node.i, node.j, map, node.depth, withTime));
+Node SearchQueue::getByIndex(const Map& map, Node node, bool withTime, bool withIntervals) {
+    auto it = sortByIndex.find(convolution(node, map, withTime, withIntervals));
     if (it == sortByIndex.end()) {
         return Node(-1, -1);
     }
@@ -39,12 +40,12 @@ Node SearchQueue::getByIndex(const Map& map, Node node, bool withTime) {
 }
 
 void SearchQueue::moveByThreshold(SearchQueue& other, double threshold, const Map& map,
-                                  bool withTime, std::multiset<double>& otherF) {
+                                  std::multiset<double>& otherF, bool withTime, bool withIntervals) {
     auto it = sortByKey.begin();
     for (it; it != sortByKey.end() && it->F <= threshold; ++it) {
-        other.insert(map, *it, withTime);
+        other.insert(map, *it, withTime, withIntervals);
         otherF.insert(it->F);
-        sortByIndex.erase(convolution(it->i, it->j, map, it->depth, withTime));
+        sortByIndex.erase(convolution(*it, map, withTime, withIntervals));
     }
     sortByKey.erase(sortByKey.begin(), it);
 }

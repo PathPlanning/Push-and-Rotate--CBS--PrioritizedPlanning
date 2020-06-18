@@ -8,6 +8,7 @@ struct Constraint
 {
     int     i, j; //grid cell coordinates
     int     time;
+    int     dur;
     int     agentId;
     int     prev_i, prev_j;
     bool    goalNode;
@@ -22,6 +23,7 @@ struct Constraint
         prev_j = PrevJ;
         goalNode = GoalNode;
         positive = false;
+        dur = 1;
     }
 
     bool operator== (const Constraint &other) const {
@@ -33,8 +35,8 @@ struct Constraint
     }
 
     bool operator< (const Constraint &other) const {
-        return std::tuple<int, int, int, int, int, bool>(i, j, time, prev_i, prev_j, goalNode) <
-               std::tuple<int, int, int, int, int, bool>(other.i, other.j, other.time, other.prev_i, other.prev_j, other.goalNode);
+        return std::tuple<int, int, int, int, int, bool>(i, j, prev_i, prev_j, time, goalNode) <
+               std::tuple<int, int, int, int, int, bool>(other.i, other.j, other.prev_i, other.prev_j, other.time, other.goalNode);
     }
 };
 

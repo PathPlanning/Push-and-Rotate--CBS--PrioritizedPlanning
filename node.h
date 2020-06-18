@@ -21,19 +21,23 @@ struct Node
     double  F, g, H; //f-, g- and h-values of the search node 
     Node    *parent; //backpointer to the predecessor node (e.g. the node which g-value was used to set the g-velue of the current node)
     int     subgraph = -1;
-    int     depth;
+    int     time;
+    int     startTime;
+    int     endTime;
     int     conflictsCount;
     int     hc;
     static bool breakingties;
 
-    Node(int x = 0, int y = 0, Node *p = nullptr, double g_ = 0, double H_ = 0, int Depth = 0, int ConflictsCount = 0, int hc_ = 0) {
+    Node(int x = 0, int y = 0, Node *p = nullptr, double g_ = 0, double H_ = 0, int Time = 0, int ConflictsCount = 0, int hc_ = 0) {
         i = x;
         j = y;
         parent = p;
         g = g_;
         H = H_;
         F = g_ + H_;
-        depth = Depth;
+        time = Time;
+        startTime = Time;
+        endTime = Time;
         conflictsCount = ConflictsCount;
         hc = hc_;
     }
@@ -50,7 +54,7 @@ struct Node
                 return conflictsCount < other.conflictsCount;
             } else {
                 if (g == other.g) {
-                    return std::tuple<int, int, int>(i, j, depth) < std::tuple<int, int, int>(other.i, other.j, other.depth);
+                    return std::tuple<int, int, int>(i, j, time) < std::tuple<int, int, int>(other.i, other.j, other.time);
                 } else {
                     if (breakingties) {
                         return g > other.g;

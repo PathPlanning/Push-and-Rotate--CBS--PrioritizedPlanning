@@ -27,7 +27,7 @@ class ISearch
                                  int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
                                  bool freshStart = true, bool returnPath = true,
-                                 int startDepth = 0, int goalDepth = -1, int maxDepth = -1,
+                                 int startTime = 0, int goalTime = -1, int maxTime = -1,
                                  bool withFocal = false, double focalW = 1.0,
                                  const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
@@ -40,6 +40,8 @@ class ISearch
 
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
         void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
+
+        static int T;
 
     protected:
         //CODE HERE
@@ -63,7 +65,7 @@ class ISearch
         //and only then begin enhancement!
 
         virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
-        virtual void makePrimaryPath(const Node &curNode);//Makes path using back pointers
+        virtual void makePrimaryPath(Node &curNode, int endTime);//Makes path using back pointers
         virtual void makeSecondaryPath(const Map &map);//Makes another type of path(sections or points)
 
         SearchResult                    sresult;
@@ -73,6 +75,7 @@ class ISearch
         SearchQueue                     open;
         std::unordered_map<int, Node>   close;
         bool                            withTime;
+        bool                            withIntervals;
         std::unordered_map<std::pair<Node, Node>, int> perfectHeuristic;
         //need to define open, close;
 

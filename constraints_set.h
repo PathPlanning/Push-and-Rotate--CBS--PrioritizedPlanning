@@ -2,6 +2,7 @@
 #define CONSTRAINTSSET_H
 
 #include "constraint.h"
+#include "gl_const.h"
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -23,11 +24,13 @@ public:
 
     ConstraintsSet getAgentConstraints(int agentId) const;
     std::vector<Constraint> getPositiveConstraints() const;
+    int getFirstConstraintTime(int i, int j, int startTime, int agentId) const;
+    std::vector<std::pair<int, int>> getSafeIntervals(int i, int j, int agentId, int startTime, int endTime) const;
 
     bool hasNodeConstraint(int i, int j, int time, int agentId) const;
     bool hasFutureConstraint(int i, int j, int time, int agentId) const;
     bool hasEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) const;
-private:
+//private:
     std::set<Constraint> nodeConstraints;
     std::set<Constraint> edgeConstraints;
     std::set<Constraint> goalNodeConstraints;
@@ -65,5 +68,6 @@ void ConstraintsSet::removeAgentPath(Iter start, Iter end, int agentId) {
         ++time;
     }
 }
+
 
 #endif // CONSTRAINTSSET_H

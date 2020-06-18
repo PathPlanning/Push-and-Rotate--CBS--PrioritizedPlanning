@@ -1,7 +1,7 @@
 #include "conflict_avoidance_table.h"
 
-void ConflictAvoidanceTable::addAgentPosition(int i, int j, int time, const Map& map) {
-    int conv = SearchQueue::convolution(i, j, map, time, true);
+void ConflictAvoidanceTable::addAgentPosition(const Node &node, const Map& map) {
+    int conv = SearchQueue::convolution(node, map, true);
     if (agentsCount.find(conv) == agentsCount.end()) {
         agentsCount[conv] = 1;
     } else {
@@ -11,23 +11,23 @@ void ConflictAvoidanceTable::addAgentPosition(int i, int j, int time, const Map&
 
 void ConflictAvoidanceTable::addAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end, const Map& map) {
     for (auto it = start; it != end; ++it) {
-        addAgentPosition(it->i, it->j, it->depth, map);
+        addAgentPosition(*it, map);
     }
 }
 
-void ConflictAvoidanceTable::removeAgentPosition(int i, int j, int time, const Map& map) {
-    int conv = SearchQueue::convolution(i, j, map, time, true);
+void ConflictAvoidanceTable::removeAgentPosition(const Node &node, const Map& map) {
+    int conv = SearchQueue::convolution(node, map, true);
     --agentsCount[conv];
 }
 
 void ConflictAvoidanceTable::removeAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end, const Map& map) {
     for (auto it = start; it != end; ++it) {
-        removeAgentPosition(it->i, it->j, it->depth, map);
+        removeAgentPosition(*it, map);
     }
 }
 
-int ConflictAvoidanceTable::getAgentsCount(int i, int j, int time, const Map& map) const {
-    int conv = SearchQueue::convolution(i, j, map, time, true);
+int ConflictAvoidanceTable::getAgentsCount(const Node &node, const Map& map) const {
+    int conv = SearchQueue::convolution(node, map, true);
     if (agentsCount.find(conv) == agentsCount.end()) {
         return 0;
     }

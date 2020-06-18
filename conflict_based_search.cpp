@@ -80,6 +80,9 @@ std::list<Node> ConflictBasedSearch::getNewPath(const Map &map, const AgentSet &
         }
         ++time;
     }
+    for (; time < startTime; ++time) {
+        res.push_back(*std::prev(pathEnd));
+    }
     for (; it1 != searchResult.lppath->end(); ++it1) {
         res.push_back(*it1);
     }
@@ -135,7 +138,7 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
 
     MDD oldMDD;
     if (config.withCardinalConflicts) {
-        node.mdds[id1] = MDD(map, agentSet, search, id1, newPath.size() - 1, agentConstraints);
+        node.mdds[id1] = MDD(map, agentSet, id1, newPath.size() - 1, agentConstraints);
         oldMDD = mdds[id1];
         mdds[id1] = node.mdds[id1];
     }
@@ -174,7 +177,9 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
 }
 
 MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
-    std::cout << agentSet.getAgentCount() << std::endl;
+    // std::cout << agentSet.getAgentCount() << std::endl;
+
+    ISearch::T = 0;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -194,7 +199,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
     std::vector<MDD> mdds;
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
         Agent agent = agentSet.getAgent(i);
-        Astar astar(false);
+        Astar astar(false, false);
         SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
                                                         agent.getGoal_i(), agent.getGoal_j());
         if (!searchResult.pathfound) {
@@ -203,7 +208,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         root.cost += searchResult.pathlength;
         root.paths[i] = *searchResult.lppath;
         if (config.withCardinalConflicts) {
-            root.mdds[i] = MDD(map, agentSet, search, i, searchResult.pathlength);
+            root.mdds[i] = MDD(map, agentSet, i, searchResult.pathlength);
         }
         starts[i] = root.paths[i].begin();
         ends[i] = root.paths[i].end();
@@ -330,6 +335,37 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
             children.push_back(child2);
         }
 
+        /*for (auto child : children) {
+            for (auto constraint : constraints.nodeConstraints) {
+                if (constraint.agentId == child.paths.begin()->first) {
+                    auto it = child.paths.begin()->second.begin();
+                    std::advance(it, constraint.time);
+                    if (it->i == constraint.i && it->j == constraint.j) {
+                        std::cout << t << std::endl;
+                    }
+                }
+            }
+            for (auto constraint : constraints.edgeConstraints) {
+                if (constraint.agentId == child.paths.begin()->first) {
+                    auto it = child.paths.begin()->second.begin();
+                    std::advance(it, constraint.time);
+                    if (it->i == constraint.i && it->j == constraint.j &&
+                            std::prev(it)->i == constraint.prev_i && std::prev(it)->j == constraint.prev_j) {
+                        std::cout << t << std::endl;
+                    }
+                }
+            }
+            for (auto constraint : constraints.positiveConstraints) {
+                if (constraint.agentId == child.paths.begin()->first) {
+                    auto it = child.paths.begin()->second.begin();
+                    std::advance(it, std::min(constraint.time, int(child.paths.begin()->second.size()) - 1));
+                    if ((it->i != constraint.i || it->j != constraint.j)) {
+                        std::cout << t << std::endl;
+                    }
+                }
+            }
+        }*/
+
         bool bypass = false;
         if (children.size() == 2) {
             for (auto child : children) {
@@ -365,7 +401,8 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
             }
         }
     }
-    // std::cout << close.size() + open.size() << std::endl;
+    //std::cout << close.size() + open.size() << std::endl;
+    //std::cout << ISearch::T << std::endl;
     return result;
 }
 

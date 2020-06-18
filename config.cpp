@@ -331,6 +331,13 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
     options->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
 
+    std::string lowLevelSearch = options->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
+    if (lowLevelSearch == CNS_SP_ST_ASTAR) {
+        lowLevel = CN_SP_ST_ASTAR;
+    } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
+        lowLevel = CN_SP_ST_SIPP;
+    }
+
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;
     withCardinalConflicts = withCardinalConflicts || withMatchingHeuristic || withDisjointSplitting;

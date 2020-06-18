@@ -7,12 +7,13 @@
 #include "map.h"
 #include "agent_set.h"
 #include "isearch.h"
+#include "astar.h"
 
 class MDD
 {
 public:
     MDD();
-    MDD(const Map& map, const AgentSet& agentSet, ISearch* search, int agentId, int cost,
+    MDD(const Map& map, const AgentSet& agentSet, int agentId, int cost,
         const ConstraintsSet& constraints = ConstraintsSet());
 
     int getLayerSize(int cost) const;

@@ -65,7 +65,8 @@ void Mission::createSearch()
 {
     if (search)
         delete search;
-    search = new Astar(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP);
+    search = new Astar(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP,
+                       (config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP) && config.lowLevel == CN_SP_ST_SIPP);
 }
 
 void Mission::createAlgorithm()
@@ -215,22 +216,6 @@ void Mission::saveAgentsPathsToLog(const std::string &agentsFile, int makespan, 
 {
     logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, makespan, flowtime);
     logger->saveLog();
-}
-
-const char *Mission::getAlgorithmName()
-{
-    if (config.SearchParams[CN_SP_ST] == CN_SP_ST_ASTAR)
-        return CNS_SP_ST_ASTAR;
-    else if (config.SearchParams[CN_SP_ST] == CN_SP_ST_DIJK)
-        return CNS_SP_ST_DIJK;
-    else if (config.SearchParams[CN_SP_ST] == CN_SP_ST_BFS)
-        return CNS_SP_ST_BFS;
-    else if (config.SearchParams[CN_SP_ST] == CN_SP_ST_JP_SEARCH)
-        return CNS_SP_ST_JP_SEARCH;
-    else if (config.SearchParams[CN_SP_ST] == CN_SP_ST_TH)
-        return CNS_SP_ST_TH;
-    else
-        return "";
 }
 
 int Mission::getTasksCount() {
