@@ -1,7 +1,7 @@
 # [English documentation](README-EN.md)
 # Push-and-Rotate--CBS--PrioritizedPlanning
 
-В данном проекте приводятся реализации различных алгоритмов решающих задачи планирования траекторий для группы агентов. Рассматриваются алгоритмы [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf) и [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf), а также некоторые их модификации.
+В данном проекте приводятся реализации различных алгоритмов решающих задачи планирования траекторий для группы агентов. Рассматриваются алгоритмы [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Enhanced conflict based search](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf) и [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf), а также некоторые их модификации.
 
 ## Сборка и запуск
 Для сборки проекта можно использовать cmake с помощью файла CMakeLists.txt, размещенного в репозитории. Также файлы проекта могут быть открыты и скомпилированы в Qt Creator с конфигурациями, заданными в файле PathPlanning.pro.
@@ -18,8 +18,12 @@
 ### Раздел options - выбор параметров алгоритма и тестов. Содержит следующие тэги:
 - algorithm - используемый алгоритм. Может принимать следующие значения:
     1. cbs - Conflict based search
+    2. ecbs - Enhanced conflict based search. В алгоритме на верхнем уровне используется вторичная эвристика h3 из [статьи](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875), а на нижнем вторичная эвристика, равная количеству вершинных конфликтов на уже построенном участке траектории до текущей вершины
     2. push_and_rotate - Push and rotate
     3. prioritized_planning - Prioritized planning
+- low_level - алгоритм, используемый в поиске нижнего уровня в алгоритмах CBS и Push and rotate. Может принимать следующие значения:
+    1. astar - алгоритм [A*](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf)
+    2. sipp - алгоритм [SIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) (дискретная версия)
 - agents_file - общий префикс названий входных файлов с описанием агентов
 - tasks_count - количество входных файлов с описанием агентов: рассматриваются файлы с названиями вида agents_file-n.xml, где n принимает значения от 1 до tasks_count
 - agents_range - в атрибутах min и max данного тега указывается минимальное и максимальное количество агентов для тестирования. При single_execution=`false`, количество агентов увеличивается от min до max, и алгоритм запускается на соотвествующем подмножестве агентов. Тестирование прекращается, если алгоритм работает дольше заданного лимита по времени или не находит решения.
@@ -27,7 +31,7 @@
 - with_perfect_h - будет ли производиться предпосчет кратчайших путей от всех вершин до конечных позиций агентов для вычисления оптимальной эвристики в A\* (`true` или `false`, учитывается для алгоритмов CBS и Prioritized planning).
 - with_cat - будет ли использоваться Conflict avodance table (`true` или `false`, учитывается если выбран алгоритм CBS)
 - with_card_conf - будут ли учитываться кардинальные конфликты (описываются [здесь](https://pdfs.semanticscholar.org/c072/38579a95c424707dbe855efba189cce68650.pdf)). Принимает значения `true` или `false`, учитывается если выбран алгоритм CBS.
-- with_bypassing - будет ли производиться обход конфликтов (conflict bypassing). Описывается [здесь](https://pdfs.semanticscholar.org/c072/38579a95c424707dbe855efba189cce68650.pdf), принимает значения `true` или `false`, учитывается если выбран алгоритм CBS.
+- with_bypassing - будет ли производиться обход конфликтов (conflict bypassing). Описывается [здесь](http://faculty.cse.tamu.edu/guni/Papers/ICAPS15-Eli.pdf), принимает значения `true` или `false`, учитывается если выбран алгоритм CBS.
 - with_matching_h - будет ли вычисляться эвристика на вершинах дерева обхода CBS, основанная на максимальном паросочетаннии в графе кардинальных конфликтов. Описывается [здесь](http://idm-lab.org/bib/abstracts/papers/icaps18a.pdf) как ICBS-h1, принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. При использовании этой опции, опция with_card_conf фиксируется равной `true`.
 - with_disjoint_splitting - будет ли производиться disjoint splitting. Описывается [здесь](http://idm-lab.org/bib/abstracts/papers/icaps19a.pdf), принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. При использовании этой опции, опция with_card_conf фиксируется равной `true`.
 - pp_order - задает правило, согласно которому выбираются приоритеты агентов в prioritized_planning. Может принимать следующие значения:

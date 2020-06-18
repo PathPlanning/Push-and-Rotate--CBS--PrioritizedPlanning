@@ -24,6 +24,7 @@
 	</map>
 	<options>
       <algorithm>cbs</algorithm>
+      <low_level>astar</low_level>
       <agents_file>empty-16-16-random</agents_file>
       <tasks_count>2</tasks_count>
       <agents_range min="1" max="16"/>

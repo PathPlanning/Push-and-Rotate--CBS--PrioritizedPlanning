@@ -1,5 +1,5 @@
 # Push-and-Rotate--CBS--PrioritizedPlanning
-This project contains implementations of different algorithms designed for the multiagent pathfinding problem. Namely, following algorithms with some of their modifications are implemented: [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf), [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf).
+This project contains implementations of different algorithms designed for the multiagent pathfinding problem. Namely, following algorithms with some of their modifications are implemented: [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Enhanced conflict based search](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf), [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf).
 
 ## Build and run
 
@@ -18,8 +18,12 @@ The main file contains two sections `map` and `options`:
 ### Section `options` - definition of the algorihm and testing parameters. Contains following tags:
 - algorithm - algorithm to be used. Can take following values:
     1. cbs - Conflict based search
-    2. push_and_rotate - Push and rotate
-    3. prioritized_planning - Prioritized planning
+    2. ecbs - Enhanced conflict based search. In the high level search secondary heuristic h3 from the [article](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) is used. In the low level search secondary heuristic is defined as number of vertex conflicts on the partial path to the current vertex
+    3. push_and_rotate - Push and rotate
+    4. prioritized_planning - Prioritized planning
+- low_level - algorithm, applied in the low level search in CBS and Push and rotate algorithms. Can take following values:
+    1. astar - algorithm [A*](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf)
+    2. sipp - algorithm [SIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) (discrete version)
 - agents_file - common prefix for the input files with agents’ description
 - tasks_count - number of input files with agents’ description: in testing files with names of the form `agents_file-n.xml` are used for all `n` from 1 to tasks_count
 - agents_range - `min` and `max` attributes specify minimal and maximal number of agents for testing. When single_execution=`false`, number of agents is  gradually increased from `min` to `max` and the algorithm is being run on corresponding subset of agent set. If algorithm fails to find the solution or runs longer then some fixed time limit, testing of current scenario terminates.

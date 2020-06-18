@@ -74,5 +74,11 @@ HEADERS += \
 
 DISTFILES += \
     CMakeLists.txt \
+    Examples/empty-16-16-random-1.xml \
+    Examples/empty-16-16-random-2.xml \
+    Examples/empty.xml \
+    Examples/empty_log.xml \
+    Examples/empty_single.xml \
+    Examples/empty_single_log.xml \
     README-EN.md \
     README.md
