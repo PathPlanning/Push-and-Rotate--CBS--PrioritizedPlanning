@@ -22,24 +22,25 @@ class ISearch
 {
     public:
         ISearch(bool WithTime = false);
-        ~ISearch(void);
+        virtual ~ISearch(void);
         SearchResult startSearch(const Map &map, const AgentSet &agentSet,
                                  int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
                                  bool freshStart = true, bool returnPath = true,
                                  int startTime = 0, int goalTime = -1, int maxTime = -1,
-                                 bool withFocal = false, double focalW = 1.0,
                                  const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
-                                 const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
+                                 bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
         virtual std::list<Node> findSuccessors(const Node &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
                                                const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
                                                const ConstraintsSet &constraints = ConstraintsSet(),
-                                               const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
+                                               bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
         void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
+        bool getWithIntervals();
+        bool setWithIntervals(bool val);
 
         static int T;
 
@@ -67,6 +68,16 @@ class ISearch
         virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
         virtual void makePrimaryPath(Node &curNode, int endTime);//Makes path using back pointers
         virtual void makeSecondaryPath(const Map &map);//Makes another type of path(sections or points)
+        virtual int getEndTime(int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
+        virtual void createSuccessorsFromNode(const Node &cur, Node &neigh, std::list<Node> &successors,
+                                              int agentId, const ConstraintsSet &constraints,
+                                              const ConflictAvoidanceTable &CAT);
+        virtual bool checkGoal(const Node &cur, int goalTime, int agentId, const ConstraintsSet &constraints);
+        virtual bool checkOpenEmpty();
+        virtual Node getCur(const Map& map);
+        virtual bool updateFocal(const Node& neigh, const Map& map);
+        virtual double getMinFocalF();
+        virtual void clearLists();
 
         SearchResult                    sresult;
         std::list<Node>                 lppath, hppath;

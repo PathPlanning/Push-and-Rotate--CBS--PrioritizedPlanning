@@ -136,7 +136,7 @@ std::vector<std::pair<int, int>> ConstraintsSet::getSafeIntervals(int i, int j, 
 
     if (beg < endTime) {
         if (end != nodeConstraints.end() && end->i == i && end->j == j) {
-            endTime = end->time;
+            endTime = end->time - 1;
         } else {
             endTime = CN_INFINITY;
         }

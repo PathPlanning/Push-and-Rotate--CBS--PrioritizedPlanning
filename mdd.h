@@ -13,7 +13,7 @@ class MDD
 {
 public:
     MDD();
-    MDD(const Map& map, const AgentSet& agentSet, int agentId, int cost,
+    MDD(const Map& map, const AgentSet& agentSet, ISearch* search, int agentId, int cost,
         const ConstraintsSet& constraints = ConstraintsSet());
 
     int getLayerSize(int cost) const;

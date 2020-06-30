@@ -4,7 +4,7 @@
 
 class Dijkstra : public ISearch
 {
-    /*public:
-        Dijkstra();*/
+public:
+    virtual ~Dijkstra() {}
 };
 #endif

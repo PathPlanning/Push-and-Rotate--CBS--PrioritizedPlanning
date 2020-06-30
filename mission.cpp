@@ -65,8 +65,15 @@ void Mission::createSearch()
 {
     if (search)
         delete search;
-    search = new Astar(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP,
-                       (config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP) && config.lowLevel == CN_SP_ST_SIPP);
+    if (config.lowLevel == CN_SP_ST_SCIPP) {
+        search = new SCIPP(config.focalW);
+    } else if (config.withFocalSearch) {
+        search = new FocalSearch(true, config.focalW);
+    } else if (config.lowLevel == CN_SP_ST_ASTAR) {
+        search = new Astar(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP);
+    } else {
+        search = new SIPP();
+    }
 }
 
 void Mission::createAlgorithm()

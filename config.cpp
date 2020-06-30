@@ -301,15 +301,24 @@ bool Config::getConfig(const char *FileName)
 
     algorithm = options->FirstChildElement(CNS_TAG_ALG);
     value = algorithm->GetText();
-    if (value == CNS_ST_CBS || value == CNS_ST_ECBS) {
+    if (value == CNS_ST_CBS || value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
         searchType = CN_ST_CBS;
-        if (value == CNS_ST_ECBS) {
+        if (value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
             withFocalSearch = true;
         }
     } else if (value == CNS_ST_PR) {
         searchType = CN_ST_PR;
     } else if (value == CNS_ST_PP) {
         searchType = CN_ST_PP;
+    }
+
+    std::string lowLevelSearch = options->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
+    if (value == CNS_ST_ECBS_CT) {
+        lowLevel = CN_SP_ST_SCIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_ASTAR) {
+        lowLevel = CN_SP_ST_ASTAR;
+    } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
+        lowLevel = CN_SP_ST_SIPP;
     }
 
     tinyxml2::XMLElement *range = options->FirstChildElement(CNS_TAG_AGENTS_RANGE);
@@ -331,16 +340,8 @@ bool Config::getConfig(const char *FileName)
     options->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
     options->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
 
-    std::string lowLevelSearch = options->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
-    if (lowLevelSearch == CNS_SP_ST_ASTAR) {
-        lowLevel = CN_SP_ST_ASTAR;
-    } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
-        lowLevel = CN_SP_ST_SIPP;
-    }
-
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;
     withCardinalConflicts = withCardinalConflicts || withMatchingHeuristic || withDisjointSplitting;
-    withCAT = withCAT || withFocalSearch;
     return true;
 }

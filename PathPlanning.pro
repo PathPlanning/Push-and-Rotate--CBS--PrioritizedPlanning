@@ -27,10 +27,13 @@ SOURCES += \
     conflict_based_search.cpp \
     conflict_set.cpp \
     constraints_set.cpp \
+    focalsearch.cpp \
     mdd.cpp \
     prioritized_planning.cpp \
     push_and_rotate.cpp \
+    scipp.cpp \
     search_queue.cpp \
+    sipp.cpp \
     tinyxml2.cpp \
     xmllogger.cpp \
     isearch.cpp \
@@ -53,11 +56,14 @@ HEADERS += \
     conflict_set.h \
     constraint.h \
     constraints_set.h \
+    focalsearch.h \
     mdd.h \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \
+    scipp.h \
     search_queue.h \
+    sipp.h \
     tinyxml2.h \
     node.h \
     gl_const.h \

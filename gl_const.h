@@ -105,10 +105,12 @@
     #define CNS_ST_PR                   "push_and_rotate"
     #define CNS_ST_PP                   "prioritized_planning"
     #define CNS_ST_ECBS                 "ecbs"
+    #define CNS_ST_ECBS_CT              "ecbs-ct"
 
     #define CN_ST_CBS                   0
     #define CN_ST_PR                    1
     #define CN_ST_PP                    2
+    #define CN_ST_ECBS_CT               3
 
     #define CN_SP_ST 0
 
@@ -117,6 +119,7 @@
 
         #define CN_SP_ST_ASTAR          0
         #define CN_SP_ST_SIPP           1
+        #define CN_SP_ST_SCIPP          2
 
     #define CN_SP_AD 1 //AllowDiagonal
 

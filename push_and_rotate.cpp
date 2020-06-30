@@ -29,7 +29,7 @@ bool PushAndRotate::clearNode(const Map &map, AgentSet &agentSet, Node &nodeToCl
 
     Dijkstra dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, nodeToClear.i, nodeToClear.j, 0, 0,
-                                                    isGoal, true, true, 0, -1, -1, false, 1, occupiedNodes);
+                                                    isGoal, true, true, 0, -1, -1, occupiedNodes);
     if (!searchResult.pathfound) {
         return false;
     }
@@ -498,7 +498,7 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
         SearchResult searchResult = search->startSearch(map, agentSet,
                                                         curAgent.getCur_i(), curAgent.getCur_j(),
                                                         curAgent.getGoal_i(), curAgent.getGoal_j(),
-                                                        nullptr, true, true, 0, -1, -1, false, 1,
+                                                        nullptr, true, true, 0, -1, -1,
                                                         isPolygon ? finishedPositions : std::unordered_set<Node>());
 
         if (!searchResult.pathfound) {
@@ -699,8 +699,7 @@ void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
                 combineNodeSubgraphs(agentSet, components, start, i);
                 Dijkstra dijkstraSearch;
                 SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                                       isGoal, true, true, 0, -1, m - 2,
-                                                                       false, 1, components[i]);
+                                                                       isGoal, true, true, 0, -1, m - 2, components[i]);
                 while (searchResult.pathfound) {
                     auto path = *searchResult.lppath;
                     for (auto it = std::next(path.begin()); std::next(it) != path.end(); ++it) {
@@ -723,11 +722,11 @@ int PushAndRotate::getReachableNodesCount(const Map &map, AgentSet &agentSet, No
     int res = 0;
     Dijkstra dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                           condition, true, false, 0, -1, -1, false, 1, occupiedNodes);
+                                                           condition, true, false, 0, -1, -1, occupiedNodes);
     while (searchResult.pathfound) {
         ++res;
         searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
-                                                               condition, false, false, 0, -1, -1, false, 1, occupiedNodes);
+                                                               condition, false, false, 0, -1, -1, occupiedNodes);
     }
     return res;
 }
@@ -774,7 +773,7 @@ void PushAndRotate::assignToSubgraphs(const Map &map, AgentSet &agentSet) {
                     };
                     Dijkstra dijkstraSearch;
                     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j,
-                                                                           0, 0, isGoal, true, true, 0, -1, -1, false, 1, {pos});
+                                                                           0, 0, isGoal, true, true, 0, -1, -1, {pos});
                     auto path = *searchResult.lppath;
                     int agentCount = 0;
                     for (auto node : path) {
@@ -821,9 +820,8 @@ void PushAndRotate::getPriorities(const Map &map, AgentSet &agentSet) {
                 auto neighSubgraphs = agentSet.getSubgraphs(neigh.i, neigh.j);
                 if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {
                     Dijkstra dijkstraSearch;
-                    SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j,
-                                                                           0, 0, isGoal, true, true, 0, -1, -1,
-                                                                           false, 1, {Node(i, j)});
+                    SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j, 0, 0,
+                                                                           isGoal, true, true, 0, -1, -1, {Node(i, j)});
                     if (!searchResult.pathfound) {
                         continue;
                     }

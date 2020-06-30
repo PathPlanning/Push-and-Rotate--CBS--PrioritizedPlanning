@@ -22,8 +22,8 @@ std::list<Node> ConflictBasedSearch::getNewPath(const Map &map, const AgentSet &
                                                 const Constraint &constraint, const ConstraintsSet &constraints,
                                                 const std::list<Node>::iterator pathStart,
                                                 const std::list<Node>::iterator pathEnd,
-                                                const ConflictAvoidanceTable &CAT,
-                                                bool withFocal, double focalW, std::vector<double> &lb) {
+                                                bool withCAT, const ConflictAvoidanceTable &CAT,
+                                                std::vector<double> &lb) {
     std::vector<Constraint> positiveConstraints = constraints.getPositiveConstraints();
     std::sort(positiveConstraints.begin(), positiveConstraints.end(),
             [](const Constraint &lhs, const Constraint &rhs){
@@ -60,8 +60,7 @@ std::list<Node> ConflictBasedSearch::getNewPath(const Map &map, const AgentSet &
     }
 
     SearchResult searchResult = search->startSearch(map, agentSet, start.i, start.j, end.i, end.j, nullptr,
-                                                    true, true, startTime, endTime, -1,
-                                                    withFocal, focalW, {}, constraints, CAT);
+                                                    true, true, startTime, endTime, -1, {}, constraints, withCAT, CAT);
     if (!searchResult.pathfound) {
         return std::list<Node>();
     }
@@ -109,16 +108,16 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
     agentConstraints.addConstraint(constraint);
 
     Agent agent = agentSet.getAgent(id1);
-    if (config.withCAT) {
-        CAT.removeAgentPath(starts[id1], ends[id1], map);
+    if (config.withCAT || config.withFocalSearch == true) {
+        CAT.removeAgentPath(starts[id1], ends[id1]);
     }
 
     double oldLb = lb[id1];
     std::list<Node> newPath = getNewPath(map, agentSet, agent, constraint, agentConstraints,
-                                         starts[id1], ends[id1], CAT, config.withFocalSearch, config.focalW, lb);
+                                         starts[id1], ends[id1], config.withCAT, CAT, lb);
 
-    if (config.withCAT) {
-        CAT.addAgentPath(starts[id1], ends[id1], map);
+    if (config.withCAT || config.withFocalSearch == true) {
+        CAT.addAgentPath(starts[id1], ends[id1]);
     }
     if (newPath.empty()) {
         return CBSNode(false);
@@ -138,7 +137,7 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
 
     MDD oldMDD;
     if (config.withCardinalConflicts) {
-        node.mdds[id1] = MDD(map, agentSet, id1, newPath.size() - 1, agentConstraints);
+        node.mdds[id1] = MDD(map, agentSet, search, id1, newPath.size() - 1, agentConstraints);
         oldMDD = mdds[id1];
         mdds[id1] = node.mdds[id1];
     }
@@ -207,9 +206,11 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         }
         root.cost += searchResult.pathlength;
         root.paths[i] = *searchResult.lppath;
+
         if (config.withCardinalConflicts) {
-            root.mdds[i] = MDD(map, agentSet, i, searchResult.pathlength);
+            root.mdds[i] = MDD(map, agentSet, search, i, searchResult.pathlength);
         }
+
         starts[i] = root.paths[i].begin();
         ends[i] = root.paths[i].end();
         mdds.push_back(root.mdds[i]);
@@ -250,11 +251,11 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
             open.erase(open.begin(), it);
             cur = *focal.begin();
             focal.erase(cur);
+            sumLb.erase(sumLb.find(cur.sumLb));
         } else {
             cur = *open.begin();
             open.erase(cur);
         }
-        sumLb.erase(cur.sumLb);
         close.push_back(cur);
 
         std::vector<int> costs(agentCount, 0);
@@ -272,8 +273,8 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
                     costs[it->first] = it->second.size() - 1;
                     agentFound[it->first] = true;
 
-                    if (config.withCAT) {
-                        CAT.addAgentPath(starts[it->first], ends[it->first], map);
+                    if (config.withCAT || config.withFocalSearch == true) {
+                        CAT.addAgentPath(starts[it->first], ends[it->first]);
                     }
                     if (config.withCardinalConflicts) {
                         mdds[it->first] = ptr->mdds.find(it->first)->second;
@@ -341,7 +342,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
                     auto it = child.paths.begin()->second.begin();
                     std::advance(it, constraint.time);
                     if (it->i == constraint.i && it->j == constraint.j) {
-                        std::cout << t << std::endl;
+                        std::cout << "1 " << t << std::endl;
                     }
                 }
             }
@@ -351,7 +352,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
                     std::advance(it, constraint.time);
                     if (it->i == constraint.i && it->j == constraint.j &&
                             std::prev(it)->i == constraint.prev_i && std::prev(it)->j == constraint.prev_j) {
-                        std::cout << t << std::endl;
+                        std::cout << "2 " << t << std::endl;
                     }
                 }
             }
@@ -360,7 +361,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
                     auto it = child.paths.begin()->second.begin();
                     std::advance(it, std::min(constraint.time, int(child.paths.begin()->second.size()) - 1));
                     if ((it->i != constraint.i || it->j != constraint.j)) {
-                        std::cout << t << std::endl;
+                        std::cout << "3 " << t << std::endl;
                     }
                 }
             }

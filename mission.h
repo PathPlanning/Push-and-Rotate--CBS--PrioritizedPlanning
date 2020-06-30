@@ -13,6 +13,9 @@
 #include "environmentoptions.h"
 #include "astar.h"
 #include "dijkstra.h"
+#include "sipp.h"
+#include "focalsearch.h"
+#include "scipp.h"
 #include "xmllogger.h"
 #include <algorithm>
 

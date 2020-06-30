@@ -6,7 +6,8 @@
 class Astar : public Dijkstra
 {
     public:
-        Astar(bool WithTime = false, bool WithIntervals = false, double HW = 1.0, bool BT = true);
+        Astar(bool WithTime = false, double HW = 1.0, bool BT = true);
+        virtual ~Astar() {}
 
     protected:
         double computeHFromCellToCell(int i1, int j1, int i2, int j2) override;
