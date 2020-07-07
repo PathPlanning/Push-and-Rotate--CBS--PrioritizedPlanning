@@ -7,20 +7,19 @@
 #include "isearch.h"
 #include "astar.h"
 #include "multiagent_search_result.h"
+#include "multiagent_search_inteface.h"
 #include <vector>
 
-class PrioritizedPlanning
+class PrioritizedPlanning : public MultiagentSearchInterface
 {
 public:
     PrioritizedPlanning();
-    PrioritizedPlanning(ISearch* Search);
+    PrioritizedPlanning(ISearch<>* Search);
     ~PrioritizedPlanning(void);
-    MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet);
-    void clear();
+    MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet) override;
 
 private:
-    ISearch*                        search;
-    std::vector<std::vector<Node>>  agentsPaths;
+    ISearch<>*                      search;
 };
 
 #endif // PRIORITIZEDPLANNING_H

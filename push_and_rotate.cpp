@@ -6,7 +6,7 @@ PushAndRotate::PushAndRotate()
     search = nullptr;
 }
 
-PushAndRotate::PushAndRotate (ISearch *Search)
+PushAndRotate::PushAndRotate (ISearch<> *Search)
 {
     search = Search;
 }
@@ -22,12 +22,13 @@ void PushAndRotate::clear() {
     agentsMoves.clear();
 }
 
-bool PushAndRotate::clearNode(const Map &map, AgentSet &agentSet, Node &nodeToClear, const std::unordered_set<Node>& occupiedNodes) {
+bool PushAndRotate::clearNode(const Map &map, AgentSet &agentSet, Node &nodeToClear,
+                              const std::unordered_set<Node, NodeHash>& occupiedNodes) {
     auto isGoal = [](const Node &start, const Node &cur, const Map &map, const AgentSet &agentSet) {
         return !agentSet.isOccupied(cur.i, cur.j);
     };
 
-    Dijkstra dijkstraSearch;
+    Dijkstra<> dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, nodeToClear.i, nodeToClear.j, 0, 0,
                                                     isGoal, true, true, 0, -1, -1, occupiedNodes);
     if (!searchResult.pathfound) {
@@ -44,7 +45,8 @@ bool PushAndRotate::clearNode(const Map &map, AgentSet &agentSet, Node &nodeToCl
     return true;
 }
 
-bool PushAndRotate::push(const Map &map, AgentSet &agentSet, Node& from, Node& to, std::unordered_set<Node>& occupiedNodes) {
+bool PushAndRotate::push(const Map &map, AgentSet &agentSet, Node& from, Node& to,
+                         std::unordered_set<Node, NodeHash>& occupiedNodes) {
     if(occupiedNodes.find(to) != occupiedNodes.end()) {
         return false;
     }
@@ -75,7 +77,7 @@ bool PushAndRotate::multipush(const Map &map, AgentSet &agentSet, Node first, No
     for (auto it = path.begin(); it != std::prev(path.end()); ++it) {
         Node curNode = *it;
         Node nextNode = *std::next(it);
-        std::unordered_set<Node> occupiedNodes = {prevNode, curNode};
+        std::unordered_set<Node, NodeHash> occupiedNodes = {prevNode, curNode};
         if (agentSet.isOccupied(nextNode.i, nextNode.j)) {
             if (!clearNode(map, agentSet, nextNode, occupiedNodes)) {
                 return false;
@@ -100,7 +102,7 @@ bool PushAndRotate::clear(const Map &map, AgentSet &agentSet, Node& first, Node&
         return true;
     }
 
-    std::unordered_set<Node> forbidden = {first, second};
+    std::unordered_set<Node, NodeHash> forbidden = {first, second};
     forbidden.insert(unoccupied.begin(), unoccupied.end());
     for (auto node : successors) {
         if (unoccupied.find(node) == unoccupied.end() && node != second &&
@@ -209,7 +211,7 @@ bool PushAndRotate::swap(const Map &map, AgentSet &agentSet, Node& first, Node& 
         return map.getCellDegree(cur.i, cur.j) >= 3;
     };
 
-    Dijkstra dijkstraSearch;
+    Dijkstra<> dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, first.i, first.j, 0, 0, isGoal);
     while (searchResult.pathfound) {
         int begSize = agentsMoves.size();
@@ -248,7 +250,7 @@ bool PushAndRotate::rotate(const Map &map, AgentSet &agentSet, std::vector<Node>
         }
     }
 
-    std::unordered_set<Node> cycleNodes(qPath.begin() + cycleBeg, qPath.end());
+    std::unordered_set<Node, NodeHash> cycleNodes(qPath.begin() + cycleBeg, qPath.end());
     for (int i = cycleBeg; i < qPath.size(); ++i) {
         cycleNodes.erase(qPath[i]);
         int firstAgentId = agentSet.getAgentId(qPath[i].i, qPath[i].j);
@@ -296,8 +298,8 @@ void PushAndRotate::getParallelPaths(AgentSet &agentSet, const Config &config) {
     int agentCount = agentSet.getAgentCount();
     std::vector<std::vector<Node>> agentsPositions(agentCount);
     std::vector<int> agentInd(agentCount, 0);
-    std::unordered_map<Node, std::vector<int>> nodesOccupations;
-    std::unordered_map<Node, int> nodeInd;
+    std::unordered_map<Node, std::vector<int>, NodeHash> nodesOccupations;
+    std::unordered_map<Node, int, NodeHash> nodeInd;
 
     agentsPaths.resize(agentSet.getAgentCount());
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
@@ -460,7 +462,7 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
 
     std::set<int, decltype(comparator)> notFinished(comparator);
     std::unordered_set<int> finished;
-    std::unordered_set<Node> qPathNodes, finishedPositions;
+    std::unordered_set<Node, NodeHash> qPathNodes, finishedPositions;
     std::vector<Node> qPath;
 
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
@@ -499,7 +501,7 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
                                                         curAgent.getCur_i(), curAgent.getCur_j(),
                                                         curAgent.getGoal_i(), curAgent.getGoal_j(),
                                                         nullptr, true, true, 0, -1, -1,
-                                                        isPolygon ? finishedPositions : std::unordered_set<Node>());
+                                                        isPolygon ? finishedPositions : std::unordered_set<Node, NodeHash>());
 
         if (!searchResult.pathfound) {
             return false;
@@ -573,8 +575,8 @@ bool PushAndRotate::solve(const Map &map, const Config &config, AgentSet &agentS
 
 void PushAndRotate::getComponent(AgentSet &agentSet, std::pair<Node, Node> &startEdge,
                                  std::vector<std::pair<Node, Node>> &edgeStack,
-                                 std::vector<std::unordered_set<Node>>& components) {
-    std::unordered_set<Node> component;
+                                 std::vector<std::unordered_set<Node, NodeHash>>& components) {
+    std::unordered_set<Node, NodeHash> component;
     std::pair<Node, Node> curEdge;
     do {
         curEdge = edgeStack.back();
@@ -592,7 +594,7 @@ void PushAndRotate::getComponent(AgentSet &agentSet, std::pair<Node, Node> &star
 
 }
 
-void PushAndRotate::combineNodeSubgraphs(AgentSet &agentSet, std::vector<std::unordered_set<Node>>& components,
+void PushAndRotate::combineNodeSubgraphs(AgentSet &agentSet, std::vector<std::unordered_set<Node, NodeHash>>& components,
                                          Node &subgraphNode, int subgraphNum) {
     std::vector<int> subgraphs = agentSet.getSubgraphs(subgraphNode.i, subgraphNode.j);
     for (int j = 0; j < subgraphs.size(); ++j) {
@@ -607,9 +609,9 @@ void PushAndRotate::combineNodeSubgraphs(AgentSet &agentSet, std::vector<std::un
 }
 
 void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
-    std::unordered_set<Node> close;
-    std::vector<std::unordered_set<Node>> components;
-    std::unordered_set<Node> joinNodes;
+    std::unordered_set<Node, NodeHash> close;
+    std::vector<std::unordered_set<Node, NodeHash>> components;
+    std::unordered_set<Node, NodeHash> joinNodes;
     int connectedComponentNum = 0;
     for (int i = 0; i < map.getMapHeight(); ++i) {
         for (int j = 0; j < map.getMapWidth(); ++j) {
@@ -618,7 +620,7 @@ void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
                 if (close.find(curNode) == close.end()) {
                     int oldSize = close.size();
                     std::vector<std::pair<Node, Node>> edgeStack;
-                    std::unordered_map<Node, int> in, up;
+                    std::unordered_map<Node, int, NodeHash> in, up;
                     std::vector<std::tuple<Node, int, int>> stack = {std::make_tuple(curNode, -1, 0)};
 
                     while (!stack.empty()) {
@@ -697,7 +699,7 @@ void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
         for (auto start : components[i]) {
             if (joinNodes.find(start) != joinNodes.end()) {
                 combineNodeSubgraphs(agentSet, components, start, i);
-                Dijkstra dijkstraSearch;
+                Dijkstra<> dijkstraSearch;
                 SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
                                                                        isGoal, true, true, 0, -1, m - 2, components[i]);
                 while (searchResult.pathfound) {
@@ -718,9 +720,9 @@ void PushAndRotate::getSubgraphs(const Map &map, AgentSet &agentSet) {
 
 int PushAndRotate::getReachableNodesCount(const Map &map, AgentSet &agentSet, Node &start,
                                          bool (*condition)(const Node&, const Node&, const Map&, const AgentSet&),
-                                         const std::unordered_set<Node> &occupiedNodes) {
+                                         const std::unordered_set<Node, NodeHash> &occupiedNodes) {
     int res = 0;
-    Dijkstra dijkstraSearch;
+    Dijkstra<> dijkstraSearch;
     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, start.i, start.j, 0, 0,
                                                            condition, true, false, 0, -1, -1, occupiedNodes);
     while (searchResult.pathfound) {
@@ -771,7 +773,7 @@ void PushAndRotate::assignToSubgraphs(const Map &map, AgentSet &agentSet) {
                     auto isGoal = [](const Node &start, const Node &cur, const Map &map, const AgentSet &agentSet) {
                         return map.getCellDegree(cur.i, cur.j) == 1 || !agentSet.getSubgraphs(cur.i, cur.j).empty();
                     };
-                    Dijkstra dijkstraSearch;
+                    Dijkstra<> dijkstraSearch;
                     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j,
                                                                            0, 0, isGoal, true, true, 0, -1, -1, {pos});
                     auto path = *searchResult.lppath;
@@ -796,7 +798,7 @@ void PushAndRotate::assignToSubgraphs(const Map &map, AgentSet &agentSet) {
 }
 
 void PushAndRotate::getPriorities(const Map &map, AgentSet &agentSet) {
-    std::unordered_map<Node, int> goalPositions;
+    std::unordered_map<Node, int, NodeHash> goalPositions;
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
         goalPositions[agentSet.getAgent(i).getGoalPosition()] = i;
     }
@@ -819,7 +821,7 @@ void PushAndRotate::getPriorities(const Map &map, AgentSet &agentSet) {
             for (auto neigh : successors) {
                 auto neighSubgraphs = agentSet.getSubgraphs(neigh.i, neigh.j);
                 if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {
-                    Dijkstra dijkstraSearch;
+                    Dijkstra<> dijkstraSearch;
                     SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j, 0, 0,
                                                                            isGoal, true, true, 0, -1, -1, {Node(i, j)});
                     if (!searchResult.pathfound) {

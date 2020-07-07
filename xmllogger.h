@@ -33,7 +33,7 @@ public:
 
     void writeToLogAgentsPaths(const AgentSet& agentSet,
                                const std::vector<std::vector<Node>>& agentsPaths,
-                               const std::string &agentsFile, int makespan, int flowtime);
+                               const std::string &agentsFile, double time, int makespan, int flowtime);
 
     void writeToLogNotFound();
 

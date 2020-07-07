@@ -35,6 +35,7 @@ SOURCES += \
     search_queue.cpp \
     sipp.cpp \
     tinyxml2.cpp \
+    weighted_sipp.cpp \
     xmllogger.cpp \
     isearch.cpp \
     mission.cpp \
@@ -42,8 +43,7 @@ SOURCES += \
     dijkstra.cpp \
     config.cpp \
     astar.cpp \
-    main.cpp \
-    environmentoptions.cpp
+    main.cpp
 
 HEADERS += \
     agent.h \
@@ -57,16 +57,22 @@ HEADERS += \
     constraint.h \
     constraints_set.h \
     focalsearch.h \
+    fs_node.h \
     mdd.h \
+    multiagent_search_inteface.h \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \
     scipp.h \
+    scipp_node.h \
     search_queue.h \
     sipp.h \
+    sipp_node.h \
     tinyxml2.h \
     node.h \
     gl_const.h \
+    weighted_sipp.h \
+    weighted_sipp_node.h \
     xmllogger.h \
     isearch.h \
     mission.h \
@@ -75,8 +81,7 @@ HEADERS += \
     dijkstra.h \
     config.h \
     astar.h \
-    searchresult.h \
-    environmentoptions.h
+    searchresult.h
 
 DISTFILES += \
     CMakeLists.txt \

@@ -2,23 +2,27 @@
 
 int CBSNode::curId = 0;
 
-ConflictBasedSearch::ConflictBasedSearch()
+template<typename SearchType>
+ConflictBasedSearch<SearchType>::ConflictBasedSearch()
 {
     search = nullptr;
 }
 
-ConflictBasedSearch::ConflictBasedSearch (ISearch *Search)
+template<typename SearchType>
+ConflictBasedSearch<SearchType>::ConflictBasedSearch (SearchType *Search)
 {
     search = Search;
 }
 
-ConflictBasedSearch::~ConflictBasedSearch()
+template<typename SearchType>
+ConflictBasedSearch<SearchType>::~ConflictBasedSearch()
 {
     if (search)
         delete search;
 }
 
-std::list<Node> ConflictBasedSearch::getNewPath(const Map &map, const AgentSet &agentSet, const Agent &agent,
+template<typename SearchType>
+std::list<Node> ConflictBasedSearch<SearchType>::getNewPath(const Map &map, const AgentSet &agentSet, const Agent &agent,
                                                 const Constraint &constraint, const ConstraintsSet &constraints,
                                                 const std::list<Node>::iterator pathStart,
                                                 const std::list<Node>::iterator pathEnd,
@@ -89,7 +93,8 @@ std::list<Node> ConflictBasedSearch::getNewPath(const Map &map, const AgentSet &
     return res;
 }
 
-CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet, const Config &config,
+template<typename SearchType>
+CBSNode ConflictBasedSearch<SearchType>::createNode(const Map &map, const AgentSet &agentSet, const Config &config,
                                         const Conflict &conflict, const std::vector<int> &costs,
                                         ConstraintsSet &constraints, int id1, int id2,
                                         const Node &pos1, const Node &pos2,
@@ -175,10 +180,11 @@ CBSNode ConflictBasedSearch::createNode(const Map &map, const AgentSet &agentSet
     return node;
 }
 
-MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
+template<typename SearchType>
+MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
     // std::cout << agentSet.getAgentCount() << std::endl;
 
-    ISearch::T = 0;
+    ISearch<>::T = 0;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -198,7 +204,7 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
     std::vector<MDD> mdds;
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
         Agent agent = agentSet.getAgent(i);
-        Astar astar(false, false);
+        Astar<> astar(false, false);
         SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
                                                         agent.getGoal_i(), agent.getGoal_j());
         if (!searchResult.pathfound) {
@@ -403,11 +409,12 @@ MultiagentSearchResult ConflictBasedSearch::startSearch(const Map &map, const Co
         }
     }
     //std::cout << close.size() + open.size() << std::endl;
-    //std::cout << ISearch::T << std::endl;
+    //std::cout << ISearch<>::T << std::endl;
     return result;
 }
 
-void ConflictBasedSearch::clear() {
-    agentsPaths.clear();
-}
-
+template class ConflictBasedSearch<Astar<>>;
+template class ConflictBasedSearch<SIPP<>>;
+template class ConflictBasedSearch<WeightedSIPP<>>;
+template class ConflictBasedSearch<FocalSearch<>>;
+template class ConflictBasedSearch<SCIPP<>>;

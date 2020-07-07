@@ -2,22 +2,24 @@
 #define CONFLICT_BASED_SEARCH_H
 
 #include "isearch.h"
-#include "astar.h"
+#include "scipp.h"
+#include "weighted_sipp.h"
 #include "cbs_node.h"
 #include "multiagent_search_result.h"
+#include "multiagent_search_inteface.h"
 #include "config.h"
 #include "conflict_avoidance_table.h"
 #include "mdd.h"
 #include "conflict_set.h"
 
-class ConflictBasedSearch
+template <typename SearchType = Astar<>>
+class ConflictBasedSearch : public MultiagentSearchInterface
 {
     public:
         ConflictBasedSearch();
-        ConflictBasedSearch(ISearch* Search);
+        ConflictBasedSearch(SearchType* Search);
         ~ConflictBasedSearch(void);
-        MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &agentSet);
-        void clear();
+        MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &agentSet) override;
         template<typename Iter>
         static ConflictSet findConflict(const std::vector<Iter> &starts, const std::vector<Iter> &ends,
                                         int agentId = -1, bool findAllConflicts = false,
@@ -40,12 +42,12 @@ class ConflictBasedSearch
                            CBSNode *parentPtr);
 
 
-        ISearch*                        search;
-        std::vector<std::vector<Node>>  agentsPaths;
+        SearchType*                     search;
 };
 
+template<typename SearchType>
 template<typename Iter>
-ConflictSet ConflictBasedSearch::findConflict(const std::vector<Iter> &starts, const std::vector<Iter> &ends,
+ConflictSet ConflictBasedSearch<SearchType>::findConflict(const std::vector<Iter> &starts, const std::vector<Iter> &ends,
                                            int agentId, bool findAllConflicts,
                                            bool withCardinalConflicts, const std::vector<MDD> &mdds) {
     ConflictSet conflictSet;
@@ -60,8 +62,8 @@ ConflictSet ConflictBasedSearch::findConflict(const std::vector<Iter> &starts, c
         order.push_back(agentId);
     }
     for (int time = 0;; ++time) {
-        std::unordered_multimap<Node, int> positions;
-        std::unordered_multimap<std::pair<Node, Node>, int> edges;
+        std::unordered_multimap<Node, int, NodeHash> positions;
+        std::unordered_multimap<std::pair<Node, Node>, int, NodePairHash> edges;
         std::vector<int> ids;
 
         int finished = 0;

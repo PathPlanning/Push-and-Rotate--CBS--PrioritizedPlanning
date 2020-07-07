@@ -1,10 +1,13 @@
 #include "scipp.h"
 
-SCIPP::~SCIPP() {}
+template<typename NodeType>
+SCIPP<NodeType>::~SCIPP() {}
 
-std::vector<std::pair<int, int>> SCIPP::splitBySoftConflicts(const Node & node, std::pair<int, int> interval,
-                                                      const ConflictAvoidanceTable &CAT) {
-    std::vector<std::pair<int, int>> res;
-    CAT.getSoftConflictIntervals(res, node, interval.first, interval.second);
-    return res;
+template<typename NodeType>
+void SCIPP<NodeType>::splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
+                                                  const NodeType & node, std::pair<int, int> interval,
+                                                  const ConflictAvoidanceTable &CAT) {
+    CAT.getSoftConflictIntervals(softConflictIntervals, node, interval.first, interval.second, false);
 }
+
+template class SCIPP<SCIPPNode>;

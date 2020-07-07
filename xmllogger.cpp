@@ -146,7 +146,7 @@ void XmlLogger::writeToLogMap(const Map &map, const std::list<Node> &path)
 
 void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
                                       const std::vector<std::vector<Node>>& agentsPaths,
-                                      const std::string &agentsFile, int makespan, int flowtime) {
+                                      const std::string &agentsFile, double time, int makespan, int flowtime) {
     XMLElement *log = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG);
 
     XMLElement *taskFileElement = doc.NewElement(CNS_TAG_TASKFN);
@@ -155,6 +155,7 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
 
     XMLElement *summaryElement = doc.NewElement(CNS_TAG_SUMMARY);
     summaryElement->SetAttribute(CNS_TAG_ATTR_COUNT, int(agentsPaths.size()));
+    summaryElement->SetAttribute(CNS_TAG_ATTR_TIME, time);
     summaryElement->SetAttribute(CNS_TAG_ATTR_MAKESPAN, makespan);
     summaryElement->SetAttribute(CNS_TAG_ATTR_FLOWTIME, flowtime);
     log->InsertEndChild(summaryElement);
@@ -163,10 +164,10 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
         Agent agent = agentSet.getAgent(i);
         XMLElement *agentElement = doc.NewElement(CNS_TAG_AGENT);
         agentElement->SetAttribute(CNS_TAG_ATTR_ID, i);
-        agentElement->SetAttribute(CNS_TAG_ATTR_STARTX, agent.getStart_i());
-        agentElement->SetAttribute(CNS_TAG_ATTR_STARTY, agent.getStart_j());
-        agentElement->SetAttribute(CNS_TAG_ATTR_GOALX, agent.getGoal_i());
-        agentElement->SetAttribute(CNS_TAG_ATTR_GOALY, agent.getGoal_j());
+        agentElement->SetAttribute(CNS_TAG_ATTR_STARTX, agent.getStart_j());
+        agentElement->SetAttribute(CNS_TAG_ATTR_STARTY, agent.getStart_i());
+        agentElement->SetAttribute(CNS_TAG_ATTR_GOALX, agent.getGoal_j());
+        agentElement->SetAttribute(CNS_TAG_ATTR_GOALY, agent.getGoal_i());
 
         XMLElement *pathElement = doc.NewElement(CNS_TAG_PATH);
         pathElement->SetAttribute(CNS_TAG_ATTR_PATH_FOUND, "true");
@@ -175,10 +176,10 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
             XMLElement *sectionElement = doc.NewElement(CNS_TAG_SECTION);
             Node curNode = agentsPaths[i][j], nextNode = agentsPaths[i][j + 1];
             sectionElement->SetAttribute(CNS_TAG_ATTR_ID, j);
-            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTX, curNode.i);
-            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTY, curNode.j);
-            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALX, nextNode.i);
-            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALY, nextNode.j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTX, curNode.j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_STARTY, curNode.i);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALX, nextNode.j);
+            sectionElement->SetAttribute(CNS_TAG_ATTR_GOALY, nextNode.i);
             sectionElement->SetAttribute(CNS_TAG_ATTR_DUR, 1);
             pathElement->InsertEndChild(sectionElement);
         }

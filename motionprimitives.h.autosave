@@ -1,0 +1,11 @@
+#ifndef MOTIONPRIMITIVES_H
+#define MOTIONPRIMITIVES_H
+
+
+struct MotionPrimitives
+{
+    MotionPrimitives();
+    std::
+};
+
+#endif // MOTIONPRIMITIVES_H

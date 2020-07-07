@@ -5,7 +5,7 @@ PrioritizedPlanning::PrioritizedPlanning()
     search = nullptr;
 }
 
-PrioritizedPlanning::PrioritizedPlanning (ISearch *Search)
+PrioritizedPlanning::PrioritizedPlanning (ISearch<> *Search)
 {
     search = Search;
 }
@@ -14,10 +14,6 @@ PrioritizedPlanning::~PrioritizedPlanning()
 {
     if (search)
         delete search;
-}
-
-void PrioritizedPlanning::clear() {
-    agentsPaths.clear();
 }
 
 MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
@@ -34,7 +30,7 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
     }
 
     if (config.ppOrder == 1 || config.ppOrder == 2) {
-        Astar astar(false, false);
+        Astar<> astar(false, false);
         std::vector<int> pathLength;
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
             Agent agent = agentSet.getAgent(i);
@@ -72,12 +68,12 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
         agentsPaths[i] = std::vector<Node>(path.begin(), path.end());
         for (auto it = path.begin(); it != path.end(); ++it) {
             if (std::next(it) == path.end()) {
-                constraints.addGoalNodeConstraint(it->i, it->j, it->time, i);
+                constraints.addGoalNodeConstraint(it->i, it->j, it->g, i);
             } else {
-                constraints.addNodeConstraint(it->i, it->j, it->time, i);
+                constraints.addNodeConstraint(it->i, it->j, it->g, i);
             }
             if (it != path.begin()) {
-                constraints.addEdgeConstraint(std::prev(it)->i, std::prev(it)->j, it->time, i, it->i, it->j);
+                constraints.addEdgeConstraint(std::prev(it)->i, std::prev(it)->j, it->g, i, it->i, it->j);
             }
         }
     }

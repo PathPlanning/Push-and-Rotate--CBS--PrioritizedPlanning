@@ -32,6 +32,7 @@
         #define CNS_TAG_LOGLVL      "loglevel"
         #define CNS_TAG_LOGPATH     "logpath"
         #define CNS_TAG_LOGFN       "logfilename"
+        #define CNS_TAG_PLANNER     "planner"
         #define CNS_TAG_MAXTIME     "maxtime"
         #define CNS_TAG_AGENTS_FILE "agents_file"
         #define CNS_TAG_WITH_CAT    "with_cat"
@@ -41,6 +42,7 @@
         #define CNS_TAG_WITH_MH     "with_matching_h"
         #define CNS_TAG_WITH_DS     "with_disjoint_splitting"
         #define CNS_TAG_FOCAL_W     "focal_w"
+        #define CNS_TAG_WEIGHT      "weight"
         #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"
         #define CNS_TAG_PAR_PATHS_1 "parallelize_paths_1"
@@ -116,10 +118,15 @@
 
         #define CNS_SP_ST_ASTAR         "astar"
         #define CNS_SP_ST_SIPP          "sipp"
+        #define CNS_SP_ST_WSIPP         "weighted_sipp"
 
         #define CN_SP_ST_ASTAR          0
-        #define CN_SP_ST_SIPP           1
-        #define CN_SP_ST_SCIPP          2
+        #define CN_SP_ST_TIME_ASTAR     1
+        #define CN_SP_ST_FOCAL_SEARCH   2
+        #define CN_SP_ST_SIPP           3
+        #define CN_SP_ST_WSIPP          4
+        #define CN_SP_ST_SCIPP          5
+
 
     #define CN_SP_AD 1 //AllowDiagonal
 

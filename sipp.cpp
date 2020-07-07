@@ -1,47 +1,63 @@
 #include "sipp.h"
 
-int SIPP::getEndTime(int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) {
+template<typename NodeType>
+void SIPP<NodeType>::setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) {
     int endTime = constraints.getFirstConstraintTime(start_i, start_j, startTime, agentId);
     if (endTime < CN_INFINITY) {
         --endTime;
     }
-    return endTime;
+    node.endTime = endTime;
 }
 
-void SIPP::createSuccessorsFromNode(const Node &cur, Node &neigh, std::list<Node> &successors,
+template<typename NodeType>
+void SIPP<NodeType>::createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
                                     int agentId, const ConstraintsSet &constraints,
                                     const ConflictAvoidanceTable &CAT) {
     std::vector<std::pair<int, int>> safeIntervals = constraints.getSafeIntervals(
-                neigh.i, neigh.j, agentId, cur.time + 1,
+                neigh.i, neigh.j, agentId, cur.g + 1,
                 cur.endTime + (cur.endTime != CN_INFINITY));
     for (auto interval : safeIntervals) {
-        std::vector<std::pair<int, int>> softConflictIntervals = splitBySoftConflicts(neigh, interval, CAT);
+        addOptimalNode(cur, neigh, interval, agentId, constraints, successors);
+        setOptimal(neigh, false);
+        std::vector<std::pair<int, int>> softConflictIntervals;
+        splitBySoftConflicts(softConflictIntervals, neigh, interval, CAT);
         for (int i = 0; i < softConflictIntervals.size(); ++i) {
-            neigh.startTime = softConflictIntervals[i].first;
-            neigh.endTime = (i == softConflictIntervals.size() - 1) ? interval.second : softConflictIntervals[i + 1].first - 1;
-            neigh.hc = cur.hc + softConflictIntervals[i].second;
-
-            for (neigh.time = std::max(neigh.startTime, cur.time + 1); neigh.time <= neigh.endTime; ++neigh.time) {
-                if (!constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.time, agentId, cur.i, cur.j)) {
-                    break;
+            if (softConflictIntervals[i].second == 0) {
+                neigh.startTime = softConflictIntervals[i].first;
+                neigh.endTime = (i == softConflictIntervals.size() - 1) ? interval.second : softConflictIntervals[i + 1].first - 1;
+                neigh.conflictsCount = softConflictIntervals[i].second;
+                setNeighG(cur, neigh, agentId, constraints);
+                if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
+                    neigh.F = neigh.g + neigh.H;
+                    successors.push_back(neigh);
                 }
-            }
-            if (neigh.time <= cur.endTime + 1 && neigh.time <= neigh.endTime) {
-                neigh.g = neigh.time;
-                neigh.F = neigh.g + neigh.H;
-                successors.push_back(neigh);
             }
         }
     }
 }
 
-std::vector<std::pair<int, int>> SIPP::splitBySoftConflicts(const Node & node, std::pair<int, int> interval,
-                                                            const ConflictAvoidanceTable &CAT) {
-    return {std::make_pair(interval.first, 0)};
+template<typename NodeType>
+void SIPP<NodeType>::setNeighG(const NodeType &cur, NodeType &neigh,
+                               int agentId, const ConstraintsSet &constraints) {
+    for (neigh.g = std::max(neigh.startTime, cur.g + 1); neigh.g <= neigh.endTime; ++neigh.g) {
+        if (!constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.g, agentId, cur.i, cur.j)) {
+            break;
+        }
+    }
 }
 
-bool SIPP::checkGoal(const Node &cur, int goalTime, int agentId, const ConstraintsSet &constraints) {
-    return goalTime == -1 || cur.time <= goalTime;
+template<typename NodeType>
+void SIPP<NodeType>::splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
+                                          const NodeType & node, std::pair<int, int> interval,
+                                          const ConflictAvoidanceTable &CAT) {
+    softConflictIntervals.push_back(std::make_pair(interval.first, 0));
 }
 
+template<typename NodeType>
+bool SIPP<NodeType>::checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints) {
+    return goalTime == -1 || cur.g <= goalTime;
+}
 
+template class SIPP<SIPPNode>;
+template class SIPP<WeightedSIPPNode>;
+template class SIPP<SCIPPNode>;

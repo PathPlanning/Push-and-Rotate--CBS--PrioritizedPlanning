@@ -1,17 +1,13 @@
 #include "search_queue.h"
 
-SearchQueue::SearchQueue(bool (*_cmp)(const Node&, const Node&)) {
+template<typename NodeType>
+SearchQueue<NodeType>::SearchQueue(bool (*_cmp)(const NodeType&, const NodeType&)) {
     cmp = _cmp;
-    sortByKey = std::set<Node, decltype (cmp)>(cmp);
+    sortByKey = std::set<NodeType, decltype (cmp)>(cmp);
 }
 
-int SearchQueue::convolution(const Node &node, const Map &map, bool withTime, bool withIntervals) {
-    int time = withIntervals ? node.startTime : node.time;
-    int res = withTime ? map.getMapWidth() * map.getMapHeight() * time : 0;
-    return res + node.i * map.getMapWidth() + node.j;
-}
-
-bool SearchQueue::insert(const Map& map, Node node, bool withTime, bool withIntervals, bool withOld, Node old) {
+template<typename NodeType>
+bool SearchQueue<NodeType>::insert(const Map& map, NodeType node, bool withTime, bool withIntervals, bool withOld, NodeType old) {
     if (!withOld) {
         old = getByIndex(map, node, withTime, withIntervals);
     }
@@ -19,51 +15,63 @@ bool SearchQueue::insert(const Map& map, Node node, bool withTime, bool withInte
         if (old.i != -1) {
             sortByKey.erase(old);
         }
-        sortByIndex[convolution(node, map, withTime, withIntervals)] = node;
+        sortByIndex[node.convolution(map.getMapWidth(), map.getMapHeight(), withTime)] = node;
         sortByKey.insert(node);
         return true;
     }
     return false;
 }
 
-void SearchQueue::erase(const Map& map, Node node, bool withTime, bool withIntervals) {
+template<typename NodeType>
+void SearchQueue<NodeType>::erase(const Map& map, NodeType node, bool withTime, bool withIntervals) {
     sortByKey.erase(node);
-    sortByIndex.erase(convolution(node, map, withTime, withIntervals));
+    sortByIndex.erase(node.convolution(map.getMapWidth(), map.getMapHeight(), withTime));
 }
 
-Node SearchQueue::getByIndex(const Map& map, Node node, bool withTime, bool withIntervals) {
-    auto it = sortByIndex.find(convolution(node, map, withTime, withIntervals));
+template<typename NodeType>
+NodeType SearchQueue<NodeType>::getByIndex(const Map& map, NodeType node, bool withTime, bool withIntervals) {
+    auto it = sortByIndex.find(node.convolution(map.getMapWidth(), map.getMapHeight(), withTime));
     if (it == sortByIndex.end()) {
-        return Node(-1, -1);
+        return NodeType(-1, -1);
     }
     return it->second;
 }
 
-void SearchQueue::moveByThreshold(SearchQueue& other, double threshold, const Map& map,
+template<typename NodeType>
+void SearchQueue<NodeType>::moveByThreshold(SearchQueue<NodeType>& other, double threshold, const Map& map,
                                   std::multiset<double>& otherF, bool withTime, bool withIntervals) {
     auto it = sortByKey.begin();
     for (it; it != sortByKey.end() && it->F <= threshold; ++it) {
         other.insert(map, *it, withTime, withIntervals);
         otherF.insert(it->F);
-        sortByIndex.erase(convolution(*it, map, withTime, withIntervals));
+        sortByIndex.erase(it->convolution(map.getMapWidth(), map.getMapHeight(), withTime));
     }
     sortByKey.erase(sortByKey.begin(), it);
 }
 
-Node SearchQueue::getFront() const {
+template<typename NodeType>
+NodeType SearchQueue<NodeType>::getFront() const {
     return *sortByKey.begin();
 }
 
-bool SearchQueue::empty() const {
+template<typename NodeType>
+bool SearchQueue<NodeType>::empty() const {
     return sortByKey.empty();
 }
 
-int SearchQueue::size() const {
+template<typename NodeType>
+int SearchQueue<NodeType>::size() const {
     return sortByKey.size();
 }
 
-void SearchQueue::clear() {
+template<typename NodeType>
+void SearchQueue<NodeType>::clear() {
     sortByKey.clear();
     sortByIndex.clear();
 }
 
+template class SearchQueue<Node>;
+template class SearchQueue<SIPPNode>;
+template class SearchQueue<WeightedSIPPNode>;
+template class SearchQueue<SCIPPNode>;
+template class SearchQueue<FSNode>;

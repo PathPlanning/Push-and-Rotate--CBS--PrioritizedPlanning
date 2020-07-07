@@ -32,8 +32,9 @@ class Config
         bool            withMatchingHeuristic;
         bool            storeConflicts;
         bool            withDisjointSplitting;
-        bool            withFocalSearch;
+        bool            withFocalSearch = false;
         double          focalW;
+        double          weight;
 };
 
 #endif

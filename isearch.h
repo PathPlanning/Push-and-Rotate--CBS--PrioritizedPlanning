@@ -2,11 +2,11 @@
 #define ISEARCH_H
 #include "ilogger.h"
 #include "searchresult.h"
-#include "environmentoptions.h"
 #include "constraint.h"
 #include "constraints_set.h"
 #include "conflict_avoidance_table.h"
 #include "search_queue.h"
+#include "weighted_sipp_node.h"
 #include <list>
 #include <vector>
 #include <math.h>
@@ -18,6 +18,7 @@
 #include <unordered_set>
 #include <queue>
 
+template <typename NodeType = Node>
 class ISearch
 {
     public:
@@ -28,19 +29,20 @@ class ISearch
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
                                  bool freshStart = true, bool returnPath = true,
                                  int startTime = 0, int goalTime = -1, int maxTime = -1,
-                                 const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
+                                 const std::unordered_set<Node, NodeHash> &occupiedNodes =
+                                       std::unordered_set<Node, NodeHash>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
                                  bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
-        virtual std::list<Node> findSuccessors(const Node &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
-                                               const std::unordered_set<Node> &occupiedNodes = std::unordered_set<Node>(),
+        virtual std::list<NodeType> findSuccessors(const NodeType &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
+                                               const std::unordered_set<Node, NodeHash> &occupiedNodes =
+                                                     std::unordered_set<Node, NodeHash>(),
                                                const ConstraintsSet &constraints = ConstraintsSet(),
                                                bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
         void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
-        bool getWithIntervals();
-        bool setWithIntervals(bool val);
+        virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
 
         static int T;
 
@@ -63,31 +65,31 @@ class ISearch
         //Hint 5. The last but not the least: working with OPEN and CLOSE is the core
         //so think of the data structures that needed to be used, about the wrap-up classes (if needed)
         //Start with very simple (and ineffective) structures like list or vector and make it work first
-        //and only then begin enhancement!
+        //and only then begin enhancement
 
-        virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
         virtual void makePrimaryPath(Node &curNode, int endTime);//Makes path using back pointers
         virtual void makeSecondaryPath(const Map &map);//Makes another type of path(sections or points)
-        virtual int getEndTime(int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
-        virtual void createSuccessorsFromNode(const Node &cur, Node &neigh, std::list<Node> &successors,
+        virtual void setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
+        virtual void setHC(NodeType &neigh, const NodeType &cur) {}
+        virtual void createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
                                               int agentId, const ConstraintsSet &constraints,
                                               const ConflictAvoidanceTable &CAT);
-        virtual bool checkGoal(const Node &cur, int goalTime, int agentId, const ConstraintsSet &constraints);
+        virtual bool checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints);
         virtual bool checkOpenEmpty();
-        virtual Node getCur(const Map& map);
-        virtual bool updateFocal(const Node& neigh, const Map& map);
+        virtual NodeType getCur(const Map& map);
+        virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();
         virtual void clearLists();
 
-        SearchResult                    sresult;
-        std::list<Node>                 lppath, hppath;
-        double                          hweight;//weight of h-value
-        bool                            breakingties;//flag that sets the priority of nodes in addOpen function when their F-values is equal
-        SearchQueue                     open;
-        std::unordered_map<int, Node>   close;
-        bool                            withTime;
-        bool                            withIntervals;
-        std::unordered_map<std::pair<Node, Node>, int> perfectHeuristic;
+        SearchResult                        sresult;
+        std::list<Node>                     lppath, hppath;
+        double                              hweight;//weight of h-value
+        bool                                breakingties;//flag that sets the priority of nodes in addOpen function when their F-values is equal
+        SearchQueue<NodeType>               open;
+        std::unordered_map<int, NodeType>   close;
+        bool                                withTime;
+        bool                                withIntervals;
+        std::unordered_map<std::pair<NodeType, NodeType>, int, NodePairHash> perfectHeuristic;
         //need to define open, close;
 
 };

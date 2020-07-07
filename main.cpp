@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
                 std::cout << "Log chanel has not been created! Program halted!" << std::endl;
             else {
                 std::cout << "Log OK!" << std::endl << "Start searching" << std::endl;
-                mission.createSearch();
+                // mission.createSearch();
                 mission.createAlgorithm();
                 int tasksCount = mission.getSingleExecution() ? 1 : mission.getTasksCount();
                 for (int i = 0; i < tasksCount; ++i) {

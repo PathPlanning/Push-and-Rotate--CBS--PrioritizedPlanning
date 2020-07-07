@@ -9,7 +9,7 @@
 Mission::Mission()
 {
     logger = nullptr;
-    search = nullptr;
+    multiagentSearch = nullptr;
     mapFile = nullptr;
 }
 
@@ -17,15 +17,15 @@ Mission::Mission (const char* MapFile)
 {
     mapFile = MapFile;
     logger = nullptr;
-    search = nullptr;
+    multiagentSearch = nullptr;
 }
 
 Mission::~Mission()
 {
     if (logger)
         delete logger;
-    if (search)
-        delete search;
+    if (multiagentSearch)
+        delete multiagentSearch;
 }
 
 bool Mission::getMap()
@@ -61,34 +61,67 @@ bool Mission::createLog()
                                      config.SearchParams[CN_SP_CC], config.SearchParams[CN_SP_MT]);
 }*/
 
-void Mission::createSearch()
+/*void Mission::createSearch()
 {
-    if (search)
-        delete search;
     if (config.lowLevel == CN_SP_ST_SCIPP) {
-        search = new SCIPP(config.focalW);
+        searchType = CN_SP_ST_SCIPP;
+        //search = new SCIPP<>(config.focalW);
     } else if (config.withFocalSearch) {
-        search = new FocalSearch(true, config.focalW);
+        searchType = CN_SP_ST_FOCAL_SEARCH;
+        //search = new FocalSearch<>(true, config.focalW);
     } else if (config.lowLevel == CN_SP_ST_ASTAR) {
-        search = new Astar(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP);
+        if (config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP) {
+            searchType = CN_SP_ST_TIME_ASTAR;
+        } else {
+            searchType = CN_SP_ST_ASTAR;
+        }
+        //search = new Astar<>(config.searchType == CN_ST_CBS || config.searchType == CN_ST_PP);
     } else {
-        search = new SIPP();
+        searchType = CN_SP_ST_SIPP;
+        //search = new SIPP<>();
     }
-}
+}*/
+
 
 void Mission::createAlgorithm()
-{   
+{
     if (config.searchType == CN_ST_PR) {
-        pushAndRotate = new PushAndRotate(search);
+        multiagentSearch = new PushAndRotate(new Astar<>(false));
     } else if (config.searchType == CN_ST_CBS) {
-        conflictBasedSearch = new ConflictBasedSearch(search);
+        if (config.lowLevel == CN_SP_ST_SCIPP) {
+            multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
+        } else if (config.withFocalSearch) {
+            multiagentSearch = new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW));
+        } else if (config.lowLevel == CN_SP_ST_ASTAR) {
+            multiagentSearch = new ConflictBasedSearch<Astar<>>(new Astar<>(true));
+        } else if (config.lowLevel == CN_SP_ST_SIPP) {
+            multiagentSearch = new ConflictBasedSearch<SIPP<>>(new SIPP<>());
+        } else {
+            multiagentSearch = new ConflictBasedSearch<WeightedSIPP<>>(new WeightedSIPP<>(config.weight));
+        }
     } else if (config.searchType == CN_ST_PP) {
-        prioritizedPlanning = new PrioritizedPlanning(search);
+        multiagentSearch = new PrioritizedPlanning(new Astar<>(true));
     }
 }
 
 void Mission::startSearch(const std::string &agentsFile)
 {
+    if (agentSet.getAgentCount() < config.maxAgents) {
+        std::cout << "Warning: not enough agents in " << agentsFile <<
+                     " agents file. This file will be ignored" << std::endl;
+        return;
+    }
+    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+        Agent agent = agentSet.getAgent(i);
+        Node start = agent.getStartPosition(), goal = agent.getGoalPosition();
+        if (!map.CellOnGrid(start.i, start.j) || !map.CellOnGrid(goal.i, goal.j) ||
+            map.CellIsObstacle(start.i, start.j) || map.CellIsObstacle(goal.i, goal.j)) {
+            std::cout << "Warning: start or goal position of agent " << agent.getId() << " in " << agentsFile <<
+                         " agents file is incorrect. This file will be ignored" << std::endl;
+            return;
+        }
+    }
+
     int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
     for (int i = minAgents; i <= config.maxAgents; ++i) {
         AgentSet curAgentSet;
@@ -96,45 +129,44 @@ void Mission::startSearch(const std::string &agentsFile)
             Agent agent = agentSet.getAgent(j);
             curAgentSet.addAgent(agent.getCur_i(), agent.getCur_j(), agent.getGoal_i(), agent.getGoal_j());
         }
-        if (config.searchType == CN_ST_PR) {
-            pushAndRotate->clear();
-            sr = pushAndRotate->startSearch(map, config, curAgentSet);
-        } else if (config.searchType == CN_ST_CBS) {
-            conflictBasedSearch->clear();
-            sr = conflictBasedSearch->startSearch(map, config, curAgentSet);
-        } else if (config.searchType == CN_ST_PP) {
-            prioritizedPlanning->clear();
-            sr = prioritizedPlanning->startSearch(map, config, curAgentSet);
-        }
+
+        multiagentSearch->clear();
+        sr = multiagentSearch->startSearch(map, config, curAgentSet);
         if (!sr.pathfound) {
+            std::cout << "Failed to find solution for " << i << " agents" << std::endl;
+            if (config.singleExecution) {
+                std::cout << "Log will not be created" << std::endl;
+            }
             break;
         }
 
         agentsPaths = *(sr.agentsPaths);
         std::pair<int, int> costs = getCosts();
         int makespan = costs.first;
-        int timeflow = costs.second;
+        int flowtime = costs.second;
         makespans[i].push_back(makespan);
-        timeflows[i].push_back(timeflow);
+        flowtimes[i].push_back(flowtime);
         times[i].push_back(sr.time);
 
         if (config.singleExecution) {
-            saveAgentsPathsToLog(agentsFile, makespan, timeflow);
+            saveAgentsPathsToLog(agentsFile, sr.time, makespan, flowtime);
         }
         if (!checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
             break;
         }
+        std::cout << "Found solution for " << i << " agents. Time: " <<
+                    sr.time << ", flowtime: " << flowtime << ", makespan: " << makespan << std::endl;
     }
 }
 
 std::pair<int, int> Mission::getCosts() {
     size_t makespan = 0, timeflow = 0;
     for (int i = 0; i < agentsPaths.size(); ++i) {
-        makespan = std::max(makespan, agentsPaths[i].size());
+        makespan = std::max(makespan, agentsPaths[i].size() - 1);
         int lastMove;
         for (lastMove = agentsPaths[i].size() - 1; lastMove > 1 && agentsPaths[i][lastMove] == agentsPaths[i][lastMove - 1]; --lastMove);
-        timeflow += lastMove + 1;
+        timeflow += lastMove;
     }
     return std::make_pair(makespan, timeflow);
 }
@@ -176,7 +208,7 @@ bool Mission::checkCorrectness() {
             }
         }
     }
-    ConflictSet conflictSet = ConflictBasedSearch::findConflict<std::vector<Node>::iterator>(starts, ends);
+    ConflictSet conflictSet = ConflictBasedSearch<>::findConflict<std::vector<Node>::iterator>(starts, ends);
     if (!conflictSet.empty()) {
         Conflict conflict = conflictSet.getBestConflict();
         if (conflict.edgeConflict) {
@@ -196,7 +228,7 @@ void Mission::saveAggregatedResultsToLog() {
         if (times[i].size() > 0) {
             successCount[i] = times[i].size();
             makespansAggregated[i] = std::accumulate(makespans[i].begin(), makespans[i].end(), 0.0) / makespans[i].size();
-            timeflowsAggregated[i] = std::accumulate(timeflows[i].begin(), timeflows[i].end(), 0.0) / timeflows[i].size();
+            timeflowsAggregated[i] = std::accumulate(flowtimes[i].begin(), flowtimes[i].end(), 0.0) / flowtimes[i].size();
             timesAggregated[i] = std::accumulate(times[i].begin(), times[i].end(), 0.0) / times[i].size();
         }
     }
@@ -219,9 +251,9 @@ void Mission::saveAggregatedResultsToLog() {
     std::cout << "time=" << sr.time << std::endl;
 }*/
 
-void Mission::saveAgentsPathsToLog(const std::string &agentsFile, int makespan, int flowtime)
+void Mission::saveAgentsPathsToLog(const std::string &agentsFile, double time, int makespan, int flowtime)
 {
-    logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, makespan, flowtime);
+    logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, time, makespan, flowtime);
     logger->saveLog();
 }
 

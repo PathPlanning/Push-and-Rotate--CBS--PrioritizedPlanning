@@ -18,7 +18,7 @@ Map::~Map()
     }
 }
 
-bool Map::CellIsTraversable(int i, int j, const std::unordered_set<Node> &occupiedNodes) const
+bool Map::CellIsTraversable(int i, int j, const std::unordered_set<Node, NodeHash> &occupiedNodes) const
 {
     return (Grid[i][j] == CN_GC_NOOBS) && occupiedNodes.find(Node(i, j)) == occupiedNodes.end();
 }
@@ -71,62 +71,37 @@ bool Map::getMap(const char *FileName)
         value = mapnode->Value();
         std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 
-        stream.str("");
-        stream.clear();
-        if (value != "grid") {
-            stream << element->GetText();
-        }
+        if (value == CNS_TAG_GRID) {
+            hasGrid = true;
 
-        if (!hasGridMem && hasHeight && hasWidth) {
+            element->QueryIntAttribute(CNS_TAG_HEIGHT, &height);
+            if (height < 0) {
+                std::cout << "Warning! Invalid value of '" << CNS_TAG_HEIGHT
+                          << "' attribute encountered (or could not convert to integer)." << std::endl;
+                std::cout << "Value of '" << CNS_TAG_HEIGHT << "' attribute should be an integer >=0" << std::endl;
+            } else {
+                hasHeight = true;
+            }
+
+            element->QueryIntAttribute(CNS_TAG_WIDTH, &width);
+            if (width < 0) {
+                std::cout << "Warning! Invalid value of '" << CNS_TAG_WIDTH
+                          << "' attribute encountered (or could not convert to integer)." << std::endl;
+                std::cout << "Value of '" << CNS_TAG_WIDTH << "' attribute should be an integer AND >0" << std::endl;
+            } else {
+                hasWidth = true;
+            }
+
+            if (!(hasHeight && hasWidth)) {
+                std::cout << "Error! No '" << CNS_TAG_WIDTH << "' attribute or '" << CNS_TAG_HEIGHT << "' attribute in '"
+                          << CNS_TAG_GRID << "' tag encountered!" << std::endl;
+                return false;
+            }
+
             Grid = new int *[height];
             for (int i = 0; i < height; ++i)
                 Grid[i] = new int[width];
-            hasGridMem = true;
-        }
 
-        if (value == CNS_TAG_HEIGHT) {
-            if (hasHeight) {
-                std::cout << "Warning! Duplicate '" << CNS_TAG_HEIGHT << "' encountered." << std::endl;
-                std::cout << "Only first value of '" << CNS_TAG_HEIGHT << "' =" << height << "will be used."
-                          << std::endl;
-            }
-            else {
-                if (!((stream >> height) && (height > 0))) {
-                    std::cout << "Warning! Invalid value of '" << CNS_TAG_HEIGHT
-                              << "' tag encountered (or could not convert to integer)." << std::endl;
-                    std::cout << "Value of '" << CNS_TAG_HEIGHT << "' tag should be an integer >=0" << std::endl;
-                    std::cout << "Continue reading XML and hope correct value of '" << CNS_TAG_HEIGHT
-                              << "' tag will be encountered later..." << std::endl;
-                }
-                else
-                    hasHeight = true;
-            }
-        }
-        else if (value == CNS_TAG_WIDTH) {
-            if (hasWidth) {
-                std::cout << "Warning! Duplicate '" << CNS_TAG_WIDTH << "' encountered." << std::endl;
-                std::cout << "Only first value of '" << CNS_TAG_WIDTH << "' =" << width << "will be used." << std::endl;
-            }
-            else {
-                if (!((stream >> width) && (width > 0))) {
-                    std::cout << "Warning! Invalid value of '" << CNS_TAG_WIDTH
-                              << "' tag encountered (or could not convert to integer)." << std::endl;
-                    std::cout << "Value of '" << CNS_TAG_WIDTH << "' tag should be an integer AND >0" << std::endl;
-                    std::cout << "Continue reading XML and hope correct value of '" << CNS_TAG_WIDTH
-                              << "' tag will be encountered later..." << std::endl;
-
-                }
-                else
-                    hasWidth = true;
-            }
-        }
-        else if (value == CNS_TAG_GRID) {
-            hasGrid = true;
-            if (!(hasHeight && hasWidth)) {
-                std::cout << "Error! No '" << CNS_TAG_WIDTH << "' tag or '" << CNS_TAG_HEIGHT << "' tag before '"
-                          << CNS_TAG_GRID << "'tag encountered!" << std::endl;
-                return false;
-            }
             element = mapnode->FirstChildElement();
             while (grid_i < height) {
                 if (!element) {

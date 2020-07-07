@@ -299,8 +299,18 @@ bool Config::getConfig(const char *FileName)
             LogParams[CN_LP_NAME] = element->GetText();
     }
 
-    algorithm = options->FirstChildElement(CNS_TAG_ALG);
-    value = algorithm->GetText();
+    agentsFile = options->FirstChildElement(CNS_TAG_AGENTS_FILE)->GetText();
+    options->FirstChildElement(CNS_TAG_TASKS_COUNT)->QueryIntText(&tasksCount);
+    tinyxml2::XMLElement *range = options->FirstChildElement(CNS_TAG_AGENTS_RANGE);
+    range->QueryIntAttribute(CNS_TAG_MIN, &minAgents);
+    range->QueryIntAttribute(CNS_TAG_MAX, &maxAgents);
+    options->FirstChildElement(CNS_TAG_MAXTIME)->QueryIntText(&maxTime);
+    options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
+
+
+    algorithm = root->FirstChildElement(CNS_TAG_ALG);
+    tinyxml2::XMLElement *planner = algorithm->FirstChildElement(CNS_TAG_PLANNER);
+    value = planner->GetText();
     if (value == CNS_ST_CBS || value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
         searchType = CN_ST_CBS;
         if (value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
@@ -312,33 +322,29 @@ bool Config::getConfig(const char *FileName)
         searchType = CN_ST_PP;
     }
 
-    std::string lowLevelSearch = options->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
+    std::string lowLevelSearch = algorithm->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
     if (value == CNS_ST_ECBS_CT) {
         lowLevel = CN_SP_ST_SCIPP;
     } else if (lowLevelSearch == CNS_SP_ST_ASTAR) {
         lowLevel = CN_SP_ST_ASTAR;
     } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
         lowLevel = CN_SP_ST_SIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
+        lowLevel = CN_SP_ST_SIPP;
     }
 
-    tinyxml2::XMLElement *range = options->FirstChildElement(CNS_TAG_AGENTS_RANGE);
-    range->QueryIntAttribute(CNS_TAG_MIN, &minAgents);
-    range->QueryIntAttribute(CNS_TAG_MAX, &maxAgents);
 
-    options->FirstChildElement(CNS_TAG_MAXTIME)->QueryIntText(&maxTime);
-    agentsFile = options->FirstChildElement(CNS_TAG_AGENTS_FILE)->GetText();
-    options->FirstChildElement(CNS_TAG_TASKS_COUNT)->QueryIntText(&tasksCount);
-    options->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
-    options->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
-    options->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
-    options->FirstChildElement(CNS_TAG_PAR_PATHS_1)->QueryBoolText(&parallelizePaths1);
-    options->FirstChildElement(CNS_TAG_PAR_PATHS_2)->QueryBoolText(&parallelizePaths2);
-    options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
-    options->FirstChildElement(CNS_TAG_CARD_CONF)->QueryBoolText(&withCardinalConflicts);
-    options->FirstChildElement(CNS_TAG_BYPASSING)->QueryBoolText(&withBypassing);
-    options->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
-    options->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
-    options->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
+    algorithm->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
+    algorithm->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
+    algorithm->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
+    algorithm->FirstChildElement(CNS_TAG_PAR_PATHS_1)->QueryBoolText(&parallelizePaths1);
+    algorithm->FirstChildElement(CNS_TAG_PAR_PATHS_2)->QueryBoolText(&parallelizePaths2);
+    algorithm->FirstChildElement(CNS_TAG_CARD_CONF)->QueryBoolText(&withCardinalConflicts);
+    algorithm->FirstChildElement(CNS_TAG_BYPASSING)->QueryBoolText(&withBypassing);
+    algorithm->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
+    algorithm->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
+    algorithm->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
+    algorithm->FirstChildElement(CNS_TAG_WEIGHT)->QueryDoubleText(&weight);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;

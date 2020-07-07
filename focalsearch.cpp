@@ -1,35 +1,40 @@
 #include "focalsearch.h"
 
-FocalSearch::FocalSearch(bool WithTime, double FocalW, double HW, bool BT) : Astar(WithTime, HW, BT) {
-    auto focalCmp = [](const Node &lhs, const Node &rhs) {
+template<typename NodeType>
+FocalSearch<NodeType>::FocalSearch(bool WithTime, double FocalW, double HW, bool BT) :
+    Astar<NodeType>(WithTime, HW, BT) {
+    auto focalCmp = [](const NodeType &lhs, const NodeType &rhs) {
         return lhs.hc < rhs.hc || lhs.hc == rhs.hc && lhs < rhs;
     };
-    focal = SearchQueue(focalCmp);
+    focal = SearchQueue<NodeType>(focalCmp);
     focalW = FocalW;
 }
 
-bool FocalSearch::checkOpenEmpty() {
-    return open.empty() && focal.empty();
+template<typename NodeType>
+bool FocalSearch<NodeType>::checkOpenEmpty() {
+    return this->open.empty() && focal.empty();
 }
 
-Node FocalSearch::getCur(const Map& map) {
-    if (!open.empty()) {
-        double minF = open.getFront().F;
+template<typename NodeType>
+NodeType FocalSearch<NodeType>::getCur(const Map& map) {
+    if (!this->open.empty()) {
+        double minF = this->open.getFront().F;
         if (!focalF.empty()) {
             minF = std::min(minF, *focalF.begin());
         }
-        open.moveByThreshold(focal, minF * focalW, map, focalF, withTime, withIntervals);
+        this->open.moveByThreshold(focal, minF * focalW, map, focalF, this->withTime, this->withIntervals);
     }
-    Node cur = focal.getFront();
-    focal.erase(map, cur, withTime, withIntervals);
+    NodeType cur = focal.getFront();
+    focal.erase(map, cur, this->withTime, this->withIntervals);
     focalF.erase(focalF.find(cur.F));
     return cur;
 }
 
-bool FocalSearch::updateFocal(const Node& neigh, const Map& map) {
-    Node old = focal.getByIndex(map, neigh, withTime, withIntervals);
+template<typename NodeType>
+bool FocalSearch<NodeType>::updateFocal(const NodeType& neigh, const Map& map) {
+    NodeType old = focal.getByIndex(map, neigh, this->withTime, this->withIntervals);
     if (old.i != -1) {
-        if (focal.insert(map, neigh, withTime, withIntervals, true, old)) {
+        if (focal.insert(map, neigh, this->withTime, this->withIntervals, true, old)) {
             focalF.erase(focalF.find(old.F));
             focalF.insert(neigh.F);
         }
@@ -38,15 +43,25 @@ bool FocalSearch::updateFocal(const Node& neigh, const Map& map) {
     return false;
 }
 
-double FocalSearch::getMinFocalF() {
+template<typename NodeType>
+double FocalSearch<NodeType>::getMinFocalF() {
     if (focalF.empty()) {
         return CN_INFINITY;
     }
     return *focalF.begin();
 }
 
-void FocalSearch::clearLists() {
-    ISearch::clearLists();
+template<typename NodeType>
+void FocalSearch<NodeType>::clearLists() {
+    ISearch<NodeType>::clearLists();
     focal.clear();
     focalF.clear();
 }
+
+template<typename NodeType>
+void FocalSearch<NodeType>::setHC(NodeType &neigh, const NodeType &cur) {
+    neigh.hc = cur.hc + neigh.conflictsCount;
+}
+
+template class FocalSearch<FSNode>;
+template class FocalSearch<SCIPPNode>;

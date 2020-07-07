@@ -16,7 +16,7 @@ class ILogger
         virtual void writeToLogPath(const std::list<Node>& path) = 0;
         virtual void writeToLogHPpath(const std::list<Node>& path) = 0;
         virtual void writeToLogAgentsPaths(const AgentSet& agentSet, const std::vector<std::vector<Node>>& agentsPaths,
-                                   const std::string &agentsFile, int makespan, int flowtime) = 0;
+                                   const std::string &agentsFile, double time, int makespan, int flowtime) = 0;
         virtual void writeToLogNotFound() = 0;
         virtual void writeToLogAggregatedResults(std::map<int, int> successCount,
                                                   std::map<int, double> makespans,

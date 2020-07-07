@@ -2,20 +2,23 @@
 #define FOCALSEARCH_H
 
 #include "astar.h"
+#include "fs_node.h"
 
-class FocalSearch : virtual public Astar
+template <typename NodeType = FSNode>
+class FocalSearch : virtual public Astar<NodeType>
 {
 public:
     FocalSearch(bool WithTime = false, double FocalW = 1.0, double HW = 1.0, bool BT = true);
     virtual ~FocalSearch() {}
 protected:
     bool checkOpenEmpty() override;
-    Node getCur(const Map& map) override;
-    bool updateFocal(const Node& neigh, const Map& map) override;
+    NodeType getCur(const Map& map) override;
+    bool updateFocal(const NodeType& neigh, const Map& map) override;
     double getMinFocalF() override;
     void clearLists() override;
+    void setHC(NodeType &neigh, const NodeType &cur) override;
 
-    SearchQueue focal;
+    SearchQueue<NodeType> focal;
     std::multiset<double> focalF;
     double focalW;
 };

@@ -1,22 +1,25 @@
 #include "isearch.h"
 
-ISearch::ISearch(bool WithTime)
+template<typename NodeType>
+ISearch<NodeType>::ISearch(bool WithTime)
 {
     hweight = 1;
     breakingties = CN_SP_BT_GMAX;
     withTime = WithTime;
 }
 
-ISearch::~ISearch(void) {}
+template<typename NodeType>
+ISearch<NodeType>::~ISearch(void) {}
 
-bool Node::breakingties;
-int ISearch::T = 0;
+template<typename NodeType>
+int ISearch<NodeType>::T = 0;
 
-SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
+template<typename NodeType>
+SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agentSet,
                                   int start_i, int start_j, int goal_i, int goal_j,
                                   bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&),
                                   bool freshStart, bool returnPath, int startTime, int goalTime, int maxTime,
-                                  const std::unordered_set<Node> &occupiedNodes,
+                                  const std::unordered_set<Node, NodeHash> &occupiedNodes,
                                   const ConstraintsSet &constraints,
                                   bool withCAT, const ConflictAvoidanceTable &CAT)
 {
@@ -25,20 +28,26 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
     if (goalTime != -1) {
         maxTime = goalTime;
     }
-    Node cur;
+    NodeType cur;
     int agentId = -1;
     if (agentSet.isOccupied(start_i, start_j)) {
         agentId = agentSet.getAgentId(start_i, start_j);
     }
 
+    if (withCAT) {
+        open = SearchQueue<NodeType>([](const NodeType &lhs, const NodeType &rhs) {
+            return std::tuple<int, int, int, int, int>(lhs.F, lhs.conflictsCount, -lhs.g, lhs.i, lhs.j) <
+                    std::tuple<int, int, int, int, int>(rhs.F, rhs.conflictsCount, -rhs.g, rhs.i, rhs.j);
+        });
+    }
+
     if (freshStart) {
         clearLists();
 
-        Node::breakingties = breakingties;
         sresult.numberofsteps = 0;
-        cur = Node(start_i, start_j, nullptr, 0,
+        cur = NodeType(start_i, start_j, nullptr, 0,
                  computeHFromCellToCell(start_i, start_j, goal_i, goal_j), startTime);
-        cur.endTime = getEndTime(start_i, start_j, startTime, agentId, constraints);
+        setEndTime(cur, start_i, start_j, startTime, agentId, constraints);
         open.insert(map, cur, withTime, withIntervals);
     }
 
@@ -53,12 +62,12 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
         }*/
 
         cur = getCur(map);
-        close[SearchQueue::convolution(cur, map, withTime, withIntervals)] = cur;
+        close[cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime)] = cur;
 
-        Node *curPtr = &(close.find(SearchQueue::convolution(cur, map, withTime, withIntervals))->second);
-        if (((isGoal != nullptr && isGoal(Node(start_i, start_j), cur, map, agentSet)) ||
+        NodeType *curPtr = &(close.find(cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime))->second);
+        if (((isGoal != nullptr && isGoal(NodeType(start_i, start_j), cur, map, agentSet)) ||
             (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j)) &&
-            !constraints.hasFutureConstraint(cur.i, cur.j, cur.time, agentId) &&
+            !constraints.hasFutureConstraint(cur.i, cur.j, cur.g, agentId) &&
             checkGoal(cur, goalTime, agentId, constraints)) {
             if (!freshStart) {
                 freshStart = true;
@@ -68,11 +77,11 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
             }
         }
 
-        if (maxTime == -1 || cur.time < maxTime) {
-            std::list<Node> successors = findSuccessors(cur, map, goal_i, goal_j, agentId, occupiedNodes,
+        if (maxTime == -1 || cur.g < maxTime) {
+            std::list<NodeType> successors = findSuccessors(cur, map, goal_i, goal_j, agentId, occupiedNodes,
                                                         constraints, withCAT, CAT);
             for (auto neigh : successors) {
-                if (close.find(SearchQueue::convolution(neigh, map, withTime, withIntervals)) == close.end()) {
+                if (close.find(neigh.convolution(map.getMapWidth(), map.getMapHeight(), withTime)) == close.end()) {
                     neigh.parent = curPtr;
                     if (!updateFocal(neigh, map)) {
                         open.insert(map, neigh, withTime, withIntervals);
@@ -94,7 +103,7 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
 
     if (sresult.pathfound) {
         sresult.pathlength = cur.g;
-        sresult.minF = std::min(cur.F, getMinFocalF());
+        sresult.minF = std::min(double(cur.F), getMinFocalF());
         sresult.lastNode = cur;
         if (returnPath) {
             lppath.clear();
@@ -108,25 +117,22 @@ SearchResult ISearch::startSearch(const Map &map, const AgentSet &agentSet,
     return sresult;
 }
 
-std::list<Node> ISearch::findSuccessors(const Node &curNode, const Map &map,
+template<typename NodeType>
+std::list<NodeType> ISearch<NodeType>::findSuccessors(const NodeType &curNode, const Map &map,
                                         int goal_i, int goal_j, int agentId,
-                                        const std::unordered_set<Node> &occupiedNodes,
+                                        const std::unordered_set<Node, NodeHash> &occupiedNodes,
                                         const ConstraintsSet &constraints,
                                         bool withCAT, const ConflictAvoidanceTable &CAT)
 {
-    std::list<Node> successors;
+    std::list<NodeType> successors;
     for (int di = -1; di <= 1; ++di) {
         for (int dj = -1; dj <= 1; ++dj) {
             int newi = curNode.i + di, newj = curNode.j + dj;
             if ((di == 0 || dj == 0) && ((withTime && !withIntervals) || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
                     map.CellIsTraversable(newi, newj, occupiedNodes)) {
                 int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
-                Node neigh(newi, newj, nullptr, curNode.g + 1, newh, curNode.time + 1);
-                int conflictsCount = CAT.getAgentsCount(neigh);
-                if (withCAT) {
-                    neigh.conflictsCount = conflictsCount;
-                }
-                neigh.hc = curNode.hc + conflictsCount;
+                NodeType neigh(newi, newj, nullptr, curNode.g + 1, newh);
+                neigh.conflictsCount = CAT.getAgentsCount(neigh);
                 createSuccessorsFromNode(curNode, neigh, successors, agentId, constraints, CAT);
             }
         }
@@ -134,61 +140,72 @@ std::list<Node> ISearch::findSuccessors(const Node &curNode, const Map &map,
     return successors;
 }
 
-void ISearch::clearLists() {
+template<typename NodeType>
+void ISearch<NodeType>::clearLists() {
     open.clear();
     close.clear();
 }
 
-bool ISearch::checkOpenEmpty() {
+template<typename NodeType>
+bool ISearch<NodeType>::checkOpenEmpty() {
     return open.empty();
 }
 
-Node ISearch::getCur(const Map& map) {
-    Node cur = open.getFront();
+template<typename NodeType>
+NodeType ISearch<NodeType>::getCur(const Map& map) {
+    NodeType cur = open.getFront();
     open.erase(map, cur, withTime, withIntervals);
     return cur;
 }
 
-bool ISearch::updateFocal(const Node& neigh, const Map& map) {
+template<typename NodeType>
+bool ISearch<NodeType>::updateFocal(const NodeType& neigh, const Map& map) {
     return false;
 }
 
-double ISearch::getMinFocalF() {
+template<typename NodeType>
+double ISearch<NodeType>::getMinFocalF() {
     return CN_INFINITY;
 }
 
-int ISearch::getEndTime(int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) {
-    return startTime;
+template<typename NodeType>
+void ISearch<NodeType>::setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) {
+    return;
 }
 
-bool ISearch::checkGoal(const Node &cur, int goalTime, int agentId, const ConstraintsSet &constraints) {
-    return goalTime == -1 || cur.time == goalTime;
+template<typename NodeType>
+bool ISearch<NodeType>::checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints) {
+    return goalTime == -1 || cur.g == goalTime;
 }
 
-void ISearch::createSuccessorsFromNode(const Node &cur, Node &neigh, std::list<Node> &successors,
+template<typename NodeType>
+void ISearch<NodeType>::createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
                                        int agentId, const ConstraintsSet &constraints,
                                        const ConflictAvoidanceTable &CAT) {
-    if (!constraints.hasNodeConstraint(neigh.i, neigh.j, neigh.time, agentId) &&
-        !constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.time, agentId, cur.i, cur.j)) {
+    if (!constraints.hasNodeConstraint(neigh.i, neigh.j, neigh.g, agentId) &&
+        !constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.g, agentId, cur.i, cur.j)) {
+        setHC(neigh, cur);
         successors.push_back(neigh);
     }
 }
 
-void ISearch::makePrimaryPath(Node &curNode, int endTime)
+template<typename NodeType>
+void ISearch<NodeType>::makePrimaryPath(Node &curNode, int endTime)
 {
     if (withTime && endTime != -1) {
-        int startTime = curNode.time;
-        for (curNode.time = endTime - 1; curNode.time > startTime; --curNode.time) {
+        int startTime = curNode.g;
+        for (curNode.g = endTime - 1; curNode.g > startTime; --curNode.g) {
             lppath.push_front(curNode);
         }
     }
     lppath.push_front(curNode);
     if (curNode.parent != nullptr) {
-        makePrimaryPath(*(curNode.parent), curNode.time);
+        makePrimaryPath(*(curNode.parent), curNode.g);
     }
 }
 
-void ISearch::makeSecondaryPath(const Map &map)
+template<typename NodeType>
+void ISearch<NodeType>::makeSecondaryPath(const Map &map)
 {
     auto it = lppath.begin();
     hppath.push_back(*it);
@@ -205,25 +222,26 @@ void ISearch::makeSecondaryPath(const Map &map)
     }
 }
 
-void ISearch::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
+template<typename NodeType>
+void ISearch<NodeType>::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
     bool oldWithTime = withTime;
     withTime = false;
     perfectHeuristic.clear();
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
         close.clear();
-        Node goal = agentSet.getAgent(i).getGoalPosition();
-        std::queue<Node> queue;
+        NodeType goal = NodeType(agentSet.getAgent(i).getGoal_i(), agentSet.getAgent(i).getGoal_j());
+        std::queue<NodeType> queue;
         queue.push(goal);
 
         while (!queue.empty()) {
-            Node cur = queue.front();
+            NodeType cur = queue.front();
             queue.pop();
-            if (close.find(SearchQueue::convolution(cur, map)) != close.end()) {
+            if (close.find(cur.convolution(map.getMapWidth(), map.getMapHeight())) != close.end()) {
                 continue;
             }
-            close[SearchQueue::convolution(cur, map)] = cur;
+            close[cur.convolution(map.getMapWidth(), map.getMapHeight())] = cur;
             perfectHeuristic[std::make_pair(cur, goal)] = cur.g;
-            std::list<Node> successors = findSuccessors(cur, map);
+            std::list<NodeType> successors = findSuccessors(cur, map);
             for (auto neigh : successors) {
                 queue.push(neigh);
             }
@@ -232,11 +250,8 @@ void ISearch::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
     withTime = oldWithTime;
 }
 
-bool ISearch::getWithIntervals() {
-    return withIntervals;
-}
-
-
-bool ISearch::setWithIntervals(bool val) {
-    withIntervals = val;
-}
+template class ISearch<Node>;
+template class ISearch<SIPPNode>;
+template class ISearch<WeightedSIPPNode>;
+template class ISearch<SCIPPNode>;
+template class ISearch<FSNode>;

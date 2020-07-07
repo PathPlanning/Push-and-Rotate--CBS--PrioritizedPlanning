@@ -10,13 +10,14 @@
 #include "isearch.h"
 #include "ilogger.h"
 #include "searchresult.h"
-#include "environmentoptions.h"
 #include "astar.h"
 #include "dijkstra.h"
 #include "sipp.h"
+#include "weighted_sipp.h"
 #include "focalsearch.h"
 #include "scipp.h"
 #include "xmllogger.h"
+#include "multiagent_search_inteface.h"
 #include <algorithm>
 
 //That's the wrap up class that first creates all the needed objects (Map, Search etc.)
@@ -36,13 +37,13 @@ class Mission
         bool getAgents(const char* agentsFile);
         bool getConfig();
         bool createLog();
-        void createSearch();
+        // void createSearch();
         void createAlgorithm();
         void createEnvironmentOptions();
         void startSearch(const std::string &agentsFile);
         void printSearchResultsToConsole();
         void saveSearchResultsToLog();
-        void saveAgentsPathsToLog(const std::string &agentsFile, int makespan, int flowtime);
+        void saveAgentsPathsToLog(const std::string &agentsFile, double time, int makespan, int flowtime);
         bool checkCorrectness();
         void saveAggregatedResultsToLog();
         std::pair<int, int> getCosts();
@@ -54,17 +55,14 @@ class Mission
         Map                                   map;
         AgentSet                              agentSet;
         Config                                config;
-        EnvironmentOptions                    options;
-        ISearch*                              search;
-        ConflictBasedSearch*                  conflictBasedSearch;
-        PushAndRotate*                        pushAndRotate;
-        PrioritizedPlanning*                  prioritizedPlanning;
+        int                                   searchType;
+        MultiagentSearchInterface*            multiagentSearch;
         ILogger*                              logger;
         const char*                           mapFile;
         MultiagentSearchResult                sr;
         std::vector<std::vector<Node>>        agentsPaths;
         std::map<int, std::vector<int>>       makespans;
-        std::map<int, std::vector<int>>       timeflows;
+        std::map<int, std::vector<int>>       flowtimes;
         std::map<int, std::vector<double>>    times;
 };
 

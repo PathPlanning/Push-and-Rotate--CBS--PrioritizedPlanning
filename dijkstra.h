@@ -2,7 +2,8 @@
 #define DIJKSTRA_H
 #include "isearch.h"
 
-class Dijkstra : public ISearch
+template <typename NodeType = Node>
+class Dijkstra : public ISearch<NodeType>
 {
 public:
     virtual ~Dijkstra() {}
