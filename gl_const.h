@@ -43,6 +43,7 @@
         #define CNS_TAG_WITH_DS     "with_disjoint_splitting"
         #define CNS_TAG_FOCAL_W     "focal_w"
         #define CNS_TAG_WEIGHT      "weight"
+        #define CNS_TAG_SFO         "gen_subopt_from_opt"
         #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"
         #define CNS_TAG_PAR_PATHS_1 "parallelize_paths_1"
@@ -117,12 +118,14 @@
     #define CN_SP_ST 0
 
         #define CNS_SP_ST_ASTAR         "astar"
+        #define CNS_SP_ST_FS            "focal_search"
         #define CNS_SP_ST_SIPP          "sipp"
         #define CNS_SP_ST_WSIPP         "weighted_sipp"
+        #define CNS_SP_ST_SCIPP         "scipp"
 
         #define CN_SP_ST_ASTAR          0
         #define CN_SP_ST_TIME_ASTAR     1
-        #define CN_SP_ST_FOCAL_SEARCH   2
+        #define CN_SP_ST_FS             2
         #define CN_SP_ST_SIPP           3
         #define CN_SP_ST_WSIPP          4
         #define CN_SP_ST_SCIPP          5

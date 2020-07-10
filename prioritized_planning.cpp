@@ -31,17 +31,16 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
 
     if (config.ppOrder == 1 || config.ppOrder == 2) {
         Astar<> astar(false, false);
-        std::vector<int> pathLength;
+        std::vector<int> dist;
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
             Agent agent = agentSet.getAgent(i);
-            SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
-                                                            agent.getGoal_i(), agent.getGoal_j());
-            pathLength.push_back(searchResult.pathlength);
+            dist.push_back(search->computeHFromCellToCell(
+                               agent.getStart_i(), agent.getStart_j(), agent.getGoal_i(), agent.getGoal_j()));
         }
 
-        std::sort(order.begin(), order.end(), [&pathLength, &config](int i, int j) {
-            return (pathLength[i] < pathLength[j] && config.ppOrder == 1) ||
-                   (pathLength[i] > pathLength[j] && config.ppOrder == 2);
+        std::sort(order.begin(), order.end(), [&dist, &config](int i, int j) {
+            return (dist[i] < dist[j] && config.ppOrder == 1) ||
+                   (dist[i] > dist[j] && config.ppOrder == 2);
         });
     }
 

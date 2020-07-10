@@ -88,16 +88,16 @@ void Mission::createAlgorithm()
     if (config.searchType == CN_ST_PR) {
         multiagentSearch = new PushAndRotate(new Astar<>(false));
     } else if (config.searchType == CN_ST_CBS) {
-        if (config.lowLevel == CN_SP_ST_SCIPP) {
-            multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
-        } else if (config.withFocalSearch) {
-            multiagentSearch = new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW));
-        } else if (config.lowLevel == CN_SP_ST_ASTAR) {
+        if (config.lowLevel == CN_SP_ST_ASTAR) {
             multiagentSearch = new ConflictBasedSearch<Astar<>>(new Astar<>(true));
         } else if (config.lowLevel == CN_SP_ST_SIPP) {
             multiagentSearch = new ConflictBasedSearch<SIPP<>>(new SIPP<>());
-        } else {
-            multiagentSearch = new ConflictBasedSearch<WeightedSIPP<>>(new WeightedSIPP<>(config.weight));
+        } else if (config.lowLevel == CN_SP_ST_WSIPP) {
+            multiagentSearch = new ConflictBasedSearch<WeightedSIPP<>>(new WeightedSIPP<>(config.focalW, config.genSuboptFromOpt));
+        } else if (config.lowLevel == CN_SP_ST_FS) {
+            multiagentSearch = new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW));
+        } else if (config.lowLevel == CN_SP_ST_SCIPP) {
+            multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
         }
     } else if (config.searchType == CN_ST_PP) {
         multiagentSearch = new PrioritizedPlanning(new Astar<>(true));

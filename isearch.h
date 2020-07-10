@@ -75,7 +75,10 @@ class ISearch
                                               int agentId, const ConstraintsSet &constraints,
                                               const ConflictAvoidanceTable &CAT);
         virtual bool checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints);
+        virtual void addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT);
+        virtual void addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {}
         virtual bool checkOpenEmpty();
+        virtual bool canStay() { return withTime; }
         virtual NodeType getCur(const Map& map);
         virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();
@@ -88,7 +91,6 @@ class ISearch
         SearchQueue<NodeType>               open;
         std::unordered_map<int, NodeType>   close;
         bool                                withTime;
-        bool                                withIntervals;
         std::unordered_map<std::pair<NodeType, NodeType>, int, NodePairHash> perfectHeuristic;
         //need to define open, close;
 

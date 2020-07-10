@@ -1,9 +1,7 @@
 <?xml version="1.0" ?>
 <root>
     <map>
-        <width>16</width>
-        <height>16</height>
-        <grid>
+        <grid width="16" height="16">
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
@@ -22,44 +20,48 @@
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
         </grid>
     </map>
-    <options>
-        <algorithm>cbs</algorithm>
-        <agents_file>empty-16-16-random</agents_file>
-        <tasks_count>2</tasks_count>
-        <agents_range min="1" max="16"/>
-        <maxtime>1000</maxtime>
+    <algorithm>
+        <planner>cbs</planner>
+        <low_level>astar</low_level>
         <with_cat>true</with_cat>
         <with_perfect_h>false</with_perfect_h>
         <with_card_conf>true</with_card_conf>
         <with_bypassing>true</with_bypassing>
         <with_matching_h>true</with_matching_h>
         <with_disjoint_splitting>true</with_disjoint_splitting>
+        <gen_subopt_from_opt>false</gen_subopt_from_opt>
+        <focal_w>1.5</focal_w>
         <pp_order>2</pp_order>
         <parallelize_paths_1>true</parallelize_paths_1>
         <parallelize_paths_2>true</parallelize_paths_2>
+    </algorithm>
+    <options>
+        <agents_file>empty-16-16-random</agents_file>
+        <tasks_count>2</tasks_count>
+        <agents_range min="1" max="16"/>
+        <maxtime>1000</maxtime>
         <single_execution>false</single_execution>
-        <logpath/>
         <logfilename/>
     </options>
     <log>
         <mapfilename>empty.xml</mapfilename>
         <aggregated_results>
-            <result agents_count="1" success_count="2" makespan="12.5" flowtime="12.5" time="0"/>
-            <result agents_count="2" success_count="2" makespan="19.5" flowtime="31" time="0.0015"/>
-            <result agents_count="3" success_count="2" makespan="19.5" flowtime="42.5" time="0.0015"/>
-            <result agents_count="4" success_count="2" makespan="19.5" flowtime="56" time="0.0035000000000000001"/>
-            <result agents_count="5" success_count="2" makespan="19.5" flowtime="64" time="0.0040000000000000001"/>
-            <result agents_count="6" success_count="2" makespan="19.5" flowtime="77" time="0.0094999999999999998"/>
-            <result agents_count="7" success_count="2" makespan="19.5" flowtime="86.5" time="0.0090000000000000011"/>
-            <result agents_count="8" success_count="2" makespan="19.5" flowtime="97.5" time="0.010499999999999999"/>
-            <result agents_count="9" success_count="2" makespan="19.5" flowtime="110.5" time="0.016"/>
-            <result agents_count="10" success_count="2" makespan="19.5" flowtime="122" time="0.0155"/>
-            <result agents_count="11" success_count="2" makespan="19.5" flowtime="128.5" time="0.016"/>
-            <result agents_count="12" success_count="2" makespan="19.5" flowtime="140.5" time="0.017000000000000001"/>
-            <result agents_count="13" success_count="2" makespan="19.5" flowtime="148.5" time="0.018500000000000003"/>
-            <result agents_count="14" success_count="2" makespan="19.5" flowtime="157" time="0.021999999999999999"/>
-            <result agents_count="15" success_count="2" makespan="19.5" flowtime="169" time="0.026000000000000002"/>
-            <result agents_count="16" success_count="1" makespan="21" flowtime="168" time="0.021000000000000001"/>
+            <result agents_count="1" success_count="2" makespan="11.5" flowtime="11.5" time="0.001"/>
+            <result agents_count="2" success_count="2" makespan="18.5" flowtime="29" time="0.0035000000000000001"/>
+            <result agents_count="3" success_count="2" makespan="18.5" flowtime="39.5" time="0.0065000000000000006"/>
+            <result agents_count="4" success_count="2" makespan="18.5" flowtime="52" time="0.01"/>
+            <result agents_count="5" success_count="2" makespan="18.5" flowtime="59" time="0.010999999999999999"/>
+            <result agents_count="6" success_count="2" makespan="18.5" flowtime="71" time="0.017000000000000001"/>
+            <result agents_count="7" success_count="2" makespan="18.5" flowtime="79.5" time="0.020499999999999997"/>
+            <result agents_count="8" success_count="2" makespan="18.5" flowtime="89.5" time="0.019999999999999997"/>
+            <result agents_count="9" success_count="2" makespan="18.5" flowtime="101.5" time="0.028000000000000001"/>
+            <result agents_count="10" success_count="2" makespan="18.5" flowtime="112" time="0.029499999999999998"/>
+            <result agents_count="11" success_count="2" makespan="18.5" flowtime="117.5" time="0.029999999999999999"/>
+            <result agents_count="12" success_count="2" makespan="18.5" flowtime="128.5" time="0.035000000000000003"/>
+            <result agents_count="13" success_count="2" makespan="18.5" flowtime="135.5" time="0.036499999999999998"/>
+            <result agents_count="14" success_count="2" makespan="18.5" flowtime="143" time="0.040499999999999994"/>
+            <result agents_count="15" success_count="2" makespan="18.5" flowtime="154" time="0.047"/>
+            <result agents_count="16" success_count="1" makespan="20" flowtime="152" time="0.035999999999999997"/>
         </aggregated_results>
     </log>
 </root>

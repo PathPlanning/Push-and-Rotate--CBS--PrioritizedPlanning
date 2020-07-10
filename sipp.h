@@ -9,10 +9,7 @@ template <typename NodeType = SIPPNode>
 class SIPP : virtual public Astar<NodeType>
 {
 public:
-    SIPP(double HW = 1.0, bool BT = true) : Astar<NodeType>(true, HW, BT) {
-        this->withTime = true;
-        this->withIntervals = true;
-    }
+    SIPP(double HW = 1.0, bool BT = true) : Astar<NodeType>(true, HW, BT) {}
     virtual ~SIPP() {}
 
 protected:
@@ -31,6 +28,10 @@ protected:
                                 std::list<NodeType> &successors) {}
     virtual bool getOptimal(const NodeType &neigh) { return false; }
     virtual void setOptimal(NodeType &neigh, bool val) {}
+    virtual bool checkSuboptimal(const NodeType &cur) { return true; }
+    virtual bool canStay() override { return false; }
+    virtual bool withZeroConflicts() { return false; }
+    virtual void updateEndTimeBySoftConflicts(NodeType &node, const ConflictAvoidanceTable &CAT);
 };
 
 #endif // SIPP_H

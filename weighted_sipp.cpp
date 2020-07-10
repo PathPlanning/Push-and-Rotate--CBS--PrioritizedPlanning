@@ -19,11 +19,18 @@ void WeightedSIPP<NodeType>::addOptimalNode(const NodeType& cur, NodeType &neigh
         neigh.startTime = interval.first;
         neigh.endTime = interval.second;
         this->setNeighG(cur, neigh, agentId, constraints);
-        neigh.F = weight * (neigh.g + neigh.H);
-        successors.push_back(neigh);
+        if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
+            neigh.F = weight * (neigh.g + neigh.H);
+            successors.push_back(neigh);
+        }
+
     }
 }
 
+template<typename NodeType>
+bool WeightedSIPP<NodeType>::checkSuboptimal(const NodeType &cur) {
+    return genSuboptFromOpt || !cur.optimal;
+}
 
 template<typename NodeType>
 bool WeightedSIPP<NodeType>::getOptimal(const NodeType &neigh) {
@@ -33,6 +40,21 @@ bool WeightedSIPP<NodeType>::getOptimal(const NodeType &neigh) {
 template<typename NodeType>
 void WeightedSIPP<NodeType>::setOptimal(NodeType &neigh, bool val) {
     neigh.optimal = val;
+}
+
+template<typename NodeType>
+void WeightedSIPP<NodeType>::addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
+    int oldF = node.F;
+    node.F *= weight;
+    this->open.insert(map, node, ISearch<NodeType>::withTime);
+    node.F = oldF;
+}
+
+template<typename NodeType>
+void WeightedSIPP<NodeType>::addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
+    this->updateEndTimeBySoftConflicts(node, CAT);
+    node.optimal = false;
+    this->open.insert(map, node, ISearch<NodeType>::withTime);
 }
 
 template class WeightedSIPP<WeightedSIPPNode>;

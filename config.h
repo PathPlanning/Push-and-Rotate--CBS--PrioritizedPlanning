@@ -33,8 +33,8 @@ class Config
         bool            storeConflicts;
         bool            withDisjointSplitting;
         bool            withFocalSearch = false;
+        bool            genSuboptFromOpt;
         double          focalW;
-        double          weight;
 };
 
 #endif

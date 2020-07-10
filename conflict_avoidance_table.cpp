@@ -38,6 +38,15 @@ int ConflictAvoidanceTable::getAgentsCount(const Node &node) const {
     return agentsCount.at(tuple);
 }
 
+int ConflictAvoidanceTable::getFirstSoftConflict(const Node & node, int startTime, int endTime) const {
+    auto it = agentsCount.lower_bound(std::make_tuple(node.i, node.j, startTime));
+    if (std::get<0>(it->first) == node.i && std::get<1>(it->first) == node.j
+            && std::get<2>(it->first) <= endTime) {
+        return std::get<2>(it->first);
+    }
+    return -1;
+}
+
 void ConflictAvoidanceTable::getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node,
                                                       int startTime, int endTime, bool binary) const {
     int count = 0, prevTime = startTime - 1, beg = -1;
@@ -56,6 +65,9 @@ void ConflictAvoidanceTable::getSoftConflictIntervals(std::vector<std::pair<int,
             count = it->second;
         }
         prevTime = time;
+    }
+    if (beg != -1) {
+        res.push_back(std::make_pair(beg, count));
     }
     if (prevTime < endTime) {
         res.push_back(std::make_pair(prevTime + 1, 0));

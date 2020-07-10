@@ -6,7 +6,6 @@ Astar<NodeType>::Astar(bool WithTime, double HW, bool BT)
     this->hweight = HW;
     this->breakingties = BT;
     this->withTime = WithTime;
-    this->withIntervals = false;
 }
 
 template<typename NodeType>

@@ -3,7 +3,7 @@
 	<map>
 		<width>16</width>
 		<height>16</height>
-		<grid>
+		<grid width="16" height="16">
 			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
 			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
 			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
@@ -22,25 +22,27 @@
 			<row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
 		</grid>
 	</map>
+	<algorithm>
+    <planner>cbs</planner>
+    <low_level>astar</low_level>
+    <with_cat>true</with_cat>
+    <with_perfect_h>false</with_perfect_h>
+    <with_card_conf>true</with_card_conf>
+    <with_bypassing>true</with_bypassing>
+    <with_matching_h>true</with_matching_h>
+    <with_disjoint_splitting>true</with_disjoint_splitting>
+    <gen_subopt_from_opt>false</gen_subopt_from_opt>
+    <focal_w>1.5</focal_w>
+    <pp_order>2</pp_order>
+    <parallelize_paths_1>true</parallelize_paths_1>
+    <parallelize_paths_2>true</parallelize_paths_2>
+	</algorithm>
 	<options>
-      <algorithm>cbs</algorithm>
-      <low_level>astar</low_level>
-      <agents_file>empty-16-16-random</agents_file>
-      <tasks_count>1</tasks_count>
-      <agents_range min="1" max="16"/>
-      <maxtime>1000</maxtime>
-      <with_cat>true</with_cat>
-      <with_perfect_h>false</with_perfect_h>
-      <with_card_conf>true</with_card_conf>
-      <with_bypassing>true</with_bypassing>
-      <with_matching_h>true</with_matching_h>
-      <with_disjoint_splitting>true</with_disjoint_splitting>
-      <focal_w>1.5</focal_w>
-      <pp_order>2</pp_order>
-      <parallelize_paths_1>true</parallelize_paths_1>
-      <parallelize_paths_2>true</parallelize_paths_2>
-      <single_execution>true</single_execution>
-      <logpath />
-      <logfilename />
+		<agents_file>empty-16-16-random</agents_file>
+		<tasks_count>1</tasks_count>
+		<agents_range min="1" max="16"/>
+		<maxtime>1000</maxtime>
+    <single_execution>true</single_execution>
+    <logfilename />
   </options>
 </root>

@@ -7,9 +7,9 @@ SearchQueue<NodeType>::SearchQueue(bool (*_cmp)(const NodeType&, const NodeType&
 }
 
 template<typename NodeType>
-bool SearchQueue<NodeType>::insert(const Map& map, NodeType node, bool withTime, bool withIntervals, bool withOld, NodeType old) {
+bool SearchQueue<NodeType>::insert(const Map& map, NodeType node, bool withTime, bool withOld, NodeType old) {
     if (!withOld) {
-        old = getByIndex(map, node, withTime, withIntervals);
+        old = getByIndex(map, node, withTime);
     }
     if (old.i == -1 || cmp(node, old)) {
         if (old.i != -1) {
@@ -23,13 +23,13 @@ bool SearchQueue<NodeType>::insert(const Map& map, NodeType node, bool withTime,
 }
 
 template<typename NodeType>
-void SearchQueue<NodeType>::erase(const Map& map, NodeType node, bool withTime, bool withIntervals) {
+void SearchQueue<NodeType>::erase(const Map& map, NodeType node, bool withTime) {
     sortByKey.erase(node);
     sortByIndex.erase(node.convolution(map.getMapWidth(), map.getMapHeight(), withTime));
 }
 
 template<typename NodeType>
-NodeType SearchQueue<NodeType>::getByIndex(const Map& map, NodeType node, bool withTime, bool withIntervals) {
+NodeType SearchQueue<NodeType>::getByIndex(const Map& map, NodeType node, bool withTime) {
     auto it = sortByIndex.find(node.convolution(map.getMapWidth(), map.getMapHeight(), withTime));
     if (it == sortByIndex.end()) {
         return NodeType(-1, -1);
@@ -39,10 +39,10 @@ NodeType SearchQueue<NodeType>::getByIndex(const Map& map, NodeType node, bool w
 
 template<typename NodeType>
 void SearchQueue<NodeType>::moveByThreshold(SearchQueue<NodeType>& other, double threshold, const Map& map,
-                                  std::multiset<double>& otherF, bool withTime, bool withIntervals) {
+                                  std::multiset<double>& otherF, bool withTime) {
     auto it = sortByKey.begin();
     for (it; it != sortByKey.end() && it->F <= threshold; ++it) {
-        other.insert(map, *it, withTime, withIntervals);
+        other.insert(map, *it, withTime);
         otherF.insert(it->F);
         sortByIndex.erase(it->convolution(map.getMapWidth(), map.getMapHeight(), withTime));
     }

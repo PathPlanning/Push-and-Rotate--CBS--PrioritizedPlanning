@@ -15,13 +15,12 @@ class SearchQueue
 public:
     SearchQueue(bool (*cmp)(const NodeType&, const NodeType&) = [](const NodeType& lhs, const NodeType& rhs) {return lhs < rhs;});
 
-    bool insert(const Map& map, NodeType node, bool withTime, bool withIntervals = false,
+    bool insert(const Map& map, NodeType node, bool withTime,
                 bool withOld = false, NodeType old = NodeType(-1, -1));
-    // static int convolution(const NodeType &node, const Map &map, bool withTime = false, bool withIntervals = false);
-    void erase(const Map& map, NodeType node, bool withTime, bool withIntervals = false);
+    void erase(const Map& map, NodeType node, bool withTime);
     void moveByThreshold(SearchQueue<NodeType>& other, double threshold, const Map& map, std::multiset<double>& otherF,
-                         bool withTime = false, bool withIntervals = false);
-    NodeType getByIndex(const Map& map, NodeType node, bool withTime, bool withIntervals = false);
+                         bool withTime = false);
+    NodeType getByIndex(const Map& map, NodeType node, bool withTime);
     NodeType getFront() const;
     bool empty() const;
     int size() const;

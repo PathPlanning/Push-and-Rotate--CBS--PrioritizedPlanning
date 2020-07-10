@@ -43,12 +43,12 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
 
     if (freshStart) {
         clearLists();
-
         sresult.numberofsteps = 0;
         cur = NodeType(start_i, start_j, nullptr, 0,
                  computeHFromCellToCell(start_i, start_j, goal_i, goal_j), startTime);
         setEndTime(cur, start_i, start_j, startTime, agentId, constraints);
-        open.insert(map, cur, withTime, withIntervals);
+        addStartNode(cur, map, CAT);
+        addSuboptimalNode(cur, map, CAT);
     }
 
     while(!checkOpenEmpty()) {
@@ -84,7 +84,7 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
                 if (close.find(neigh.convolution(map.getMapWidth(), map.getMapHeight(), withTime)) == close.end()) {
                     neigh.parent = curPtr;
                     if (!updateFocal(neigh, map)) {
-                        open.insert(map, neigh, withTime, withIntervals);
+                        open.insert(map, neigh, withTime);
                     }
                 }
             }
@@ -99,7 +99,7 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
     sresult.time = static_cast<double>(elapsedMilliseconds) / 1000;
     sresult.nodescreated = open.size() + close.size();
 
-    //std::cout << sresult.nodescreated << std::endl;
+    //std::cout << sresult.numberofsteps << std::endl;
 
     if (sresult.pathfound) {
         sresult.pathlength = cur.g;
@@ -128,7 +128,7 @@ std::list<NodeType> ISearch<NodeType>::findSuccessors(const NodeType &curNode, c
     for (int di = -1; di <= 1; ++di) {
         for (int dj = -1; dj <= 1; ++dj) {
             int newi = curNode.i + di, newj = curNode.j + dj;
-            if ((di == 0 || dj == 0) && ((withTime && !withIntervals) || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
+            if ((di == 0 || dj == 0) && (canStay() || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
                     map.CellIsTraversable(newi, newj, occupiedNodes)) {
                 int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
                 NodeType neigh(newi, newj, nullptr, curNode.g + 1, newh);
@@ -147,6 +147,11 @@ void ISearch<NodeType>::clearLists() {
 }
 
 template<typename NodeType>
+void ISearch<NodeType>::addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
+    open.insert(map, node, withTime);
+}
+
+template<typename NodeType>
 bool ISearch<NodeType>::checkOpenEmpty() {
     return open.empty();
 }
@@ -154,7 +159,7 @@ bool ISearch<NodeType>::checkOpenEmpty() {
 template<typename NodeType>
 NodeType ISearch<NodeType>::getCur(const Map& map) {
     NodeType cur = open.getFront();
-    open.erase(map, cur, withTime, withIntervals);
+    open.erase(map, cur, withTime);
     return cur;
 }
 

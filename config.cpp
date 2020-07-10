@@ -311,9 +311,9 @@ bool Config::getConfig(const char *FileName)
     algorithm = root->FirstChildElement(CNS_TAG_ALG);
     tinyxml2::XMLElement *planner = algorithm->FirstChildElement(CNS_TAG_PLANNER);
     value = planner->GetText();
-    if (value == CNS_ST_CBS || value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
+    if (value == CNS_ST_CBS || value == CNS_ST_ECBS) {
         searchType = CN_ST_CBS;
-        if (value == CNS_ST_ECBS || value == CNS_ST_ECBS_CT) {
+        if (value == CNS_ST_ECBS) {
             withFocalSearch = true;
         }
     } else if (value == CNS_ST_PR) {
@@ -323,16 +323,17 @@ bool Config::getConfig(const char *FileName)
     }
 
     std::string lowLevelSearch = algorithm->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
-    if (value == CNS_ST_ECBS_CT) {
-        lowLevel = CN_SP_ST_SCIPP;
-    } else if (lowLevelSearch == CNS_SP_ST_ASTAR) {
+    if (lowLevelSearch == CNS_SP_ST_ASTAR) {
         lowLevel = CN_SP_ST_ASTAR;
     } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
         lowLevel = CN_SP_ST_SIPP;
-    } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
-        lowLevel = CN_SP_ST_SIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_WSIPP) {
+        lowLevel = CN_SP_ST_WSIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_FS) {
+        lowLevel = CN_SP_ST_FS;
+    } else if (lowLevelSearch == CNS_SP_ST_SCIPP) {
+        lowLevel = CN_SP_ST_SCIPP;
     }
-
 
     algorithm->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
     algorithm->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
@@ -344,7 +345,7 @@ bool Config::getConfig(const char *FileName)
     algorithm->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
     algorithm->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
     algorithm->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
-    algorithm->FirstChildElement(CNS_TAG_WEIGHT)->QueryDoubleText(&weight);
+    algorithm->FirstChildElement(CNS_TAG_SFO)->QueryBoolText(&genSuboptFromOpt);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;

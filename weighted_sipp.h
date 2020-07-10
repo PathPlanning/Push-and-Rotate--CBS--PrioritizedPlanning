@@ -8,8 +8,9 @@ template <typename NodeType = WeightedSIPPNode>
 class WeightedSIPP : public SIPP<NodeType>
 {
 public:
-    WeightedSIPP(double Weight = 1.0, double HW = 1.0, bool BT = true) :
-        SIPP<NodeType>(HW, BT), weight(Weight) {}
+    WeightedSIPP(double Weight = 1.0, bool GenSuboptFromOpt = false, double HW = 1.0, bool BT = true) :
+        Astar<NodeType>(true, HW, BT),
+        SIPP<NodeType>(HW, BT), weight(Weight), genSuboptFromOpt(GenSuboptFromOpt)  {}
     virtual ~WeightedSIPP();
 
 protected:
@@ -19,11 +20,16 @@ protected:
     bool binarySplitting() { return true; }
     bool getOptimal(const NodeType &neigh) override;
     void setOptimal(NodeType &neigh, bool val) override;
+    bool checkSuboptimal(const NodeType &cur) override;
     void addOptimalNode(const NodeType& cur, NodeType &neigh, std::pair<int, int> interval,
                         int agentId, const ConstraintsSet &constraints,
                         std::list<NodeType> &successors) override;
+    bool withZeroConflicts() override { return true; };
+    void addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) override;
+    void addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) override;
 
     double weight;
+    bool genSuboptFromOpt;
 };
 
 

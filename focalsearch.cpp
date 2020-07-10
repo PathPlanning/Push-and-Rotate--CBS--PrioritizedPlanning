@@ -22,19 +22,19 @@ NodeType FocalSearch<NodeType>::getCur(const Map& map) {
         if (!focalF.empty()) {
             minF = std::min(minF, *focalF.begin());
         }
-        this->open.moveByThreshold(focal, minF * focalW, map, focalF, this->withTime, this->withIntervals);
+        this->open.moveByThreshold(focal, minF * focalW, map, focalF, this->withTime);
     }
     NodeType cur = focal.getFront();
-    focal.erase(map, cur, this->withTime, this->withIntervals);
+    focal.erase(map, cur, this->withTime);
     focalF.erase(focalF.find(cur.F));
     return cur;
 }
 
 template<typename NodeType>
 bool FocalSearch<NodeType>::updateFocal(const NodeType& neigh, const Map& map) {
-    NodeType old = focal.getByIndex(map, neigh, this->withTime, this->withIntervals);
+    NodeType old = focal.getByIndex(map, neigh, this->withTime);
     if (old.i != -1) {
-        if (focal.insert(map, neigh, this->withTime, this->withIntervals, true, old)) {
+        if (focal.insert(map, neigh, this->withTime, true, old)) {
             focalF.erase(focalF.find(old.F));
             focalF.insert(neigh.F);
         }

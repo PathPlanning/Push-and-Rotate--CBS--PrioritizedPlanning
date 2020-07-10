@@ -15,6 +15,7 @@ public:
     void addAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end);
     void removeAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end);
     int getAgentsCount(const Node &node) const;
+    int getFirstSoftConflict(const Node & node, int startTime, int endTime) const;
     void getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node,
                                                           int startTime, int endTime, bool binary) const;
 

@@ -3,18 +3,20 @@
 
 #include "SIPP_node.h"
 
-struct WeightedSIPPNode : virtual public SIPPNode
+struct WeightedSIPPNode : public SIPPNode
 {
     bool optimal;
 
-    WeightedSIPPNode(int x = 0, int y = 0, Node *p = nullptr, int g_ = 0, int H_ = 0, int ConflictsCount = 0, bool Optimal = false) :
-        SIPPNode(x, y, p, g_, H_, ConflictsCount), optimal(Optimal) {}
+    WeightedSIPPNode(int x = 0, int y = 0, Node *p = nullptr, int g_ = 0, int H_ = 0, int ConflictsCount = 0, bool Optimal = true) :
+        Node(x, y, p, g_, H_, ConflictsCount),
+        SIPPNode(x, y, p, g_, H_, ConflictsCount),
+        optimal(Optimal) {}
 
-    WeightedSIPPNode(const Node &other) : Node(other) {}
+    //WeightedSIPPNode(const Node &other) : Node(other) {}
 
     virtual int convolution(int width, int height, bool withTime = true) const {
         int res = withTime ? width * height * startTime : 0;
-        return (res + i * width + height) * -optimal;
+        return (res + i * width + j) * (optimal ? -1 : 1);
     }
 
     bool operator< (const WeightedSIPPNode &other) const {

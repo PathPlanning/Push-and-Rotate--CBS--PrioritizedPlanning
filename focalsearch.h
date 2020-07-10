@@ -16,7 +16,7 @@ protected:
     bool updateFocal(const NodeType& neigh, const Map& map) override;
     double getMinFocalF() override;
     void clearLists() override;
-    void setHC(NodeType &neigh, const NodeType &cur) override;
+    virtual void setHC(NodeType &neigh, const NodeType &cur) override;
 
     SearchQueue<NodeType> focal;
     std::multiset<double> focalF;

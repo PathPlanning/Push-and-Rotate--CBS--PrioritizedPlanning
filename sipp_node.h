@@ -15,7 +15,7 @@ struct SIPPNode : virtual public Node
 
     virtual int convolution(int width, int height, bool withTime = true) const {
         int res = withTime ? width * height * startTime : 0;
-        return res + i * width + height;
+        return res + i * width + j;
     }
 
 };

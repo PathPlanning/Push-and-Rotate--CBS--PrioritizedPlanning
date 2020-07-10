@@ -2,11 +2,18 @@
 
 template<typename NodeType>
 void SIPP<NodeType>::setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) {
-    int endTime = constraints.getFirstConstraintTime(start_i, start_j, startTime, agentId);
-    if (endTime < CN_INFINITY) {
-        --endTime;
+    node.endTime = constraints.getFirstConstraintTime(start_i, start_j, startTime, agentId);
+    if (node.endTime < CN_INFINITY) {
+        --node.endTime;
     }
-    node.endTime = endTime;
+}
+
+template<typename NodeType>
+void SIPP<NodeType>::updateEndTimeBySoftConflicts(NodeType &node, const ConflictAvoidanceTable &CAT) {
+    int newEndTime = CAT.getFirstSoftConflict(node, node.startTime, node.endTime);
+    if (newEndTime != -1) {
+        node.endTime = newEndTime - 1;
+    }
 }
 
 template<typename NodeType>
@@ -21,15 +28,19 @@ void SIPP<NodeType>::createSuccessorsFromNode(const NodeType &cur, NodeType &nei
         setOptimal(neigh, false);
         std::vector<std::pair<int, int>> softConflictIntervals;
         splitBySoftConflicts(softConflictIntervals, neigh, interval, CAT);
-        for (int i = 0; i < softConflictIntervals.size(); ++i) {
-            if (softConflictIntervals[i].second == 0) {
-                neigh.startTime = softConflictIntervals[i].first;
-                neigh.endTime = (i == softConflictIntervals.size() - 1) ? interval.second : softConflictIntervals[i + 1].first - 1;
-                neigh.conflictsCount = softConflictIntervals[i].second;
-                setNeighG(cur, neigh, agentId, constraints);
-                if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
-                    neigh.F = neigh.g + neigh.H;
-                    successors.push_back(neigh);
+
+        if (checkSuboptimal(cur)) {
+            for (int i = 0; i < softConflictIntervals.size(); ++i) {
+                if (!withZeroConflicts() || softConflictIntervals[i].second == 0) {
+                    neigh.startTime = softConflictIntervals[i].first;
+                    neigh.endTime = (i == softConflictIntervals.size() - 1) ? interval.second : softConflictIntervals[i + 1].first - 1;
+                    neigh.conflictsCount = softConflictIntervals[i].second;
+                    setNeighG(cur, neigh, agentId, constraints);
+                    this->setHC(neigh, cur);
+                    if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
+                        neigh.F = neigh.g + neigh.H;
+                        successors.push_back(neigh);
+                    }
                 }
             }
         }

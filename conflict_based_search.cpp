@@ -346,7 +346,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             for (auto constraint : constraints.nodeConstraints) {
                 if (constraint.agentId == child.paths.begin()->first) {
                     auto it = child.paths.begin()->second.begin();
-                    std::advance(it, constraint.time);
+                    std::advance(it, std::min(constraint.time, int(child.paths.begin()->second.size()) - 1));
                     if (it->i == constraint.i && it->j == constraint.j) {
                         std::cout << "1 " << t << std::endl;
                     }
@@ -355,6 +355,9 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             for (auto constraint : constraints.edgeConstraints) {
                 if (constraint.agentId == child.paths.begin()->first) {
                     auto it = child.paths.begin()->second.begin();
+                    if (constraint.time > child.paths.begin()->second.size() - 1) {
+                        continue;
+                    }
                     std::advance(it, constraint.time);
                     if (it->i == constraint.i && it->j == constraint.j &&
                             std::prev(it)->i == constraint.prev_i && std::prev(it)->j == constraint.prev_j) {
