@@ -6,20 +6,22 @@
 #include "map.h"
 #include "isearch.h"
 #include "astar.h"
+#include "sipp.h"
 #include "multiagent_search_result.h"
 #include "multiagent_search_inteface.h"
 #include <vector>
 
+template <typename SearchType = Astar<>>
 class PrioritizedPlanning : public MultiagentSearchInterface
 {
 public:
     PrioritizedPlanning();
-    PrioritizedPlanning(ISearch<>* Search);
+    PrioritizedPlanning(SearchType* Search);
     ~PrioritizedPlanning(void);
     MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet) override;
 
 private:
-    ISearch<>*                      search;
+    SearchType*                      search;
 };
 
 #endif // PRIORITIZEDPLANNING_H

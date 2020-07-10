@@ -100,16 +100,19 @@ void Mission::createAlgorithm()
             multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
         }
     } else if (config.searchType == CN_ST_PP) {
-        multiagentSearch = new PrioritizedPlanning(new Astar<>(true));
+        if (config.lowLevel == CN_SP_ST_ASTAR) {
+            multiagentSearch = new PrioritizedPlanning<Astar<>>(new Astar<>(true));
+        } else if (config.lowLevel == CN_SP_ST_SIPP) {
+            multiagentSearch = new PrioritizedPlanning<SIPP<>>(new SIPP<>());
+        }
     }
 }
 
-void Mission::startSearch(const std::string &agentsFile)
-{
+bool Mission::checkAgentsCorrectness(const std::string &agentsFile) {
     if (agentSet.getAgentCount() < config.maxAgents) {
         std::cout << "Warning: not enough agents in " << agentsFile <<
                      " agents file. This file will be ignored" << std::endl;
-        return;
+        return false;
     }
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {
         Agent agent = agentSet.getAgent(i);
@@ -118,10 +121,27 @@ void Mission::startSearch(const std::string &agentsFile)
             map.CellIsObstacle(start.i, start.j) || map.CellIsObstacle(goal.i, goal.j)) {
             std::cout << "Warning: start or goal position of agent " << agent.getId() << " in " << agentsFile <<
                          " agents file is incorrect. This file will be ignored" << std::endl;
-            return;
+            return false;
         }
     }
+    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+        for (int j = i + 1; j < agentSet.getAgentCount(); ++j) {
+            if (agentSet.getAgent(i).getStartPosition() == agentSet.getAgent(j).getStartPosition()) {
+                std::cout << "Warning: start positions of agents " << i << " and " << j <<
+                             " in " << agentsFile << " are in the same cell. This file will be ignored" << std::endl;
+                return false;
+            } else if (agentSet.getAgent(i).getGoalPosition() == agentSet.getAgent(j).getGoalPosition()) {
+                std::cout << "Warning: goal positions of agents " << i << " and " << j <<
+                             " in " << agentsFile << " are in the same cell. This file will be ignored" << std::endl;
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
+void Mission::startSearch(const std::string &agentsFile)
+{
     int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
     for (int i = minAgents; i <= config.maxAgents; ++i) {
         AgentSet curAgentSet;

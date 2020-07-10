@@ -1,22 +1,26 @@
 #include "prioritized_planning.h"
 
-PrioritizedPlanning::PrioritizedPlanning()
+template <typename SearchType>
+PrioritizedPlanning<SearchType>::PrioritizedPlanning()
 {
     search = nullptr;
 }
 
-PrioritizedPlanning::PrioritizedPlanning (ISearch<> *Search)
+template <typename SearchType>
+PrioritizedPlanning<SearchType>::PrioritizedPlanning (SearchType *Search)
 {
     search = Search;
 }
 
-PrioritizedPlanning::~PrioritizedPlanning()
+template <typename SearchType>
+PrioritizedPlanning<SearchType>::~PrioritizedPlanning()
 {
     if (search)
         delete search;
 }
 
-MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
+template <typename SearchType>
+MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     // std::cout << agentSet.getAgentCount() << std::endl;
 
@@ -84,3 +88,6 @@ MultiagentSearchResult PrioritizedPlanning::startSearch(const Map &map, const Co
     result.time = static_cast<double>(elapsedMilliseconds) / 1000;
     return result;
 }
+
+template class PrioritizedPlanning<Astar<>>;
+template class PrioritizedPlanning<SIPP<>>;

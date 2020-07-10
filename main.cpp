@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
                     std::string agentsFile = mission.getAgentsFile() + "-" + std::to_string(i + 1) + ".xml";
                     if (!mission.getAgents(agentsFile.c_str()))
                         std::cout << "Agent set has not been created! Program halted!" << std::endl;
-                    else {
+                    else if (mission.checkAgentsCorrectness(agentsFile)) {
                         std::cout << "Starting search for agents file " << agentsFile << std::endl;
                         mission.startSearch(agentsFile);
                     }

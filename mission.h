@@ -40,6 +40,7 @@ class Mission
         // void createSearch();
         void createAlgorithm();
         void createEnvironmentOptions();
+        bool checkAgentsCorrectness(const std::string &agentsFile);
         void startSearch(const std::string &agentsFile);
         void printSearchResultsToConsole();
         void saveSearchResultsToLog();

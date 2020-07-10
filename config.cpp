@@ -335,6 +335,11 @@ bool Config::getConfig(const char *FileName)
         lowLevel = CN_SP_ST_SCIPP;
     }
 
+    if (!withFocalSearch && lowLevel != CN_SP_ST_ASTAR && lowLevel != CN_SP_ST_SIPP) {
+        std::cout << "Warning! Specified low level search can not be used in this algorithm. Using A* instead." << std::endl;
+        lowLevel = CN_SP_ST_ASTAR;
+    }
+
     algorithm->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
     algorithm->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
     algorithm->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
