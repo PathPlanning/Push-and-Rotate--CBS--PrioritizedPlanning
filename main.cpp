@@ -7,9 +7,6 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    Primitives pr;
-    pr.loadPrimitives("trajectories_moving.xml");
-
     Mission mission(argv[1]);
 
     std::cout << argv[1] << std::endl;

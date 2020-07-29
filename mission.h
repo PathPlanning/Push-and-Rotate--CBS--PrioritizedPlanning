@@ -19,7 +19,6 @@
 #include "xmllogger.h"
 #include "multiagent_search_inteface.h"
 #include "testing_results.h"
-#include "motion_primitives.h"
 #include <algorithm>
 
 //That's the wrap up class that first creates all the needed objects (Map, Search etc.)
