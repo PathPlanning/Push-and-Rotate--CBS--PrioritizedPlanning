@@ -188,19 +188,22 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
     }
 }
 
-void XmlLogger::writeToLogAggregatedResults(std::map<int, int> successCount,
-                                            std::map<int, double> makespans,
-                                            std::map<int, double> timeflows,
-                                            std::map<int, double> times) {
+void XmlLogger::writeToLogAggregatedResults(std::map<int, int>& successCount,
+                                            TestingResults &res,
+                                            const std::string& agentsFile) {
     XMLElement *log = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG);
     XMLElement *results = doc.NewElement(CNS_TAG_RESULTS);
+    if (!agentsFile.empty()) {
+        results->SetAttribute(CNS_TAG_AGENTS_FILE, agentsFile.c_str());
+    }
+    std::vector<std::string> keys = res.getKeys();
     for (auto pair : successCount) {
         XMLElement *result = doc.NewElement(CNS_TAG_RESULT);
         result->SetAttribute(CNS_TAG_ATTR_COUNT, pair.first);
         result->SetAttribute(CNS_TAG_ATTR_SC, pair.second);
-        result->SetAttribute(CNS_TAG_ATTR_MAKESPAN, makespans[pair.first]);
-        result->SetAttribute(CNS_TAG_ATTR_FLOWTIME, timeflows[pair.first]);
-        result->SetAttribute(CNS_TAG_ATTR_TIME, times[pair.first]);
+        for (auto key : keys) {
+            result->SetAttribute(key.c_str(), res.data[key][pair.first]);
+        }
         results->InsertEndChild(result);
     }
     log->InsertEndChild(results);

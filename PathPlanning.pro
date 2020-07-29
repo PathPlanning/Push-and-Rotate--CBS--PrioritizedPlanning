@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-TARGET = ASearch
+TARGET = MultiAgentSearch
 CONFIG   += console
 CONFIG   -= app_bundle
 TEMPLATE = app
@@ -68,6 +68,7 @@ HEADERS += \
     search_queue.h \
     sipp.h \
     sipp_node.h \
+    testing_results.h \
     tinyxml2.h \
     node.h \
     gl_const.h \

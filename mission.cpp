@@ -104,12 +104,16 @@ void Mission::createAlgorithm()
             multiagentSearch = new PrioritizedPlanning<Astar<>>(new Astar<>(true));
         } else if (config.lowLevel == CN_SP_ST_SIPP) {
             multiagentSearch = new PrioritizedPlanning<SIPP<>>(new SIPP<>());
+        } else if (config.lowLevel == CN_SP_ST_SCIPP) {
+            multiagentSearch = new PrioritizedPlanning<SCIPP<>>(new SCIPP<>(config.focalW));
+        } else if (config.lowLevel == CN_SP_ST_WSIPP) {
+            multiagentSearch = new PrioritizedPlanning<WeightedSIPP<>>(new WeightedSIPP<>(config.focalW, config.genSuboptFromOpt));
         }
     }
 }
 
 bool Mission::checkAgentsCorrectness(const std::string &agentsFile) {
-    if (agentSet.getAgentCount() < config.maxAgents) {
+    if (config.maxAgents != -1 && agentSet.getAgentCount() < config.maxAgents) {
         std::cout << "Warning: not enough agents in " << agentsFile <<
                      " agents file. This file will be ignored" << std::endl;
         return false;
@@ -143,7 +147,9 @@ bool Mission::checkAgentsCorrectness(const std::string &agentsFile) {
 void Mission::startSearch(const std::string &agentsFile)
 {
     int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
-    for (int i = minAgents; i <= config.maxAgents; ++i) {
+    int maxAgents = config.maxAgents == -1 ? agentSet.getAgentCount() : config.maxAgents;
+    TestingResults res;
+    for (int i = minAgents; i <= maxAgents; ++i) {
         AgentSet curAgentSet;
         for (int j = 0; j < i; ++j) {
             Agent agent = agentSet.getAgent(j);
@@ -164,9 +170,14 @@ void Mission::startSearch(const std::string &agentsFile)
         std::pair<int, int> costs = getCosts();
         int makespan = costs.first;
         int flowtime = costs.second;
-        makespans[i].push_back(makespan);
-        flowtimes[i].push_back(flowtime);
-        times[i].push_back(sr.time);
+
+        res.data[CNS_TAG_ATTR_MAKESPAN][i] = makespan;
+        res.data[CNS_TAG_ATTR_FLOWTIME][i] = flowtime;
+        res.data[CNS_TAG_ATTR_TIME][i] = sr.time;
+        res.data[CNS_TAG_ATTR_HLE][i] = sr.HLExpansions;
+        res.data[CNS_TAG_ATTR_HLN][i] = sr.HLNodes;
+        res.data[CNS_TAG_ATTR_LLE][i] = sr.AvgLLExpansions;
+        res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
 
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, sr.time, makespan, flowtime);
@@ -178,6 +189,7 @@ void Mission::startSearch(const std::string &agentsFile)
         std::cout << "Found solution for " << i << " agents. Time: " <<
                     sr.time << ", flowtime: " << flowtime << ", makespan: " << makespan << std::endl;
     }
+    testingResults.push_back(res);
 }
 
 std::pair<int, int> Mission::getCosts() {
@@ -241,35 +253,47 @@ bool Mission::checkCorrectness() {
     return true;
 }
 
-void Mission::saveAggregatedResultsToLog() {
-    std::map<int, int> successCount;
-    std::map<int, double> makespansAggregated, timeflowsAggregated, timesAggregated;
-    for (int i = config.minAgents; i <= config.maxAgents; ++i) {
-        if (times[i].size() > 0) {
-            successCount[i] = times[i].size();
-            makespansAggregated[i] = std::accumulate(makespans[i].begin(), makespans[i].end(), 0.0) / makespans[i].size();
-            timeflowsAggregated[i] = std::accumulate(flowtimes[i].begin(), flowtimes[i].end(), 0.0) / flowtimes[i].size();
-            timesAggregated[i] = std::accumulate(times[i].begin(), times[i].end(), 0.0) / times[i].size();
+void Mission::saveSeparateResultsToLog() {
+    for (int i = 0; i < testingResults.size(); ++i) {
+        std::map<int, int> successCount;
+        for (auto pair : testingResults[i].data[CNS_TAG_ATTR_TIME]) {
+            successCount[pair.first] = 1;
         }
+        logger->writeToLogAggregatedResults(successCount, testingResults[i],
+                                            config.agentsFile + "-" + std::to_string(i + 1));
+        logger->saveLog();
     }
-    logger->writeToLogAggregatedResults(successCount, makespansAggregated, timeflowsAggregated, timesAggregated);
-    logger->saveLog();
 }
 
-/*void Mission::printSearchResultsToConsole()
-{
-    std::cout << "Path ";
-    if (!sr.pathfound)
-        std::cout << "NOT ";
-    std::cout << "found!" << std::endl;
-    std::cout << "numberofsteps=" << sr.numberofsteps << std::endl;
-    std::cout << "nodescreated=" << sr.nodescreated << std::endl;
-    if (sr.pathfound) {
-        std::cout << "pathlength=" << sr.pathlength << std::endl;
-        std::cout << "pathlength_scaled=" << sr.pathlength * map.getCellSize() << std::endl;
+void Mission::saveAggregatedResultsToLog() {
+    std::map<int, int> successCounts;
+    TestingResults aggRes;
+    std::vector<std::string> keys = testingResults[0].getKeys();
+    for (int i = config.minAgents; i <= config.maxAgents; ++i) {
+        std::map<std::string, double> sums;
+        for (auto key : keys) {
+            sums[key] = 0.0;
+        }
+        int successCount = 0;
+        for (auto res : testingResults) {
+            if (res.data[CNS_TAG_ATTR_TIME].find(i) != res.data[CNS_TAG_ATTR_TIME].end()) {
+                for (auto key : keys) {
+                    sums[key] += res.data[key][i];
+                }
+                ++successCount;
+            }
+        }
+        if (successCount == 0) {
+            break;
+        }
+        successCounts[i] = successCount;
+        for (auto key : keys) {
+            aggRes.data[key][i] = sums[key] / successCount;
+        }
     }
-    std::cout << "time=" << sr.time << std::endl;
-}*/
+    logger->writeToLogAggregatedResults(successCounts, aggRes);
+    logger->saveLog();
+}
 
 void Mission::saveAgentsPathsToLog(const std::string &agentsFile, double time, int makespan, int flowtime)
 {

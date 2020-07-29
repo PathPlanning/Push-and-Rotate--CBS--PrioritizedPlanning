@@ -1,4 +1,5 @@
 #include "constraints_set.h"
+#include <iostream>
 
 void ConstraintsSet::addNodeConstraint(int i, int j, int time, int agentId) {
     nodeConstraints.insert(Constraint(i, j, time, agentId));
@@ -108,9 +109,13 @@ int ConstraintsSet::getFirstConstraintTime(int i, int j, int startTime, int agen
 
 std::vector<std::pair<int, int>> ConstraintsSet::getSafeIntervals(int i, int j, int agentId,
                                                                   int startTime, int endTime) const {
+    int goalConstraintTime = -1;
     auto it = goalNodeConstraints.lower_bound(Constraint(i, j, 0));
-    if (it != goalNodeConstraints.end() && it->i == i && it->j == j && it->time <= endTime) {
-        endTime = it->time - 1;
+    if (it != goalNodeConstraints.end() && it->i == i && it->j == j) {
+        goalConstraintTime = it->time;
+        if (goalConstraintTime <= endTime) {
+            endTime = goalConstraintTime - 1;
+        }
         if (endTime < startTime) {
             return {};
         }
@@ -134,11 +139,13 @@ std::vector<std::pair<int, int>> ConstraintsSet::getSafeIntervals(int i, int j, 
         beg = it->time + it->dur;
     }
 
-    if (beg < endTime) {
-        if (end != nodeConstraints.end() && end->i == i && end->j == j) {
+    if (beg <= endTime) {
+        endTime = CN_INFINITY;
+        if (goalConstraintTime != -1) {
+            endTime = goalConstraintTime - 1;
+        }
+        if (end != nodeConstraints.end() && end->i == i && end->j == j && end->time - 1 < endTime) {
             endTime = end->time - 1;
-        } else {
-            endTime = CN_INFINITY;
         }
         res.push_back(std::make_pair(beg, endTime));
     }

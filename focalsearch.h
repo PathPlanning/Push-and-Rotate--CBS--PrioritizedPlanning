@@ -16,7 +16,11 @@ protected:
     bool updateFocal(const NodeType& neigh, const Map& map) override;
     double getMinFocalF() override;
     void clearLists() override;
-    virtual void setHC(NodeType &neigh, const NodeType &cur) override;
+    virtual void setHC(NodeType &neigh, const NodeType &cur,
+                       const ConflictAvoidanceTable &CAT, bool isGoal) override;
+    virtual int getFocalSize() override { return focal.size(); }
+    virtual void subtractFutureConflicts(NodeType &node) override { node.hc -= node.futureConflictsCount; }
+    virtual void addFutureConflicts(NodeType &neigh, const ConflictAvoidanceTable &CAT);
 
     SearchQueue<NodeType> focal;
     std::multiset<double> focalF;

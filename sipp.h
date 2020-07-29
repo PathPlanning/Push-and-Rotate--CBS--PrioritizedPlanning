@@ -16,10 +16,10 @@ protected:
     void setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints) override;
     void createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
                                   int agentId, const ConstraintsSet &constraints,
-                                  const ConflictAvoidanceTable &CAT) override;
+                                  const ConflictAvoidanceTable &CAT, bool isGoal) override;
     bool checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints) override;
     virtual void splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
-                                      const NodeType & node, std::pair<int, int> interval,
+                                      const NodeType & node, const NodeType &prevNode, std::pair<int, int> interval,
                                       const ConflictAvoidanceTable &CAT);
     virtual void setNeighG(const NodeType &cur, NodeType &neigh,
                    int agentId, const ConstraintsSet &constraints);

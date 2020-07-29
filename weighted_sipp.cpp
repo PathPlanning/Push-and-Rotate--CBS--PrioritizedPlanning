@@ -5,9 +5,9 @@ WeightedSIPP<NodeType>::~WeightedSIPP() {}
 
 template<typename NodeType>
 void WeightedSIPP<NodeType>::splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
-                                                  const NodeType & node, std::pair<int, int> interval,
-                                                  const ConflictAvoidanceTable &CAT) {
-    CAT.getSoftConflictIntervals(softConflictIntervals, node, interval.first, interval.second, true);
+                                                  const NodeType & node, const NodeType & prevNode,
+                                                  std::pair<int, int> interval, const ConflictAvoidanceTable &CAT) {
+    CAT.getSoftConflictIntervals(softConflictIntervals, node, prevNode, interval.first, interval.second, true);
 }
 
 template<typename NodeType>

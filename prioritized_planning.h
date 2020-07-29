@@ -7,9 +7,12 @@
 #include "isearch.h"
 #include "astar.h"
 #include "sipp.h"
+#include "scipp.h"
+#include "weighted_sipp.h"
 #include "multiagent_search_result.h"
 #include "multiagent_search_inteface.h"
 #include <vector>
+#include <numeric>
 
 template <typename SearchType = Astar<>>
 class PrioritizedPlanning : public MultiagentSearchInterface

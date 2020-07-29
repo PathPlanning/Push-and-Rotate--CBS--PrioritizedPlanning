@@ -24,6 +24,7 @@ NodeType FocalSearch<NodeType>::getCur(const Map& map) {
         }
         this->open.moveByThreshold(focal, minF * focalW, map, focalF, this->withTime);
     }
+
     NodeType cur = focal.getFront();
     focal.erase(map, cur, this->withTime);
     focalF.erase(focalF.find(cur.F));
@@ -59,8 +60,18 @@ void FocalSearch<NodeType>::clearLists() {
 }
 
 template<typename NodeType>
-void FocalSearch<NodeType>::setHC(NodeType &neigh, const NodeType &cur) {
+void FocalSearch<NodeType>::setHC(NodeType &neigh, const NodeType &cur,
+                                  const ConflictAvoidanceTable &CAT, bool isGoal) {
     neigh.hc = cur.hc + neigh.conflictsCount;
+    if (isGoal) {
+        addFutureConflicts(neigh, CAT);
+    }
+}
+
+template<typename NodeType>
+void FocalSearch<NodeType>::addFutureConflicts(NodeType &neigh, const ConflictAvoidanceTable &CAT) {
+    neigh.futureConflictsCount = CAT.getFutureConflictsCount(neigh, neigh.g);
+    neigh.hc += neigh.futureConflictsCount;
 }
 
 template class FocalSearch<FSNode>;

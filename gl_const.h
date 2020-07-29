@@ -1,9 +1,11 @@
 #ifndef GL_CONST_H
 #define	GL_CONST_H
 
-#define CN_PI_CONSTANT 3.14159265359
+#define CN_PI          3.14159265359
 #define CN_SQRT_TWO    1.41421356237
 #define CN_INFINITY    1000000000
+#define CN_RESOLUTION  1e-6
+#define CN_EPSILON     1e-9
 
 //XML tags
 #define CNS_TAG_ROOT "root"
@@ -44,6 +46,7 @@
         #define CNS_TAG_FOCAL_W     "focal_w"
         #define CNS_TAG_WEIGHT      "weight"
         #define CNS_TAG_SFO         "gen_subopt_from_opt"
+        #define CNS_TAG_AR          "aggregated_results"
         #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"
         #define CNS_TAG_PAR_PATHS_1 "parallelize_paths_1"
@@ -59,7 +62,7 @@
         #define CNS_TAG_TASKFN      "taskfilename"
         #define CNS_TAG_SUM         "summary"
         #define CNS_TAG_PATH        "path"
-        #define CNS_TAG_RESULTS     "aggregated_results"
+        #define CNS_TAG_RESULTS     "results"
         #define CNS_TAG_RESULT      "result"
         #define CNS_TAG_SUMMARY     "summary"
         #define CNS_TAG_AGENT       "agent"
@@ -78,7 +81,11 @@
     #define CNS_TAG_ATTR_LENGTH         "length"
     #define CNS_TAG_ATTR_LENGTH_SCALED  "length_scaled"
     #define CNS_TAG_ATTR_TIME           "time"
-    #define CNS_TAG_ATTR_NAME           "name"
+    #define CNS_TAG_ATTR_HLE            "HL_expansions"
+    #define CNS_TAG_ATTR_HLN            "HL_nodes"
+    #define CNS_TAG_ATTR_LLE            "LL_avg_expansions"
+    #define CNS_TAG_ATTR_LLN            "LL_avg_nodes"
+    #define CNS_TAG_ATTR_FILENAME       "filename"
     #define CNS_TAG_ATTR_X              "x"
     #define CNS_TAG_ATTR_Y              "y"
     #define CNS_TAG_ATTR_NUM            "number"

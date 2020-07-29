@@ -18,6 +18,8 @@
 #include "scipp.h"
 #include "xmllogger.h"
 #include "multiagent_search_inteface.h"
+#include "testing_results.h"
+#include "motion_primitives.h"
 #include <algorithm>
 
 //That's the wrap up class that first creates all the needed objects (Map, Search etc.)
@@ -47,10 +49,12 @@ class Mission
         void saveAgentsPathsToLog(const std::string &agentsFile, double time, int makespan, int flowtime);
         bool checkCorrectness();
         void saveAggregatedResultsToLog();
+        void saveSeparateResultsToLog();
         std::pair<int, int> getCosts();
         int getTasksCount();
         std::string getAgentsFile();
         bool getSingleExecution();
+        bool getSaveAggregatedResults() { return config.saveAggregatedResults; }
 
     private:
         Map                                   map;
@@ -62,9 +66,10 @@ class Mission
         const char*                           mapFile;
         MultiagentSearchResult                sr;
         std::vector<std::vector<Node>>        agentsPaths;
-        std::map<int, std::vector<int>>       makespans;
-        std::map<int, std::vector<int>>       flowtimes;
-        std::map<int, std::vector<double>>    times;
+        std::vector<TestingResults>           testingResults;
+        //std::map<int, std::vector<int>>       makespans;
+        //std::map<int, std::vector<int>>       flowtimes;
+        //std::map<int, std::vector<double>>    times;
 };
 
 #endif

@@ -10,17 +10,23 @@
 class ConflictAvoidanceTable
 {
 public:
-    void addAgentPosition(const Node &node);
-    void removeAgentPosition(const Node &node);
-    void addAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end);
-    void removeAgentPath(std::list<Node>::iterator& start, std::list<Node>::iterator& end);
+    void addNode(const Node &node);
+    void addEdge(const Node &node, const Node &prev);
+    void removeNode(const Node &node);
+    void removeEdge(const Node &node, const Node &prev);
+    void addAgentPath(const std::list<Node>::const_iterator& start,
+                      const std::list<Node>::const_iterator& end);
+    void removeAgentPath(const std::list<Node>::const_iterator& start,
+                         const std::list<Node>::const_iterator& end);
     int getAgentsCount(const Node &node) const;
     int getFirstSoftConflict(const Node & node, int startTime, int endTime) const;
-    void getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node,
+    int getFutureConflictsCount(const Node & node, int time) const;
+    void getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node, const Node &prevNode,
                                                           int startTime, int endTime, bool binary) const;
 
 private:
-    std::map<std::tuple<int, int, int>, int> agentsCount;
+    std::map<std::tuple<int, int, int>, int> nodeAgentsCount;
+    std::map<std::tuple<int, int, int, int, int>, int> edgeAgentsCount;
 };
 
 #endif // CONFLICTAVOIDANCETABLE_H

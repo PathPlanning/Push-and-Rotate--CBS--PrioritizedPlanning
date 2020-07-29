@@ -41,7 +41,10 @@ class ISearch
                                                bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
 
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
-        void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
+
+        std::unordered_map<std::pair<NodeType, NodeType>, int, NodePairHash> getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
+
+        // void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
         virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
 
         static int T;
@@ -70,16 +73,19 @@ class ISearch
         virtual void makePrimaryPath(Node &curNode, int endTime);//Makes path using back pointers
         virtual void makeSecondaryPath(const Map &map);//Makes another type of path(sections or points)
         virtual void setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
-        virtual void setHC(NodeType &neigh, const NodeType &cur) {}
+        virtual void setHC(NodeType &neigh, const NodeType &cur,
+                           const ConflictAvoidanceTable &CAT, bool isGoal) {}
         virtual void createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
                                               int agentId, const ConstraintsSet &constraints,
-                                              const ConflictAvoidanceTable &CAT);
+                                              const ConflictAvoidanceTable &CAT, bool isGoal);
         virtual bool checkGoal(const NodeType &cur, int goalTime, int agentId, const ConstraintsSet &constraints);
         virtual void addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT);
         virtual void addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {}
         virtual bool checkOpenEmpty();
         virtual bool canStay() { return withTime; }
+        virtual int getFocalSize() { return 0; }
         virtual NodeType getCur(const Map& map);
+        virtual void subtractFutureConflicts(NodeType &node) {}
         virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();
         virtual void clearLists();
@@ -91,8 +97,9 @@ class ISearch
         SearchQueue<NodeType>               open;
         std::unordered_map<int, NodeType>   close;
         bool                                withTime;
-        std::unordered_map<std::pair<NodeType, NodeType>, int, NodePairHash> perfectHeuristic;
         //need to define open, close;
 
 };
+
+
 #endif

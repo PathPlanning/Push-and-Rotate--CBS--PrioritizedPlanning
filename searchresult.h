@@ -38,6 +38,7 @@ struct SearchResult
                                         //This is a pointer to the list of nodes that is actually created and hadled by ISearch class,
                                         //so no need to re-create them, delete them etc. It's just a trick to save some memory
         unsigned int nodescreated; //|OPEN| + |CLOSE| = total number of nodes saved in memory during search process.
+        unsigned int nodesexpanded;
         unsigned int numberofsteps; //number of iterations (expansions) made by algorithm to find a solution
         double time; //runtime of the search algorithm (expanding nodes + reconstructing the path)
         Node lastNode;

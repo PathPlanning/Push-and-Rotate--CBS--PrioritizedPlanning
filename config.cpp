@@ -36,281 +36,70 @@ bool Config::getConfig(const char *FileName)
         return false;
     }
 
-    /*algorithm = root->FirstChildElement(CNS_TAG_ALG);
-    if (!algorithm) {
-        std::cout << "Error! No '" << CNS_TAG_ALG << "' tag found in XML file!" << std::endl;
+    options = getChild(root, CNS_TAG_OPT);
+    if (!options) {
         return false;
     }
 
-    element = algorithm->FirstChildElement(CNS_TAG_ST);
-    if (!element) {
-        std::cout << "Error! No '" << CNS_TAG_ST << "' tag found in XML file!" << std::endl;
-        return false;
-    }
-    if (element->GetText())
-        value = element->GetText();
-    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-
-    if (value == CNS_SP_ST_BFS) {
-        N = 4;
-        SearchParams = new double[N];
-        SearchParams[CN_SP_ST] = CN_SP_ST_BFS;
-    }
-    else if (value == CNS_SP_ST_DIJK) {
-        N = 4;
-        SearchParams = new double[N];
-        SearchParams[CN_SP_ST] = CN_SP_ST_DIJK;
-    }
-    else if (value == CNS_SP_ST_ASTAR || value == CNS_SP_ST_JP_SEARCH || value == CNS_SP_ST_TH) {
-        N = 7;
-        SearchParams = new double[N];
-        SearchParams[CN_SP_ST] = CN_SP_ST_ASTAR;
-        if (value == CNS_SP_ST_JP_SEARCH)
-            SearchParams[CN_SP_ST] = CN_SP_ST_JP_SEARCH;
-        else if (value == CNS_SP_ST_TH)
-            SearchParams[CN_SP_ST] = CN_SP_ST_TH;
-        element = algorithm->FirstChildElement(CNS_TAG_HW);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_HW << "' tag found in algorithm section." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_HW << "' was defined to 1." << std::endl;
-            SearchParams[CN_SP_HW] = 1;
-        }
-        else {
-            stream << element->GetText();
-            stream >> SearchParams[CN_SP_HW];
-            stream.str("");
-            stream.clear();
-
-            if (SearchParams[CN_SP_HW] < 1) {
-                std::cout << "Warning! Value of '" << CNS_TAG_HW << "' tag is not correctly specified. Should be >= 1."
-                          << std::endl;
-                std::cout << "Value of '" << CNS_TAG_HW << "' was defined to 1." << std::endl;
-                SearchParams[CN_SP_HW] = 1;
-            }
-        }
-
-        element = algorithm->FirstChildElement(CNS_TAG_MT);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_MT << "' tag found in XML file." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_MT << "' was defined to 'euclidean'." << std::endl;
-            SearchParams[CN_SP_MT] = CN_SP_MT_EUCL;
-        }
-        else {
-            if (element->GetText())
-                value = element->GetText();
-            std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            if (value == CNS_SP_MT_MANH) SearchParams[CN_SP_MT] = CN_SP_MT_MANH;
-            else if (value == CNS_SP_MT_EUCL) SearchParams[CN_SP_MT] = CN_SP_MT_EUCL;
-            else if (value == CNS_SP_MT_DIAG) SearchParams[CN_SP_MT] = CN_SP_MT_DIAG;
-            else if (value == CNS_SP_MT_CHEB) SearchParams[CN_SP_MT] = CN_SP_MT_CHEB;
-            else {
-                std::cout << "Warning! Value of'" << CNS_TAG_MT << "' is not correctly specified." << std::endl;
-                std::cout << "Value of '" << CNS_TAG_MT << "' was defined to 'euclidean'" << std::endl;
-                SearchParams[CN_SP_MT] = CN_SP_MT_EUCL;
-            }
-            if (SearchParams[CN_SP_ST] == CN_SP_ST_TH && SearchParams[CN_SP_MT] != CN_SP_MT_EUCL) {
-                std::cout << "Warning! This type of metric is not admissible for Theta*!" << std::endl;
-            }
-        }
-
-
-        element = algorithm->FirstChildElement(CNS_TAG_BT);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_BT << "' tag found in XML file" << std::endl;
-            std::cout << "Value of '" << CNS_TAG_BT << "' was defined to 'g-max'" << std::endl;
-            SearchParams[CN_SP_BT] = CN_SP_BT_GMAX;
-        }
-        else {
-            value = element->GetText();
-            std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            if (value == CNS_SP_BT_GMIN) SearchParams[CN_SP_BT] = CN_SP_BT_GMIN;
-            else if (value == CNS_SP_BT_GMAX) SearchParams[CN_SP_BT] = CN_SP_BT_GMAX;
-            else {
-                std::cout << "Warning! Value of '" << CNS_TAG_BT << "' is not correctly specified." << std::endl;
-                std::cout << "Value of '" << CNS_TAG_BT << "' was defined to 'g-max'" << std::endl;
-                SearchParams[CN_SP_BT] = CN_SP_BT_GMAX;
-            }
-        }
-    }
-    else {
-        std::cout << "Error! Value of '" << CNS_TAG_ST << "' tag (algorithm name) is not correctly specified."
-                  << std::endl;
-        std::cout << "Supported algorithm's names are: '" << CNS_SP_ST_BFS << "', '" << CNS_SP_ST_DIJK << "', '"
-                  << CNS_SP_ST_ASTAR << "', '" << CNS_SP_ST_TH << "', '" << CNS_SP_ST_JP_SEARCH << "'." << std::endl;
-        return false;
-    }
-
-
-    element = algorithm->FirstChildElement(CNS_TAG_AD);
-    if (!element) {
-        std::cout << "Warning! No '" << CNS_TAG_AD << "' element found in XML file." << std::endl;
-        std::cout << "Value of '" << CNS_TAG_AD << "' was defined to default - true" << std::endl;
-        SearchParams[CN_SP_AD] = 1;
-    }
-    else {
-        std::string check;
-        stream << element->GetText();
-        stream >> check;
-        stream.clear();
-        stream.str("");
-
-        if (check != "1" && check != "true" && check != "0" && check != "false") {
-            std::cout << "Warning! Value of '" << CNS_TAG_AD << "' is not correctly specified." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_AD << "' was defined to default - true " << std::endl;
-            SearchParams[CN_SP_AD] = 1;
-        }
-        else if (check == "1" || check == "true")
-            SearchParams[CN_SP_AD] = 1;
-        else
-            SearchParams[CN_SP_AD] = 0;
-    }
-
-    if (SearchParams[CN_SP_AD] == 0) {
-        SearchParams[CN_SP_CC] = 0;
-        SearchParams[CN_SP_AS] = 0;
-    }
-    else {
-        element = algorithm->FirstChildElement(CNS_TAG_CC);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_CC << "' element found in XML file." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_CC << "' was defined to default - false" << std::endl;
-            SearchParams[CN_SP_CC] = 0;
-        }
-        else {
-            std::string check;
-            stream << element->GetText();
-            stream >> check;
-            stream.clear();
-            stream.str("");
-            if (check != "1" && check != "true" && check != "0" && check != "false") {
-                std::cout << "Warning! Value of '" << CNS_TAG_CC << "' is not correctly specified." << std::endl;
-                std::cout << "Value of '" << CNS_TAG_CC << "' was defined to default - false" << std::endl;
-                SearchParams[CN_SP_CC] = 0;
-            }
-            else {
-                if (check == "1" || check == "true")
-                    SearchParams[CN_SP_CC] = 1;
-                else
-                    SearchParams[CN_SP_CC] = 0;
-            }
-        }
-        if (SearchParams[CN_SP_CC] == 0) {
-            SearchParams[CN_SP_AS] = 0;
-        }
-        else {
-            element = algorithm->FirstChildElement(CNS_TAG_AS);
-            if (!element) {
-                std::cout << "Warning! No '" << CNS_TAG_AS << "' element found in XML file." << std::endl;
-                std::cout << "Value of '" << CNS_TAG_AS << "' was defined to default - false." << std::endl;
-                SearchParams[CN_SP_AS] = 0;
-            }
-            else {
-                std::string check;
-                stream << element->GetText();
-                stream >> check;
-                stream.clear();
-                stream.str("");
-                if (check != "1" && check != "true" && check != "0" && check != "false") {
-                    std::cout << "Warning! Value of '" << CNS_TAG_AS << "' is not correctly specified." << std::endl;
-                    std::cout << "Value of '" << CNS_TAG_AS << "' was defined to default - false." << std::endl;
-                    SearchParams[CN_SP_AS] = 0;
-                }
-                else {
-                    if (check == "1" || check == "true")
-                        SearchParams[CN_SP_AS] = 1;
-                    else
-                        SearchParams[CN_SP_AS] = 0;
-                }
-            }
-        }
-    }*/
-
-    options = root->FirstChildElement(CNS_TAG_OPT);
     LogParams = new std::string[3];
     LogParams[CN_LP_PATH] = "";
     LogParams[CN_LP_NAME] = "";
 
-    if (!options) {
-        std::cout << "Warning! No '" << CNS_TAG_OPT << "' tag found in XML file." << std::endl;
-        std::cout << "Value of '" << CNS_TAG_LOGLVL << "' tag was defined to 'short log' (1)." << std::endl;
-        LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_SHORT_WORD;
+    element = options->FirstChildElement(CNS_TAG_LOGPATH);
+    if (!element) {
+        std::cout << "Warning! No '" << CNS_TAG_LOGPATH << "' tag found in XML file." << std::endl;
+        std::cout << "Value of '" << CNS_TAG_LOGPATH << "' tag was defined to 'current directory'." << std::endl;
+    }
+    else if (!element->GetText()) {
+        std::cout << "Warning! Value of '" << CNS_TAG_LOGPATH << "' tag is missing!" << std::endl;
+        std::cout << "Value of '" << CNS_TAG_LOGPATH << "' tag was defined to 'current directory'." << std::endl;
     }
     else {
-        /*
-        element = options->FirstChildElement(CNS_TAG_LOGLVL);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_LOGLVL << "' tag found in XML file." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_LOGLVL << "' tag was defined to 'short log' (1)." << std::endl;
-            LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_SHORT_WORD;
-        }
-        else {
-            stream << element->GetText();
-            stream >> value;
-            stream.str("");
-            stream.clear();
-            //std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            if (value == CN_LP_LEVEL_NOPE_WORD || value == CN_LP_LEVEL_NOPE_VALUE)
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_NOPE_WORD;
-            else if (value == CN_LP_LEVEL_TINY_WORD || value == CN_LP_LEVEL_TINY_VALUE)
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_TINY_WORD;
-            else if (value == CN_LP_LEVEL_SHORT_WORD || value == CN_LP_LEVEL_SHORT_VALUE)
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_SHORT_WORD;
-            else if (value == CN_LP_LEVEL_MEDIUM_WORD || value == CN_LP_LEVEL_MEDIUM_VALUE)
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_MEDIUM_WORD;
-            else if (value == CN_LP_LEVEL_FULL_WORD || value == CN_LP_LEVEL_FULL_VALUE)
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_FULL_WORD;
-            else {
-                std::cout << "'" << CNS_TAG_LOGLVL << "' is not correctly specified" << std::endl;
-                std::cout << "Value of '" << CNS_TAG_LOGLVL << "' tag was defined to 'short log' (1)." << std::endl;
-                LogParams[CN_LP_LEVEL] = CN_LP_LEVEL_SHORT_WORD;
-            }
-            std::cout << LogParams[CN_LP_LEVEL] << std::endl;
-        }*/
-
-
-        element = options->FirstChildElement(CNS_TAG_LOGPATH);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_LOGPATH << "' tag found in XML file." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_LOGPATH << "' tag was defined to 'current directory'." << std::endl;
-        }
-        else if (!element->GetText()) {
-            std::cout << "Warning! Value of '" << CNS_TAG_LOGPATH << "' tag is missing!" << std::endl;
-            std::cout << "Value of '" << CNS_TAG_LOGPATH << "' tag was defined to 'current directory'." << std::endl;
-        }
-        else {
-            LogParams[CN_LP_PATH] = element->GetText();
-        }
-
-
-        element = options->FirstChildElement(CNS_TAG_LOGFN);
-        if (!element) {
-            std::cout << "Warning! No '" << CNS_TAG_LOGFN << "' tag found in XML file!" << std::endl;
-            std::cout << "Value of '" << CNS_TAG_LOGFN
-                      << "' tag was defined to default (original filename +'_log' + original file extension."
-                      << std::endl;
-        }
-        else if (!element->GetText()) {
-            std::cout << "Warning! Value of '" << CNS_TAG_LOGFN << "' tag is missing." << std::endl;
-            std::cout << "Value of '" << CNS_TAG_LOGFN
-                      << "' tag was defined to default (original filename +'_log' + original file extension."
-                      << std::endl;
-        }
-        else
-            LogParams[CN_LP_NAME] = element->GetText();
+        LogParams[CN_LP_PATH] = element->GetText();
     }
 
-    agentsFile = options->FirstChildElement(CNS_TAG_AGENTS_FILE)->GetText();
-    options->FirstChildElement(CNS_TAG_TASKS_COUNT)->QueryIntText(&tasksCount);
-    tinyxml2::XMLElement *range = options->FirstChildElement(CNS_TAG_AGENTS_RANGE);
-    range->QueryIntAttribute(CNS_TAG_MIN, &minAgents);
-    range->QueryIntAttribute(CNS_TAG_MAX, &maxAgents);
-    options->FirstChildElement(CNS_TAG_MAXTIME)->QueryIntText(&maxTime);
-    options->FirstChildElement(CNS_TAG_SINGLE_EX)->QueryBoolText(&singleExecution);
+
+    element = options->FirstChildElement(CNS_TAG_LOGFN);
+    if (!element) {
+        std::cout << "Warning! No '" << CNS_TAG_LOGFN << "' tag found in XML file!" << std::endl;
+        std::cout << "Value of '" << CNS_TAG_LOGFN
+                  << "' tag was defined to default (original filename +'_log' + original file extension."
+                  << std::endl;
+    }
+    else if (!element->GetText()) {
+        std::cout << "Warning! Value of '" << CNS_TAG_LOGFN << "' tag is missing." << std::endl;
+        std::cout << "Value of '" << CNS_TAG_LOGFN
+                  << "' tag was defined to default (original filename +'_log' + original file extension."
+                  << std::endl;
+    }
+    else
+        LogParams[CN_LP_NAME] = element->GetText();
+
+    bool success = true;
+    success = success && getText(options, CNS_TAG_AGENTS_FILE, agentsFile);
+
+    tinyxml2::XMLElement *range = getChild(options, CNS_TAG_AGENTS_RANGE, false);
+    if (range) {
+        getValueFromAttribute(range, CNS_TAG_AGENTS_RANGE, CNS_TAG_MIN, "int", &minAgents);
+        getValueFromAttribute(range, CNS_TAG_AGENTS_RANGE, CNS_TAG_MAX, "int", &maxAgents);
+    }
+    if (minAgents < 1 || (maxAgents != -1 && maxAgents < minAgents)) {
+        std::cout << "Error! '" << CNS_TAG_MIN << "' value or '" << CNS_TAG_MAX << "' value is incorrect." << std::endl;
+        return false;
+    }
+
+    getValueFromText(options, CNS_TAG_TASKS_COUNT, "int", &tasksCount);
+    getValueFromText(options, CNS_TAG_MAXTIME, "int", &maxTime);
+    getValueFromText(options, CNS_TAG_SINGLE_EX, "bool", &singleExecution);
+    getValueFromText(options, CNS_TAG_AR, "bool", &saveAggregatedResults);
 
 
-    algorithm = root->FirstChildElement(CNS_TAG_ALG);
-    tinyxml2::XMLElement *planner = algorithm->FirstChildElement(CNS_TAG_PLANNER);
-    value = planner->GetText();
+    algorithm = getChild(root, CNS_TAG_ALG);
+    if (!algorithm) {
+        return false;
+    }
+
+    success = success && getText(algorithm, CNS_TAG_PLANNER, value);
     if (value == CNS_ST_CBS || value == CNS_ST_ECBS) {
         searchType = CN_ST_CBS;
         if (value == CNS_ST_ECBS) {
@@ -320,9 +109,19 @@ bool Config::getConfig(const char *FileName)
         searchType = CN_ST_PR;
     } else if (value == CNS_ST_PP) {
         searchType = CN_ST_PP;
+    } else {
+        std::cout << "Error! Planner name '" << value << "' is unknown." << std::endl;
+        return false;
     }
 
-    std::string lowLevelSearch = algorithm->FirstChildElement(CNS_TAG_LOW_LEVEL)->GetText();
+    std::string lowLevelSearch;
+    success = success && getText(algorithm, CNS_TAG_LOW_LEVEL, lowLevelSearch);
+
+    if (!success) {
+        std::cout << "Error! Incorrect config: one or more required parameters are missing." << std::endl;
+        return false;
+    }
+
     if (lowLevelSearch == CNS_SP_ST_ASTAR) {
         lowLevel = CN_SP_ST_ASTAR;
     } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
@@ -333,27 +132,93 @@ bool Config::getConfig(const char *FileName)
         lowLevel = CN_SP_ST_FS;
     } else if (lowLevelSearch == CNS_SP_ST_SCIPP) {
         lowLevel = CN_SP_ST_SCIPP;
+    } else {
+        std::cout << "Error! Low level search '" << lowLevelSearch << "' is unknown." << std::endl;
+        return false;
     }
 
-    if (!withFocalSearch && lowLevel != CN_SP_ST_ASTAR && lowLevel != CN_SP_ST_SIPP) {
+    if (searchType == CN_ST_CBS && !withFocalSearch && lowLevel != CN_SP_ST_ASTAR && lowLevel != CN_SP_ST_SIPP) {
         std::cout << "Warning! Specified low level search can not be used in this algorithm. Using A* instead." << std::endl;
         lowLevel = CN_SP_ST_ASTAR;
     }
 
-    algorithm->FirstChildElement(CNS_TAG_WITH_CAT)->QueryBoolText(&withCAT);
-    algorithm->FirstChildElement(CNS_TAG_WITH_PH)->QueryBoolText(&withPerfectHeuristic);
-    algorithm->FirstChildElement(CNS_TAG_PP_ORDER)->QueryIntText(&ppOrder);
-    algorithm->FirstChildElement(CNS_TAG_PAR_PATHS_1)->QueryBoolText(&parallelizePaths1);
-    algorithm->FirstChildElement(CNS_TAG_PAR_PATHS_2)->QueryBoolText(&parallelizePaths2);
-    algorithm->FirstChildElement(CNS_TAG_CARD_CONF)->QueryBoolText(&withCardinalConflicts);
-    algorithm->FirstChildElement(CNS_TAG_BYPASSING)->QueryBoolText(&withBypassing);
-    algorithm->FirstChildElement(CNS_TAG_WITH_MH)->QueryBoolText(&withMatchingHeuristic);
-    algorithm->FirstChildElement(CNS_TAG_WITH_DS)->QueryBoolText(&withDisjointSplitting);
-    algorithm->FirstChildElement(CNS_TAG_FOCAL_W)->QueryDoubleText(&focalW);
-    algorithm->FirstChildElement(CNS_TAG_SFO)->QueryBoolText(&genSuboptFromOpt);
+    getValueFromText(algorithm, CNS_TAG_WITH_CAT, "bool", &withCAT);
+    getValueFromText(algorithm, CNS_TAG_WITH_PH, "bool", &withPerfectHeuristic);
+    getValueFromText(algorithm, CNS_TAG_PP_ORDER, "int", &ppOrder);
+    getValueFromText(algorithm, CNS_TAG_PAR_PATHS_1, "bool", &parallelizePaths1);
+    getValueFromText(algorithm, CNS_TAG_PAR_PATHS_2, "bool", &parallelizePaths2);
+    getValueFromText(algorithm, CNS_TAG_CARD_CONF, "bool", &withCardinalConflicts);
+    getValueFromText(algorithm, CNS_TAG_BYPASSING, "bool", &withBypassing);
+    getValueFromText(algorithm, CNS_TAG_WITH_MH, "bool", &withMatchingHeuristic);
+    getValueFromText(algorithm, CNS_TAG_WITH_DS, "bool", &withDisjointSplitting);
+    getValueFromText(algorithm, CNS_TAG_FOCAL_W, "double", &focalW);
+    getValueFromText(algorithm, CNS_TAG_SFO, "bool", &genSuboptFromOpt);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;
     withCardinalConflicts = withCardinalConflicts || withMatchingHeuristic || withDisjointSplitting;
+    return true;
+}
+
+bool Config::getValueFromText(tinyxml2::XMLElement *elem, const char *name, const char *typeName, void *field) {
+    tinyxml2::XMLElement *child;
+    child = elem->FirstChildElement(name);
+    if (!child) {
+        std::cout << "Warning! No '" << name << "' tag found in XML file! Using deafult value." << std::endl;
+        return false;
+    }
+
+    tinyxml2::XMLError res;
+    if (typeName == "int") {
+        res = child->QueryIntText((int*)field);
+    } else if (typeName == "bool") {
+        res = child->QueryBoolText((bool*)field);
+    } else if (typeName == "double") {
+        res = child->QueryDoubleText((double*)field);
+    }
+    if (res != tinyxml2::XML_SUCCESS) {
+        std::cout << "Warning! Couldn't get value from '" << name << "' tag! Using deafult value." << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool Config::getValueFromAttribute(tinyxml2::XMLElement *elem, const char *elemName, const char *attrName, const char *typeName, void *field) {
+    tinyxml2::XMLError res;
+    if (typeName == "int") {
+        res = elem->QueryIntAttribute(attrName, (int*)field);
+    } else if (typeName == "bool") {
+        res = elem->QueryBoolAttribute(attrName, (bool*)field);
+    } else if (typeName == "double") {
+        res = elem->QueryDoubleAttribute(attrName, (double*)field);
+    }
+    if (res != tinyxml2::XML_SUCCESS) {
+        std::cout << "Warning! Couldn't get value from '" << attrName << "' attribute in '" <<
+                    elemName << "' tag! Using deafult value." << std::endl;
+        return false;
+    }
+    return true;
+}
+
+tinyxml2::XMLElement* Config::getChild(tinyxml2::XMLElement *elem, const char *name, bool printError) {
+    tinyxml2::XMLElement *child = elem->FirstChildElement(name);
+    if (!child) {
+        std::cout << (printError ? "Error" : "Warning") << "! No '"
+                  << name << "' tag found in XML file!";
+        if (!printError) {
+            std::cout << " Using default value.";
+        }
+        std::cout << std::endl;
+        return 0;
+    }
+    return child;
+}
+
+bool Config::getText(tinyxml2::XMLElement *elem, const char *name, std::string &field) {
+    tinyxml2::XMLElement *child = getChild(elem, name);
+    if (!child) {
+        return false;
+    }
+    field = child->GetText();
     return true;
 }

@@ -18,6 +18,11 @@ struct SIPPNode : virtual public Node
         return res + i * width + j;
     }
 
+    bool operator< (const SIPPNode &other) const {
+        return std::tuple<int, int, int, int, int>(F, -g, -startTime, i, j) <
+                std::tuple<int, int, int, int, int>(other.F, -other.g, -other.startTime, other.i, other.j);
+    }
+
 };
 
 #endif

@@ -26,7 +26,7 @@ public:
     int size() const;
     void clear();
 
-private:
+//private:
     std::set<NodeType, bool (*)(const NodeType&, const NodeType&)> sortByKey;
     std::unordered_map<int, NodeType> sortByIndex;
     bool (*cmp)(const NodeType&, const NodeType&);

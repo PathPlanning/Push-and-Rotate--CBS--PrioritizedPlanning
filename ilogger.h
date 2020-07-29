@@ -1,6 +1,7 @@
 #ifndef ILOGGER_H
 #define	ILOGGER_H
 #include "map.h"
+#include "testing_results.h"
 #include <node.h>
 #include <unordered_map>
 #include <list>
@@ -18,10 +19,9 @@ class ILogger
         virtual void writeToLogAgentsPaths(const AgentSet& agentSet, const std::vector<std::vector<Node>>& agentsPaths,
                                    const std::string &agentsFile, double time, int makespan, int flowtime) = 0;
         virtual void writeToLogNotFound() = 0;
-        virtual void writeToLogAggregatedResults(std::map<int, int> successCount,
-                                                  std::map<int, double> makespans,
-                                                  std::map<int, double> timeflows,
-                                                  std::map<int, double> times) = 0;
+        virtual void writeToLogAggregatedResults(std::map<int, int>& successCount,
+                                                 TestingResults &res,
+                                                 const std::string& agentsFile = "") = 0;
         virtual void writeToLogSummary(unsigned int numberofsteps, unsigned int nodescreated, float length, double time, double cellSize) = 0;
         virtual ~ILogger() {};
     protected:

@@ -11,6 +11,10 @@ struct MultiagentSearchResult
     std::vector<AgentMove>*         agentsMoves;
     std::vector<std::vector<Node>>* agentsPaths;
     double                          time;
+    double                          AvgLLExpansions = 0;
+    double                          AvgLLNodes = 0;
+    int                             HLExpansions = 0;
+    int                             HLNodes = 0;
 
     MultiagentSearchResult(bool Pathfound = false) {
         pathfound = Pathfound;

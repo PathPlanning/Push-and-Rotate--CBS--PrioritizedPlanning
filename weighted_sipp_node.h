@@ -15,13 +15,13 @@ struct WeightedSIPPNode : public SIPPNode
     //WeightedSIPPNode(const Node &other) : Node(other) {}
 
     virtual int convolution(int width, int height, bool withTime = true) const {
-        int res = withTime ? width * height * startTime : 0;
-        return (res + i * width + j) * (optimal ? -1 : 1);
+        int res = withTime ? 2 * width * height * startTime : 0;
+        return res + 2 * i * width + 2 * j + int(optimal);
     }
 
     bool operator< (const WeightedSIPPNode &other) const {
-        return std::tuple<int, int, int, int, bool>(F, -g, i, j, optimal) <
-                std::tuple<int, int, int, int, bool>(other.F, -other.g, other.i, other.j, other.optimal);
+        return std::tuple<int, int, int, int, int, bool>(F, -g, -startTime, i, j, optimal) <
+                std::tuple<int, int, int, int, int, bool>(other.F, -other.g, -other.startTime, other.i, other.j, other.optimal);
     }
 
 };

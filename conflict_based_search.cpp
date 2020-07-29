@@ -27,7 +27,8 @@ std::list<Node> ConflictBasedSearch<SearchType>::getNewPath(const Map &map, cons
                                                 const std::list<Node>::iterator pathStart,
                                                 const std::list<Node>::iterator pathEnd,
                                                 bool withCAT, const ConflictAvoidanceTable &CAT,
-                                                std::vector<double> &lb) {
+                                                std::vector<double> &lb,
+                                                std::vector<int> &LLExpansions, std::vector<int> &LLNodes) {
     std::vector<Constraint> positiveConstraints = constraints.getPositiveConstraints();
     std::sort(positiveConstraints.begin(), positiveConstraints.end(),
             [](const Constraint &lhs, const Constraint &rhs){
@@ -65,6 +66,9 @@ std::list<Node> ConflictBasedSearch<SearchType>::getNewPath(const Map &map, cons
 
     SearchResult searchResult = search->startSearch(map, agentSet, start.i, start.j, end.i, end.j, nullptr,
                                                     true, true, startTime, endTime, -1, {}, constraints, withCAT, CAT);
+
+    LLNodes.push_back(searchResult.nodescreated);
+    LLExpansions.push_back(searchResult.nodesexpanded);
     if (!searchResult.pathfound) {
         return std::list<Node>();
     }
@@ -102,6 +106,7 @@ CBSNode ConflictBasedSearch<SearchType>::createNode(const Map &map, const AgentS
                                         std::vector<std::list<Node>::iterator> &ends,
                                         ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
                                         std::vector<MDD> &mdds, std::vector<double> &lb,
+                                        std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
                                         CBSNode *parentPtr) {
     Constraint constraint(pos1.i, pos1.j, conflict.time, id1);
     if (conflict.edgeConflict) {
@@ -119,7 +124,7 @@ CBSNode ConflictBasedSearch<SearchType>::createNode(const Map &map, const AgentS
 
     double oldLb = lb[id1];
     std::list<Node> newPath = getNewPath(map, agentSet, agent, constraint, agentConstraints,
-                                         starts[id1], ends[id1], config.withCAT, CAT, lb);
+                                         starts[id1], ends[id1], config.withCAT, CAT, lb, LLExpansions, LLNodes);
 
     if (config.withCAT || config.withFocalSearch == true) {
         CAT.addAgentPath(starts[id1], ends[id1]);
@@ -225,6 +230,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             root.sumLb += searchResult.minF;
         }
     }
+
     if (config.storeConflicts) {
         root.conflictSet = findConflict<std::list<Node>::iterator>(starts, ends, -1, true,
                                                                    config.withCardinalConflicts, mdds);
@@ -237,6 +243,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
     MultiagentSearchResult result(false);
     std::set<CBSNode> open = {root};
     std::list<CBSNode> close;
+    std::vector<int> LLExpansions, LLNodes;
 
     int t = 0;
     while (!open.empty() || !focal.empty()) {
@@ -314,6 +321,15 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             }
             result.agentsPaths = &agentsPaths;
             result.pathfound = true;
+            result.HLExpansions = close.size();
+            result.HLNodes = open.size() + close.size() + focal.size();
+            if (LLExpansions.empty()) {
+                result.AvgLLExpansions = 0;
+                result.AvgLLNodes = 0;
+            } else {
+                result.AvgLLExpansions = (double)std::accumulate(LLExpansions.begin(), LLExpansions.end(), 0) / LLExpansions.size();
+                result.AvgLLNodes = (double)std::accumulate(LLNodes.begin(), LLNodes.end(), 0) / LLNodes.size();
+            }
 
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
@@ -331,18 +347,18 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         std::vector<CBSNode> children;
         CBSNode child1 = createNode(map, agentSet, config, conflict, costs, constraints,
                                    conflict.id1, conflict.id2, conflict.pos2, conflict.pos1,
-                                   starts, ends, CAT, conflictSet, mdds, lb, &close.back());
+                                   starts, ends, CAT, conflictSet, mdds, lb, LLExpansions, LLNodes, &close.back());
         if (child1.pathFound) {
             children.push_back(child1);
         }
         CBSNode child2 = createNode(map, agentSet, config, conflict, costs, constraints,
                            conflict.id2, conflict.id1, conflict.pos1, conflict.pos2,
-                           starts, ends, CAT, conflictSet, mdds, lb, &close.back());
+                           starts, ends, CAT, conflictSet, mdds, lb, LLExpansions, LLNodes, &close.back());
         if (child2.pathFound) {
             children.push_back(child2);
         }
 
-        /*for (auto child : children) {
+        for (auto child : children) {
             for (auto constraint : constraints.nodeConstraints) {
                 if (constraint.agentId == child.paths.begin()->first) {
                     auto it = child.paths.begin()->second.begin();
@@ -374,7 +390,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
                     }
                 }
             }
-        }*/
+        }
 
         bool bypass = false;
         if (children.size() == 2) {

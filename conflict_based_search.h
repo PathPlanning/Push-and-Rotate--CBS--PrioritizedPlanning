@@ -11,6 +11,7 @@
 #include "conflict_avoidance_table.h"
 #include "mdd.h"
 #include "conflict_set.h"
+#include <numeric>
 
 template <typename SearchType = Astar<>>
 class ConflictBasedSearch : public MultiagentSearchInterface
@@ -30,7 +31,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
                                    const std::list<Node>::iterator pathStart,
                                    const std::list<Node>::iterator pathEnd,
                                    bool withCAT, const ConflictAvoidanceTable &CAT,
-                                   std::vector<double> &lb);
+                                   std::vector<double> &lb, std::vector<int> &LLExpansions, std::vector<int> &LLNodes);
         CBSNode createNode(const Map &map, const AgentSet &agentSet, const Config &config,
                            const Conflict &conflict, const std::vector<int> &costs,
                            ConstraintsSet &constraints, int id1, int id2,
@@ -39,7 +40,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
                            std::vector<std::list<Node>::iterator> &ends,
                            ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
                            std::vector<MDD> &mdds, std::vector<double> &lb,
-                           CBSNode *parentPtr);
+                           std::vector<int> &LLExpansions, std::vector<int> &LLNodes, CBSNode *parentPtr);
 
 
         SearchType*                     search;

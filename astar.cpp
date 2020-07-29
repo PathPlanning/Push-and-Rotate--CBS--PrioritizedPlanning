@@ -28,6 +28,31 @@ double Astar<NodeType>::metric(int x1, int y1, int x2, int y2) {
     return manhattanDistance(x1, y1, x2, y2);
 }
 
+template<typename NodeType>
+void Astar<NodeType>::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
+    std::unordered_set<int> visited;
+    ISearch<> search(false);
+    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+        visited.clear();
+        Node goal = Node(agentSet.getAgent(i).getGoal_i(), agentSet.getAgent(i).getGoal_j());
+        std::queue<Node> queue;
+        queue.push(goal);
+        while (!queue.empty()) {
+            Node cur = queue.front();
+            queue.pop();
+            if (visited.find(cur.convolution(map.getMapWidth(), map.getMapHeight())) != visited.end()) {
+                continue;
+            }
+            perfectHeuristic[std::make_pair(cur, goal)] = cur.g;
+            visited.insert(cur.convolution(map.getMapWidth(), map.getMapHeight()));
+            std::list<Node> successors = search.findSuccessors(cur, map);
+            for (auto neigh : successors) {
+                queue.push(neigh);
+            }
+        }
+    }
+}
+
 template class Astar<Node>;
 template class Astar<SIPPNode>;
 template class Astar<WeightedSIPPNode>;

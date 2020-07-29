@@ -26,10 +26,9 @@ public:
 
     void writeToLogHPpath(const std::list<Node> &hppath);
 
-    void writeToLogAggregatedResults(std::map<int, int> successCount,
-                                     std::map<int, double> makespans,
-                                     std::map<int, double> timeflows,
-                                     std::map<int, double> times);
+    void writeToLogAggregatedResults(std::map<int, int>& successCount,
+                                     TestingResults &res,
+                                     const std::string& agentsFile = "");
 
     void writeToLogAgentsPaths(const AgentSet& agentSet,
                                const std::vector<std::vector<Node>>& agentsPaths,

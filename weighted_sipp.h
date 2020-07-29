@@ -15,7 +15,7 @@ public:
 
 protected:
     void splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
-                              const NodeType & node, std::pair<int, int> interval,
+                              const NodeType & node, const NodeType & prevNode, std::pair<int, int> interval,
                               const ConflictAvoidanceTable &CAT) override;
     bool binarySplitting() { return true; }
     bool getOptimal(const NodeType &neigh) override;

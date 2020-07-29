@@ -7,6 +7,9 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+    Primitives pr;
+    pr.loadPrimitives("trajectories_moving.xml");
+
     Mission mission(argv[1]);
 
     std::cout << argv[1] << std::endl;
@@ -39,7 +42,11 @@ int main(int argc, char* argv[])
                     }
                 }
                 if (!mission.getSingleExecution()) {
-                    mission.saveAggregatedResultsToLog();
+                    if (mission.getSaveAggregatedResults()) {
+                        mission.saveAggregatedResultsToLog();
+                    } else {
+                        mission.saveSeparateResultsToLog();
+                    }
                 }
                 std::cout << "All searches are finished!" << std::endl;
             }
