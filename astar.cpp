@@ -55,6 +55,6 @@ void Astar<NodeType>::getPerfectHeuristic(const Map &map, const AgentSet &agentS
 
 template class Astar<Node>;
 template class Astar<SIPPNode>;
-template class Astar<WeightedSIPPNode>;
+template class Astar<ZeroSCIPPNode>;
 template class Astar<SCIPPNode>;
 template class Astar<FSNode>;

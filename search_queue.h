@@ -2,7 +2,7 @@
 #define SEARCHQUEUE_H
 
 #include "node.h"
-#include "weighted_sipp_node.h"
+#include "zero_scipp_node.h"
 #include "scipp_node.h"
 #include "fs_node.h"
 #include "map.h"

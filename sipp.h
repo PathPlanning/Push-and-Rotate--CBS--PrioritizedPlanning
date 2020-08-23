@@ -3,7 +3,7 @@
 
 #include "astar.h"
 #include "sipp_node.h"
-#include "weighted_sipp_node.h"
+#include "zero_scipp_node.h"
 
 template <typename NodeType = SIPPNode>
 class SIPP : virtual public Astar<NodeType>

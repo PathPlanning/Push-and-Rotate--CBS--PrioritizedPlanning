@@ -8,7 +8,7 @@
 #include "astar.h"
 #include "sipp.h"
 #include "scipp.h"
-#include "weighted_sipp.h"
+#include "zero_scipp.h"
 #include "multiagent_search_result.h"
 #include "multiagent_search_inteface.h"
 #include <vector>

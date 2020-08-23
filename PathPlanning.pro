@@ -35,7 +35,6 @@ SOURCES += \
     search_queue.cpp \
     sipp.cpp \
     tinyxml2.cpp \
-    weighted_sipp.cpp \
     xmllogger.cpp \
     isearch.cpp \
     mission.cpp \
@@ -43,7 +42,8 @@ SOURCES += \
     dijkstra.cpp \
     config.cpp \
     astar.cpp \
-    main.cpp
+    main.cpp \
+    zero_scipp.cpp
 
 HEADERS += \
     agent.h \
@@ -72,8 +72,6 @@ HEADERS += \
     tinyxml2.h \
     node.h \
     gl_const.h \
-    weighted_sipp.h \
-    weighted_sipp_node.h \
     xmllogger.h \
     isearch.h \
     mission.h \
@@ -82,7 +80,9 @@ HEADERS += \
     dijkstra.h \
     config.h \
     astar.h \
-    searchresult.h
+    searchresult.h \
+    zero_scipp.h \
+    zero_scipp_node.h
 
 DISTFILES += \
     CMakeLists.txt \

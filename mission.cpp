@@ -92,8 +92,8 @@ void Mission::createAlgorithm()
             multiagentSearch = new ConflictBasedSearch<Astar<>>(new Astar<>(true));
         } else if (config.lowLevel == CN_SP_ST_SIPP) {
             multiagentSearch = new ConflictBasedSearch<SIPP<>>(new SIPP<>());
-        } else if (config.lowLevel == CN_SP_ST_WSIPP) {
-            multiagentSearch = new ConflictBasedSearch<WeightedSIPP<>>(new WeightedSIPP<>(config.focalW, config.genSuboptFromOpt));
+        } else if (config.lowLevel == CN_SP_ST_ZSCIPP) {
+            multiagentSearch = new ConflictBasedSearch<ZeroSCIPP<>>(new ZeroSCIPP<>(config.focalW, config.genSuboptFromOpt));
         } else if (config.lowLevel == CN_SP_ST_FS) {
             multiagentSearch = new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW));
         } else if (config.lowLevel == CN_SP_ST_SCIPP) {
@@ -106,8 +106,8 @@ void Mission::createAlgorithm()
             multiagentSearch = new PrioritizedPlanning<SIPP<>>(new SIPP<>());
         } else if (config.lowLevel == CN_SP_ST_SCIPP) {
             multiagentSearch = new PrioritizedPlanning<SCIPP<>>(new SCIPP<>(config.focalW));
-        } else if (config.lowLevel == CN_SP_ST_WSIPP) {
-            multiagentSearch = new PrioritizedPlanning<WeightedSIPP<>>(new WeightedSIPP<>(config.focalW, config.genSuboptFromOpt));
+        } else if (config.lowLevel == CN_SP_ST_ZSCIPP) {
+            multiagentSearch = new PrioritizedPlanning<ZeroSCIPP<>>(new ZeroSCIPP<>(config.focalW, config.genSuboptFromOpt));
         }
     }
 }

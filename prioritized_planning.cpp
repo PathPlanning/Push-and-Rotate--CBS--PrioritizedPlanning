@@ -49,7 +49,7 @@ MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &m
 
     ConflictAvoidanceTable CAT;
     std::vector<std::list<Node>> individualPaths;
-    if (config.lowLevel == CN_SP_ST_SCIPP || config.lowLevel == CN_SP_ST_WSIPP) {
+    if (config.lowLevel == CN_SP_ST_SCIPP || config.lowLevel == CN_SP_ST_ZSCIPP) {
         Astar<> astar(false);
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
             Agent agent = agentSet.getAgent(i);
@@ -73,7 +73,7 @@ MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &m
             return result;
         }
 
-        if (config.lowLevel == CN_SP_ST_SCIPP || config.lowLevel == CN_SP_ST_WSIPP) {
+        if (config.lowLevel == CN_SP_ST_SCIPP || config.lowLevel == CN_SP_ST_ZSCIPP) {
             CAT.removeAgentPath(individualPaths[i].begin(), individualPaths[i].end());
         }
 
@@ -119,4 +119,4 @@ MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &m
 template class PrioritizedPlanning<Astar<>>;
 template class PrioritizedPlanning<SIPP<>>;
 template class PrioritizedPlanning<SCIPP<>>;
-template class PrioritizedPlanning<WeightedSIPP<>>;
+template class PrioritizedPlanning<ZeroSCIPP<>>;

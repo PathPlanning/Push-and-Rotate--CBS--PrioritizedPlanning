@@ -13,7 +13,7 @@
 #include "astar.h"
 #include "dijkstra.h"
 #include "sipp.h"
-#include "weighted_sipp.h"
+#include "zero_scipp.h"
 #include "focalsearch.h"
 #include "scipp.h"
 #include "xmllogger.h"

@@ -126,8 +126,8 @@ bool Config::getConfig(const char *FileName)
         lowLevel = CN_SP_ST_ASTAR;
     } else if (lowLevelSearch == CNS_SP_ST_SIPP) {
         lowLevel = CN_SP_ST_SIPP;
-    } else if (lowLevelSearch == CNS_SP_ST_WSIPP) {
-        lowLevel = CN_SP_ST_WSIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_ZSCIPP) {
+        lowLevel = CN_SP_ST_ZSCIPP;
     } else if (lowLevelSearch == CNS_SP_ST_FS) {
         lowLevel = CN_SP_ST_FS;
     } else if (lowLevelSearch == CNS_SP_ST_SCIPP) {

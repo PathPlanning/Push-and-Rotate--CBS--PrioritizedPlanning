@@ -358,40 +358,6 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             children.push_back(child2);
         }
 
-        for (auto child : children) {
-            for (auto constraint : constraints.nodeConstraints) {
-                if (constraint.agentId == child.paths.begin()->first) {
-                    auto it = child.paths.begin()->second.begin();
-                    std::advance(it, std::min(constraint.time, int(child.paths.begin()->second.size()) - 1));
-                    if (it->i == constraint.i && it->j == constraint.j) {
-                        std::cout << "1 " << t << std::endl;
-                    }
-                }
-            }
-            for (auto constraint : constraints.edgeConstraints) {
-                if (constraint.agentId == child.paths.begin()->first) {
-                    auto it = child.paths.begin()->second.begin();
-                    if (constraint.time > child.paths.begin()->second.size() - 1) {
-                        continue;
-                    }
-                    std::advance(it, constraint.time);
-                    if (it->i == constraint.i && it->j == constraint.j &&
-                            std::prev(it)->i == constraint.prev_i && std::prev(it)->j == constraint.prev_j) {
-                        std::cout << "2 " << t << std::endl;
-                    }
-                }
-            }
-            for (auto constraint : constraints.positiveConstraints) {
-                if (constraint.agentId == child.paths.begin()->first) {
-                    auto it = child.paths.begin()->second.begin();
-                    std::advance(it, std::min(constraint.time, int(child.paths.begin()->second.size()) - 1));
-                    if ((it->i != constraint.i || it->j != constraint.j)) {
-                        std::cout << "3 " << t << std::endl;
-                    }
-                }
-            }
-        }
-
         bool bypass = false;
         if (children.size() == 2) {
             for (auto child : children) {
@@ -434,6 +400,6 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
 
 template class ConflictBasedSearch<Astar<>>;
 template class ConflictBasedSearch<SIPP<>>;
-template class ConflictBasedSearch<WeightedSIPP<>>;
+template class ConflictBasedSearch<ZeroSCIPP<>>;
 template class ConflictBasedSearch<FocalSearch<>>;
 template class ConflictBasedSearch<SCIPP<>>;

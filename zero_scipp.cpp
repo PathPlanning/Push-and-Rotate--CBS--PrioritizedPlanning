@@ -1,17 +1,17 @@
-#include "weighted_sipp.h"
+#include "zero_scipp.h"
 
 template<typename NodeType>
-WeightedSIPP<NodeType>::~WeightedSIPP() {}
+ZeroSCIPP<NodeType>::~ZeroSCIPP() {}
 
 template<typename NodeType>
-void WeightedSIPP<NodeType>::splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
+void ZeroSCIPP<NodeType>::splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,
                                                   const NodeType & node, const NodeType & prevNode,
                                                   std::pair<int, int> interval, const ConflictAvoidanceTable &CAT) {
     CAT.getSoftConflictIntervals(softConflictIntervals, node, prevNode, interval.first, interval.second, true);
 }
 
 template<typename NodeType>
-void WeightedSIPP<NodeType>::addOptimalNode(const NodeType& cur, NodeType &neigh, std::pair<int, int> interval,
+void ZeroSCIPP<NodeType>::addOptimalNode(const NodeType& cur, NodeType &neigh, std::pair<int, int> interval,
                                             int agentId, const ConstraintsSet &constraints,
                                             std::list<NodeType> &successors) {
     if (cur.optimal) {
@@ -28,22 +28,22 @@ void WeightedSIPP<NodeType>::addOptimalNode(const NodeType& cur, NodeType &neigh
 }
 
 template<typename NodeType>
-bool WeightedSIPP<NodeType>::checkSuboptimal(const NodeType &cur) {
+bool ZeroSCIPP<NodeType>::checkSuboptimal(const NodeType &cur) {
     return genSuboptFromOpt || !cur.optimal;
 }
 
 template<typename NodeType>
-bool WeightedSIPP<NodeType>::getOptimal(const NodeType &neigh) {
+bool ZeroSCIPP<NodeType>::getOptimal(const NodeType &neigh) {
     return neigh.optimal;
 }
 
 template<typename NodeType>
-void WeightedSIPP<NodeType>::setOptimal(NodeType &neigh, bool val) {
+void ZeroSCIPP<NodeType>::setOptimal(NodeType &neigh, bool val) {
     neigh.optimal = val;
 }
 
 template<typename NodeType>
-void WeightedSIPP<NodeType>::addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
+void ZeroSCIPP<NodeType>::addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
     int oldF = node.F;
     node.F *= weight;
     this->open.insert(map, node, ISearch<NodeType>::withTime);
@@ -51,10 +51,10 @@ void WeightedSIPP<NodeType>::addStartNode(NodeType &node, const Map &map, const 
 }
 
 template<typename NodeType>
-void WeightedSIPP<NodeType>::addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
+void ZeroSCIPP<NodeType>::addSuboptimalNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) {
     this->updateEndTimeBySoftConflicts(node, CAT);
     node.optimal = false;
     this->open.insert(map, node, ISearch<NodeType>::withTime);
 }
 
-template class WeightedSIPP<WeightedSIPPNode>;
+template class ZeroSCIPP<ZeroSCIPPNode>;

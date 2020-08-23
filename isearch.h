@@ -6,7 +6,7 @@
 #include "constraints_set.h"
 #include "conflict_avoidance_table.h"
 #include "search_queue.h"
-#include "weighted_sipp_node.h"
+#include "zero_scipp_node.h"
 #include <list>
 #include <vector>
 #include <math.h>

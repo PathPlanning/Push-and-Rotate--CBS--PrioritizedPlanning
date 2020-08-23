@@ -1,17 +1,17 @@
-#ifndef WEIGHTEDSIPP_H
-#define WEIGHTEDSIPP_H
+#ifndef ZEROSCIPP_H
+#define ZEROSCIPP_H
 
 #include "sipp.h"
-#include "weighted_sipp_node.h"
+#include "zero_scipp_node.h"
 
-template <typename NodeType = WeightedSIPPNode>
-class WeightedSIPP : public SIPP<NodeType>
+template <typename NodeType = ZeroSCIPPNode>
+class ZeroSCIPP : public SIPP<NodeType>
 {
 public:
-    WeightedSIPP(double Weight = 1.0, bool GenSuboptFromOpt = false, double HW = 1.0, bool BT = true) :
+    ZeroSCIPP(double Weight = 1.0, bool GenSuboptFromOpt = false, double HW = 1.0, bool BT = true) :
         Astar<NodeType>(true, HW, BT),
         SIPP<NodeType>(HW, BT), weight(Weight), genSuboptFromOpt(GenSuboptFromOpt)  {}
-    virtual ~WeightedSIPP();
+    virtual ~ZeroSCIPP();
 
 protected:
     void splitBySoftConflicts(std::vector<std::pair<int, int>> &softConflictIntervals,

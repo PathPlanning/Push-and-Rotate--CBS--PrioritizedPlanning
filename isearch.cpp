@@ -103,10 +103,6 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
     sresult.nodescreated = open.size() + close.size() + getFocalSize();
     sresult.nodesexpanded = close.size();
 
-    //if (withTime) {
-    //    std::cout << sresult.numberofsteps << std::endl;
-    //}
-
     if (sresult.pathfound) {
         sresult.pathlength = cur.g;
         sresult.minF = std::min(double(cur.F), getMinFocalF());
@@ -236,6 +232,6 @@ void ISearch<NodeType>::makeSecondaryPath(const Map &map)
 
 template class ISearch<Node>;
 template class ISearch<SIPPNode>;
-template class ISearch<WeightedSIPPNode>;
+template class ISearch<ZeroSCIPPNode>;
 template class ISearch<SCIPPNode>;
 template class ISearch<FSNode>;

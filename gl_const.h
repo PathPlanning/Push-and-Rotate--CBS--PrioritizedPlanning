@@ -127,14 +127,14 @@
         #define CNS_SP_ST_ASTAR         "astar"
         #define CNS_SP_ST_FS            "focal_search"
         #define CNS_SP_ST_SIPP          "sipp"
-        #define CNS_SP_ST_WSIPP         "weighted_sipp"
+        #define CNS_SP_ST_ZSCIPP        "zero_scipp"
         #define CNS_SP_ST_SCIPP         "scipp"
 
         #define CN_SP_ST_ASTAR          0
         #define CN_SP_ST_TIME_ASTAR     1
         #define CN_SP_ST_FS             2
         #define CN_SP_ST_SIPP           3
-        #define CN_SP_ST_WSIPP          4
+        #define CN_SP_ST_ZSCIPP         4
         #define CN_SP_ST_SCIPP          5
 
 
