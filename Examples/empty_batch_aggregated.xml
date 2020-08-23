@@ -37,11 +37,11 @@
     </algorithm>
     <options>
         <agents_file>empty-16-16-random</agents_file>
-        <tasks_count>1</tasks_count>
+        <tasks_count>2</tasks_count>
         <agents_range min="1" max="16"/>
         <maxtime>1000</maxtime>
-        <single_execution>true</single_execution>
-        <aggregated_results>false</aggregated_results>
+        <single_execution>false</single_execution>
+        <aggregated_results>true</aggregated_results>
     <logfilename />
   </options>
 </root>

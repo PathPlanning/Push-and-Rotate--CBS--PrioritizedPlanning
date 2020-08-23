@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<root>
+    <map>
+        <grid width="16" height="16">
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        </grid>
+    </map>
+    <algorithm>
+        <planner>cbs</planner>
+        <low_level>astar</low_level>
+        <with_cat>true</with_cat>
+        <with_perfect_h>false</with_perfect_h>
+        <with_card_conf>true</with_card_conf>
+        <with_bypassing>true</with_bypassing>
+        <with_matching_h>true</with_matching_h>
+        <with_disjoint_splitting>true</with_disjoint_splitting>
+        <gen_subopt_from_opt>false</gen_subopt_from_opt>
+        <focal_w>1.5</focal_w>
+        <pp_order>2</pp_order>
+        <parallelize_paths_1>true</parallelize_paths_1>
+        <parallelize_paths_2>true</parallelize_paths_2>
+    </algorithm>
+    <options>
+        <agents_file>empty-16-16-random</agents_file>
+        <tasks_count>2</tasks_count>
+        <agents_range min="1" max="16"/>
+        <maxtime>1000</maxtime>
+        <single_execution>false</single_execution>
+        <aggregated_results>false</aggregated_results>
+        <logfilename/>
+    </options>
+    <log>
+        <mapfilename>empty_batch_full.xml</mapfilename>
+        <results agents_file="empty-16-16-random-1">
+            <result agents_count="1" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="6" makespan="6" time="0"/>
+            <result agents_count="2" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="26" makespan="20" time="0"/>
+            <result agents_count="3" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="36" makespan="20" time="0"/>
+            <result agents_count="4" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="47" makespan="20" time="0.001"/>
+            <result agents_count="5" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="55" makespan="20" time="0.001"/>
+            <result agents_count="6" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="170" LL_avg_nodes="300.5" flowtime="72" makespan="20" time="0.0040000000000000001"/>
+            <result agents_count="7" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="170" LL_avg_nodes="300.5" flowtime="78" makespan="20" time="0.0040000000000000001"/>
+            <result agents_count="8" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="170" LL_avg_nodes="300.5" flowtime="84" makespan="20" time="0.0080000000000000002"/>
+            <result agents_count="9" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="170" LL_avg_nodes="300.5" flowtime="92" makespan="20" time="0.0040000000000000001"/>
+            <result agents_count="10" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="111.5" LL_avg_nodes="224.5" flowtime="102" makespan="20" time="0.0089999999999999993"/>
+            <result agents_count="11" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="111.5" LL_avg_nodes="224.5" flowtime="108" makespan="20" time="0.0060000000000000001"/>
+            <result agents_count="12" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="111.5" LL_avg_nodes="224.5" flowtime="116" makespan="20" time="0.0070000000000000001"/>
+            <result agents_count="13" success_count="1" HL_expansions="4" HL_nodes="4" LL_avg_expansions="77" LL_avg_nodes="160" flowtime="120" makespan="20" time="0.0070000000000000001"/>
+            <result agents_count="14" success_count="1" HL_expansions="4" HL_nodes="4" LL_avg_expansions="77" LL_avg_nodes="160" flowtime="126" makespan="20" time="0.0070000000000000001"/>
+            <result agents_count="15" success_count="1" HL_expansions="5" HL_nodes="5" LL_avg_expansions="60.125" LL_avg_nodes="130.125" flowtime="135" makespan="20" time="0.01"/>
+            <result agents_count="16" success_count="1" HL_expansions="5" HL_nodes="5" LL_avg_expansions="60.125" LL_avg_nodes="130.125" flowtime="152" makespan="20" time="0.0089999999999999993"/>
+        </results>
+        <results agents_file="empty-16-16-random-2">
+            <result agents_count="1" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="17" makespan="17" time="0"/>
+            <result agents_count="2" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="32" makespan="17" time="0"/>
+            <result agents_count="3" success_count="1" HL_expansions="1" HL_nodes="1" LL_avg_expansions="0" LL_avg_nodes="0" flowtime="43" makespan="17" time="0"/>
+            <result agents_count="4" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="78.5" LL_avg_nodes="188.5" flowtime="57" makespan="17" time="0.002"/>
+            <result agents_count="5" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="78.5" LL_avg_nodes="188.5" flowtime="63" makespan="17" time="0.0040000000000000001"/>
+            <result agents_count="6" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="78.5" LL_avg_nodes="188.5" flowtime="70" makespan="17" time="0.002"/>
+            <result agents_count="7" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="78.5" LL_avg_nodes="188.5" flowtime="81" makespan="17" time="0.0030000000000000001"/>
+            <result agents_count="8" success_count="1" HL_expansions="2" HL_nodes="2" LL_avg_expansions="78.5" LL_avg_nodes="188.5" flowtime="95" makespan="17" time="0.0040000000000000001"/>
+            <result agents_count="9" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="143.75" LL_avg_nodes="265.75" flowtime="111" makespan="17" time="0.010999999999999999"/>
+            <result agents_count="10" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="143.75" LL_avg_nodes="265.75" flowtime="122" makespan="17" time="0.0070000000000000001"/>
+            <result agents_count="11" success_count="1" HL_expansions="3" HL_nodes="3" LL_avg_expansions="143.75" LL_avg_nodes="265.75" flowtime="127" makespan="17" time="0.0070000000000000001"/>
+            <result agents_count="12" success_count="1" HL_expansions="4" HL_nodes="4" LL_avg_expansions="101" LL_avg_nodes="200" flowtime="141" makespan="17" time="0.0080000000000000002"/>
+            <result agents_count="13" success_count="1" HL_expansions="5" HL_nodes="5" LL_avg_expansions="78.875" LL_avg_nodes="164" flowtime="151" makespan="17" time="0.01"/>
+            <result agents_count="14" success_count="1" HL_expansions="8" HL_nodes="9" LL_avg_expansions="56.571428571428569" LL_avg_nodes="132.5" flowtime="160" makespan="17" time="0.014"/>
+            <result agents_count="15" success_count="1" HL_expansions="9" HL_nodes="10" LL_avg_expansions="63.125" LL_avg_nodes="146" flowtime="173" makespan="17" time="0.017000000000000001"/>
+            <result agents_count="16" success_count="1" HL_expansions="7" HL_nodes="7" LL_avg_expansions="76.583333333333329" LL_avg_nodes="171.58333333333334" flowtime="192" makespan="19" time="0.016"/>
+        </results>
+    </log>
+</root>

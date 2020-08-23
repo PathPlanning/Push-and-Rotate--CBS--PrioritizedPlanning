@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <root>
     <map>
-        <width>16</width>
-        <height>16</height>
         <grid width="16" height="16">
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
             <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
@@ -43,12 +41,13 @@
         <agents_range min="1" max="16"/>
         <maxtime>1000</maxtime>
         <single_execution>true</single_execution>
+        <aggregated_results>false</aggregated_results>
         <logfilename/>
     </options>
     <log>
         <mapfilename>empty_single.xml</mapfilename>
         <taskfilename>empty-16-16-random-1.xml</taskfilename>
-        <summary agents_count="16" time="0.042000000000000003" makespan="20" flowtime="152"/>
+        <summary agents_count="16" time="0.0089999999999999993" makespan="20" flowtime="152" HL_expansions="5" HL_nodes="5" LL_avg_expansions="60.125" LL_avg_nodes="130.125"/>
         <agent id="0" start.x="13" start.y="8" goal.x="8" goal.y="7">
             <path pathfound="true">
                 <section id="0" start.x="13" start.y="8" goal.x="12" goal.y="8" duration="1"/>

@@ -180,7 +180,8 @@ void Mission::startSearch(const std::string &agentsFile)
         res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
 
         if (config.singleExecution) {
-            saveAgentsPathsToLog(agentsFile, sr.time, makespan, flowtime);
+            saveAgentsPathsToLog(agentsFile, sr.time, makespan, flowtime,
+                                 sr.HLExpansions, sr.HLNodes, sr.AvgLLExpansions, sr.AvgLLNodes);
         }
         if (!checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
@@ -295,9 +296,12 @@ void Mission::saveAggregatedResultsToLog() {
     logger->saveLog();
 }
 
-void Mission::saveAgentsPathsToLog(const std::string &agentsFile, double time, int makespan, int flowtime)
-{
-    logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, time, makespan, flowtime);
+void Mission::saveAgentsPathsToLog(const std::string &agentsFile, double time,
+                                   double makespan, double flowtime,
+                                   int HLExpansions, int HLNodes,
+                                   double LLExpansions, double LLNodes) {
+    logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, time, makespan, flowtime,
+                                  HLExpansions, HLNodes, LLExpansions, LLNodes);
     logger->saveLog();
 }
 

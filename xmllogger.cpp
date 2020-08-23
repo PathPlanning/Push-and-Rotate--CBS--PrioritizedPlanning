@@ -146,7 +146,10 @@ void XmlLogger::writeToLogMap(const Map &map, const std::list<Node> &path)
 
 void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
                                       const std::vector<std::vector<Node>>& agentsPaths,
-                                      const std::string &agentsFile, double time, int makespan, int flowtime) {
+                                      const std::string &agentsFile, double time,
+                                      double makespan, double flowtime,
+                                      int HLExpansions, int HLNodes,
+                                      double LLExpansions, double LLNodes) {
     XMLElement *log = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG);
 
     XMLElement *taskFileElement = doc.NewElement(CNS_TAG_TASKFN);
@@ -158,6 +161,10 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
     summaryElement->SetAttribute(CNS_TAG_ATTR_TIME, time);
     summaryElement->SetAttribute(CNS_TAG_ATTR_MAKESPAN, makespan);
     summaryElement->SetAttribute(CNS_TAG_ATTR_FLOWTIME, flowtime);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_HLE, HLExpansions);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_HLN, HLNodes);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_LLE, LLExpansions);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_LLN, LLNodes);
     log->InsertEndChild(summaryElement);
 
     for (int i = 0; i < agentsPaths.size(); ++i) {

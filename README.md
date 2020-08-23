@@ -1,98 +1,97 @@
-# [English documentation](README-EN.md)
+# [Документация на русском](README-RU.md)
 # Push-and-Rotate--CBS--PrioritizedPlanning
+This project contains implementations of different algorithms designed for the multiagent pathfinding problem. Namely, following algorithms with some of their modifications are implemented: [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Enhanced conflict based search](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf), [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf).
 
-В данном проекте приводятся реализации различных алгоритмов решающих задачи планирования траекторий для группы агентов. Рассматриваются алгоритмы [Conflict based search](https://www.aaai.org/ocs/index.php/AAAI/AAAI12/paper/viewFile/5062/5239), [Enhanced conflict based search](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875), [Push and rotate](https://pdfs.semanticscholar.org/0a84/5fa6530f84b5df50d652a5e4eecc38d77681.pdf) и [Prioritized planning](https://arxiv.org/pdf/1409.2399.pdf), а также некоторые их модификации.
+## Build and run
 
-## Сборка и запуск
-Для сборки проекта можно использовать cmake с помощью файла CMakeLists.txt, размещенного в репозитории. Также файлы проекта могут быть открыты и скомпилированы в Qt Creator с конфигурациями, заданными в файле PathPlanning.pro.
+The project can be built with cmake using CMakeLists.txt file provided in repository. Also the project can be opened and built in Qt Creator using PathPlanning.pro file.
 
-Данные поступают в виде файлов в формате XML: одного основного файла и одного или нескольких дополнительных. В качестве первого аргумента командной строки передается название основного входного файла, в котором приводится описание среды, алгоритма и даются ссылки на дополнительные входные файлы с агентами. Результатом работы является выходной файл в формате XML. Примеры оформления входных и выходного файлов можно найти в разделе Examples.
+Input of the programm consists of several XML files: one main file and one or more additional files. Name of the main input file is passed through the first command line argument. This file contains the description of an environement and an algorithm and links for the additional input files with agents’ description. Output of the program is also saved in the XML file. Examples of input and output files are provided in `Examples` directory.
 
-## Формат входных данных
-Основной файл содержит разделы map, algorithm и options:
+## Input data
 
-### Раздел map - задание карты. Содержит следующие тэги:
-- grid - содержит атрибуты width и height, задающие ширину и высота карты (в клетках). В теле тега описывается сама карта, 0 означает свободную клетку, а 1 - препятствие. Ряды обособляются тэгом row, количество рядов должно быть равно height, а количество символов в каждом ряду должно быть равно width.
+The main file contains two sections `map` and `options`:
 
-### Раздел algorithm - выбор параметров алгоритма. Содержит следующие тэги:
-- planner - используемый алгоритм. Может принимать следующие значения:
+### Section `map` - map definition. Contains following tags:
+- grid - contains attributes `width` and `height` specifing dimensions of the map. Map description is provided in the tag body, 0 means a traversable cell and 1 means an obstacle. Each row is included into `row` tag, number of rows must be equal to the `height` value and number of digits in every row must be equal to the `width` value.
+
+### Section `algorithm` - definition of the algorihm parameters. Contains following tags:
+- algorithm - algorithm to be used. Can take following values:
     1. cbs - Conflict based search
-    2. ecbs - Enhanced conflict based search. В алгоритме на верхнем уровне используется вторичная эвристика h3 из [статьи](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875). Поиск нижнего уровня зависит от параметра low_level.
+    2. ecbs - Enhanced conflict based search. In the high level search secondary heuristic h3 from the [article](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) is used. Low level search depends on the low_level option
     3. push_and_rotate - Push and rotate
     4. prioritized_planning - Prioritized planning
-- low_level - алгоритм, используемый в поиске нижнего уровня в алгоритмах CBS, ECBS и Prioritized planning. Может принимать следующие значения:
-    1. astar - алгоритм [A*](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf)
-    2. sipp - алгоритм [SIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) (дискретная версия для четырехсвязной сетки)
-    3. weighted_sipp - субоптимальная версия SIPP, описанная [здесь](https://docs.google.com/document/d/16NjWHubNFczPDGi3QqWkMrWE8ewQtOBXruUBaa9hQnw/edit). Может работать в двух режимах в зависимости от значения параметра gen_subopt_from_opt
-    4. focal_search - Алгритм Focal search как в оригинальной [статье](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) про ECBS. В алгоритме используется вторичная эвристика, равная количеству вершинных конфликтов на уже построенном участке траектории до текущей вершины
-    5. scipp - алгоритм [SCIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS19/paper/viewFile/18327/17443) (дискретная версия для четырехсвязной сетки)
+- low_level - algorithm, applied in the low level search in CBS, ECBS and Prioritized planning algorithms. Can take following values:
+    1. astar - algorithm [A*](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf)
+    2. sipp - algorithm [SIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) (discrete version for 4-connected grid)
+    3. weighted_sipp - suboptimal version of SIPP algorithm described [here](https://docs.google.com/document/d/16NjWHubNFczPDGi3QqWkMrWE8ewQtOBXruUBaa9hQnw/edit)
+    4. focal_search - focal search algorithm, as in original ECBS [paper](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875). Secondary heuristic is defined as number of vertex conflicts on the partial path to the current vertex
+    5. scipp - [SCIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS19/paper/viewFile/18327/17443) algoritm (discrete version for 4-connected grid)
+- agents_file - common prefix for the input files with agents’ description
+- tasks_count - number of input files with agents’ description: in testing files with names of the form `agents_file-n.xml` are used for all `n` from 1 to tasks_count. Optional parameter, default value is 1
+- agents_range - `min` and `max` attributes specify minimal and maximal number of agents for testing. When single_execution=`false`, number of agents is  gradually increased from `min` to `max` and the algorithm is being run on corresponding subset of agent set. If algorithm fails to find the solution or runs longer then some fixed time limit, testing of current scenario terminates. Optional parameter, by default minimal number of agents is 1 and maximal is the same as number of agents in the agents file
+- maxtime - maximal running time of the algorihm in milliseconds. Optional parameter, default value is 1000
+- with_perfect_h - find the shortest paths from all cells to agents goal positions to compute perfect heuristic for A* method (`true` or `false`, considered for CBS and Prioritized planning algorithms). Optional parameter, default value is false
+- with_cat - use Conflict avodance table (`true` or `false`, considered for CBS and ECBS algorithms). Optional parameter, default value is false
+- with_card_conf - use cardinal conflicts (as described [here](https://pdfs.semanticscholar.org/c072/38579a95c424707dbe855efba189cce68650.pdf)). Can be `true` or `false`, considered for CBS and ECBS algorithms. Optional parameter, default value is false
+- with_bypassing - use conflict bypassing (as described [here](https://pdfs.semanticscholar.org/c072/38579a95c424707dbe855efba189cce68650.pdf)). Can be `true` or `false`, considered for CBS and ECBS algorithms. Optional parameter, default value is false
+- with_matching_h - compute heuristic on vertices of constraint tree in CBS, based on maximal matching in cardinal conflicts graph. Described [here](http://idm-lab.org/bib/abstracts/papers/icaps18a.pdf) as ICBS-h1, can be `true` or `false`, considered for CBS and ECBS algorithms. Optional parameter, default value is false
+- with_disjoint_splitting - use disjoint splitting. Described [here](http://idm-lab.org/bib/abstracts/papers/icaps19a.pdf), can be `true` or `false`, considered for CBS and ECBS algorithms. When using this option, with_card_conf option is set to `true`. Optional parameter, default value is false
+- focal_w - weight used in ECBS high level search and in Focal search and SCIPP low level searches for construction of the FOCAL list. Also f-values of optimal nodes in weighted_sipp algorithm are multiplied by this value. In any case it is garantied that cost of the found solution will not exceed the optimal cost more than in focal_w times. Optional parameter, default value is 1.0
+- gen_subopt_from_opt - generate suboptimal successors from optimal nodes in weighted_sipp alogrithm. Can be `true` or `false`, considered for low_level = `weighted_sipp`. Optional parameter, default value is false
 
-    Для алгоритма CBS могут использоваться только алгоритмы A* и SIPP, если выбрано другое значение low_level, оно будет проигнорированно и будет использоваться алгоритм A*.
-- with_perfect_h - будет ли производиться предпосчет кратчайших путей от всех вершин до конечных позиций агентов для вычисления оптимальной эвристики в A\* (`true` или `false`, учитывается для алгоритмов CBS и Prioritized planning). Опциональный параметр, значение по умолчанию равно `false`
-- with_cat - будет ли использоваться Conflict avodance table (`true` или `false`, учитывается если выбран алгоритм CBS). Опциональный параметр, значение по умолчанию равно `false`
-- with_card_conf - будут ли учитываться кардинальные конфликты (описываются [здесь](https://pdfs.semanticscholar.org/c072/38579a95c424707dbe855efba189cce68650.pdf)). Принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. Опциональный параметр, значение по умолчанию равно `false`
-- with_bypassing - будет ли производиться обход конфликтов (conflict bypassing). Описывается [здесь](http://faculty.cse.tamu.edu/guni/Papers/ICAPS15-Eli.pdf), принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. Опциональный параметр, значение по умолчанию равно `false`
-- with_matching_h - будет ли вычисляться эвристика на вершинах дерева обхода CBS, основанная на максимальном паросочетаннии в графе кардинальных конфликтов. Описывается [здесь](http://idm-lab.org/bib/abstracts/papers/icaps18a.pdf) как ICBS-h1, принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. При использовании этой опции, опция with_card_conf фиксируется равной `true`. Опциональный параметр, значение по умолчанию равно `false`
-- with_disjoint_splitting - будет ли производиться disjoint splitting. Описывается [здесь](http://idm-lab.org/bib/abstracts/papers/icaps19a.pdf), принимает значения `true` или `false`, учитывается если выбран алгоритм CBS. При использовании этой опции, опция with_card_conf фиксируется равной `true`. Опциональный параметр, значение по умолчанию равно `false`
-- focal_w - вес, который используется на верхнем уровне в алгоритме ECBS и на нижнем уровне в алгоритмах Focal search и SCIPP при построении списка FOCAL. Также на эту величину домножаются f-значения оптимальных верхин в weighted_sipp. Во всех случаях гарантируется, что стоимость полученного решения будет отличаться от оптимальной не более чем в focal_w раз. Опциональный параметр, значение по умолчанию равно 1.0
-- gen_subopt_from_opt - могут ли оптимальные вершины генерировать субоптимальных потомков в алгоритме weighted_sipp. Принимает значения `true` или `false`, учитывается если low_level = `weighted_sipp`. Опциональный параметр, значение по умолчанию равно `false`
-- pp_order - задает правило, согласно которому выбираются приоритеты агентов в prioritized_planning. Может принимать следующие значения:
-    - 0 - агенты обрабатываются в том же порядке, в котором они указаны в файле
-    - 1 - агенты обрабатываются в порядке увеличения манхэттенского расстояния от стартовой позиции до конечной
-    - 2 - агенты обрабатываются в порядке уменьшения манхэттенского расстояния от стартовой позиции до конечной
+- pp_order - specifies a method of agents priorities definition for Prioritized Planning. Can take following values:
+    - 0 - agents are considered in the same order as in the input file
+    - 1 - agents are considered in increasing order of manhattan distances from start to goal node
+    - 2 - agents are considered in decreasing order of manhattan distances from start to goal node
 
-    Опциональный параметр, значение по умолчанию равно 0
-- parallelize_paths_1 - требуется ли применять процедуру параллеллезации путей, построенных Push and rotate (без этой опции в каждый момент времени двигается только один агент). Принимает значения `true` или `false`, учитывается только для алгоритма Push and rotate. . Опциональный параметр, значение по умолчанию равно `false`
-- parallelize_paths_2 - требуется ли дополнительно параллелизовать пути, построенные Push and rotate (увеличивает коэффициент сжатия, но замедляет работу алгоритма). Принимает значения `true` или `false`, учитывается только для алгоритма Push and rotate. При использовании этой опции, опция parallelize_paths_1 фиксируется равной `true`. Опциональный параметр, значение по умолчанию равно `false`
+    Optional parameter, default value is 0
+- parallelize_paths_1 - use path parallelization technique in Push and rotate algorithm (without this option only one agent is moving at every time step in the solution). Can be `true` or `false`, considered for Push and rotate algorithm. Optional parameter, default value is false
+- parallelize_paths_2 - use additional parallelization technique in Push and rotate algorithm (allows to increase parallelization ratio, but significantly slows algorihm down). Can be `true` or `false`, considered for Push and rotate algorithm. When using this option, option parallelize_paths_1 is set to `true`. Optional parameter, default value is false
+- single_execution - can be `true` or `false`. If option is set to `true`, the algorithm will be executed only once for the first agents file with the number of agents equal to `max` attribute in agents_range option. Output file format will also be different (see "Output data" section). Optional parameter, default value is false
+- aggregated_results - save separate testing results for each agents file or aggregated results over all agents files. Optional parameter, default value is true
+- logpath - path to the directory, where log will be stored (optional parameter, by default log is stored to the same directory where the input file is located)
+- logfilename - name of the log file (optional parameter, by default name of the log file has the form `input_file_name_log.xml` where "input_file_name.xml" is a name of the main input file)
 
-### Раздел options - выбор параметров тестирования. Содержит следующие тэги:
-- agents_file - общий префикс названий входных файлов с описанием агентов
-- tasks_count - количество входных файлов с описанием агентов: рассматриваются файлы с названиями вида agents_file-n.xml, где n принимает значения от 1 до tasks_count. Опциональный параметр, значение по умолчанию равно 1
-- agents_range - в атрибутах min и max данного тега указывается минимальное и максимальное количество агентов для тестирования. При single_execution=`false`, количество агентов увеличивается от min до max, и алгоритм запускается на соотвествующем подмножестве агентов. Тестирование прекращается, если алгоритм работает дольше заданного лимита по времени или не находит решения. Опциональный параметр, по умолчанию минимальное количество агентов равно 1, а максимальное совпадает с количеством агентов во входном файле
-- maxtime - максимальное время работы алгоритма в миллисекундах. Опциональный параметр, по умолчанию минимальное количество агентов равно 1, а максимальное совпадает с количеством агентов во входном файле
-- single_execution - `true` или `false`, если выбрано значение `true`, алгоритм будет запущен только один раз для первого файла с агентами, с количеством агентов равным значению атрибута max в agents_range. При этом будет отличаться формат выходного файла (см. раздел "Формат выходных данных"). Опциональный параметр, значение по умолчанию равно `false`
-- aggregated_results - сохранять ли в лог отдельные результаты тестирования для каждого файла с агентами или усредененные результаты по всем файлам. Опциональный параметр, значение по умолчанию равно `true`
-- logpath - каталог, в который будет сохранен отчет. Опциональный параметр, по умолчанию, отчет сохраняется в тот же каталог, в котором находится входной файл)
-- logfilename - название файла с отчетом. Опциональный параметр, по умолчанию, название файла с отчетом получается из названия входного файла дописыванием строки "_log")
+### Files with agents’ descriptions
+For each agent its own tag `agent` is provided with following attributes:
+- id - agent’s id
+- start_i, start_j - coordinates of agent’s start position (cells are numbered from 0, cell (0, 0) is in the left upper corner of the map, the first coordinate corresponds to the row number and the second to the column number)
+- goal_i, goal_j - coordinates of agent’s goal position
 
-### Файлы с агентами
-Каждому агенту соответствует собственный тег agent со следующими атрибутами:
-- id - идентификатор агента
-- start_i, start_j - координаты стартовой позиции агента (клетки нумеруются с 0, клетка (0, 0) это верхний левый угол карты, первая координата соответствует номеру строки, а вторая номеру столбца)
-- goal_i, goal_j - координаты конечной позиции агента
+## Output data
+Output file contains `map` and `options` sections, similar to the input file, and also the `log` section with results of the execution. This section contains the `mapfilename` tag and several other tags depending on the value of single_execution and aggregated_results parameters.
 
-Количество агентов в файле должно быть не меньше атрибута `max` в теге agents_range, начальные и целевые позиции агентов должны располагаться в проходимых ячейках карты, и начальные вершины для всех агентов должны быть
-попарно различны, также как и целевые. Если какое-либо из этих условий в текущем файле не выполняются, тестирование на нем не производится.
+If single_execution = `false`, aggregated_results  = `false`, one or more `results` tags are created. There is one `results` tag for each agents file containing several `result` tags for each number of agents. Every such tag has following attributes, descibing execution results for current agents file and current number of agents:
 
-## Формат выходных данных
-Выходной файл так же содержит разделы map и options, содержание которых совпадает со входным файлом, а также раздел log, в котором содержится сам отчет. Он содержит
-тэг mapfilename с названием основного входного файла, и ряд других тегов в зависимости от значения параметра single_execution.
+    1. agents_count - number of agents
+    2. success_count - number of tests (among tasks_count input files) for which algorihm was able to find the solution in fixed time.
+    3. makespan - number of time steps until the last agent stops moving (average)
+    4. flowtime - total number of actions performed by each of the agents until they reach their goal positions (average)
+    5. time - running time of the algorithm  (average)
+    6. HL_expansions - number of high level expansions in CBS and ECBS (the size of CLOSE list at the end of the search).
+    7. HL_nodes - number of high level nodes created in CBS and ECBS (the size of CLOSE list at the end of the search)
+    8. LL_avg_expansions - average number of low level expansions in CBS and ECBS among all low level search executions
+    9. LL_avg_nodes - average number of low level nodes created in CBS and ECBS among all low level search executions
 
-В случае, если single_execution=`false`:
+[Example](Examples/empty_batch_full_log.xml) of output file for this mode.
 
-- один или несколько тегов results с результатами тестирования. Если aggregated_results = `false`, каждому входному файлу с агентами соотвествует отдельный тег, иначе создается только один тег с усредненными результатами. Для каждого количества агентов указывается тег result со следующими атрибутами (в случае aggregated_results = `false` каждый результат соотвествует одному запуску, иначе значения усредняются по всем тестам, для которых было найдено решение):
-    1. agents_count - количество агентов
-    2. success_count - количество тестов (среди tasks_count тестовых файлов) для которых алгоритм построил корректное решение в заданное время
-    3. makespan - количество итераций до того как последний из агентов закончит движение
-    4. flowtime - суммарное количество действий, совершенных агентами с учетом остановок
-    5. time - время работы алгоритма
-    6. HL_expansions - количество раскрытых вершин верхнего уровня в алгоритмах CBS и ECBS (размер списка CLOSE окончании поиска).
-    7. HL_nodes - количество созданных вершин верхнего уровня в алгоритмах CBS и ECBS (сумма размеров списков OPEN, CLOSE и FOCAL по окончании поиска).
-    8. LL_avg_expansions - среднее количество раскрытых вершин нижнего уровня в алгоритмах CBS и ECBS, усредненное по всем запускам поиска нижнего уровня.
-    9. LL_avg_nodes - среднее количество созданных вершин нижнего уровня в алгоритмах CBS и ECBS, усредненное по всем запускам поиска нижнего уровня.
+If single_execution = `false`, aggregated_results  = `true`, one `results` tag with aggeregated testing results is created. As in the previous case, this tag contains several `result` tags with the same attributes for each number of agents. Tag attributes contain average values among all agent files for which algorithm was able to find the solution with current number of agents. [Example](Examples/empty_batch_aggregated_log.xml) of output file for this mode.
 
-В случае, если single_execution=`true`:
+If single_execution=`true`, following tags are created (tag aggregated_results is not considered):
+- taskfilename - name of the file with agents’ description
+- summary - properties of the found solution. Contains `agents_count`, `makespan`, `flowtime`, `time`, `HL_expansions`, `HL_nodes`, `LL_avg_expansions`, `LL_avg_nodes` which are defined in the same way as stated above
+- for each agent its own tag `agent` is provided with following attributes:
+    - id - agent’s id
+    - start.x, start.y - coordinates of agent’s start position
+    - goal.x, goal.y - coordinates of agent’s goal position
 
-- taskfilename - название дополнительного входного файла с агентами
-- summary - информация о построенном решении. Содержит атрибуты agents_count, makespan, flowtime и time, которые определяются так же, как указано выше
-- для каждого агента указывается отдельный тег agent со следующими атрибутами:
-    - id - идентификатор агента
-    - start.x, start.y - координаты стартовой позиции агента
-    - goal.x, goal.y - координаты конечной позиции агента
+  **Coordinate x corresponds to j coordinate, and y cooresponds to i coordinate.**
 
-    **При этом координата x соотвествует координате j, а координата y координате i.**
-    Также в этот тег вкладывается тег path с атрибутом pathfound, принимающим значения `true` или `false` в зависимости от того, было ли найдено решение, в который в свою очередь вкладывается несколько тегов section. Каждый такой тег соответствует одному действию агента и содержит следующие теги:
-    - id - идентификатор секции
-    - start.x, start.y - позиция агента перед совершением действия
-    - goal.x, goal.y - позиция агента после совершения действия (эта позиция либо совпадает со стартовой либо является соседней с ней)
-    - duration - продолжительность действия (всегда равна 1)
+  This tag also includes tag `path` with `pathfound` attribute, which can be `true` or `false` depending on whether the solution was found. Tag `path` includes several `section` tags each of which corresponds to one agent’s action and contains the following tags:
+    - id - section id
+    - start.x, start.y - agent position before taking action
+    - goal.x, goal.y - agent position after taking action (this position is either the same as the start position either adjacent to it)
+    - duration - duration of the action (always equals 1)
+
+[Example](Examples/empty_single_log.xml) of output file for this mode.
