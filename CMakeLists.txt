@@ -16,6 +16,7 @@ set(SOURCE_FILES
         isearch.cpp
         main.cpp
         map.cpp
+        mdd.cpp
         mission.cpp
         prioritized_planning.cpp
         push_and_rotate.cpp
