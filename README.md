@@ -16,7 +16,7 @@ The main file contains two sections `map` and `options`:
 - grid - contains attributes `width` and `height` specifing dimensions of the map. Map description is provided in the tag body, 0 means a traversable cell and 1 means an obstacle. Each row is included into `row` tag, number of rows must be equal to the `height` value and number of digits in every row must be equal to the `width` value.
 
 ### Section `algorithm` - definition of the algorihm parameters. Contains following tags:
-- algorithm - algorithm to be used. Can take following values:
+- planner - algorithm to be used. Can take following values:
     1. cbs - Conflict based search
     2. ecbs - Enhanced conflict based search. In the high level search secondary heuristic h3 from the [article](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) is used. Low level search depends on the low_level option
     3. push_and_rotate - Push and rotate

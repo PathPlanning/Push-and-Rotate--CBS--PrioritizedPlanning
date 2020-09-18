@@ -1,7 +1,7 @@
 #ifndef ZERO_SCIPP_NODE_H
 #define ZERO_SCIPP_NODE_H
 
-#include "SIPP_node.h"
+#include "sipp_node.h"
 
 struct ZeroSCIPPNode : public SIPPNode
 {
