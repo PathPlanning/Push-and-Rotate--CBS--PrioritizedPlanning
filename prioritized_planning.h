@@ -10,7 +10,7 @@
 #include "scipp.h"
 #include "zero_scipp.h"
 #include "multiagent_search_result.h"
-#include "multiagent_search_inteface.h"
+#include "multiagent_search_interface.h"
 #include <vector>
 #include <numeric>
 

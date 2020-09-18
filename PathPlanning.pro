@@ -59,7 +59,7 @@ HEADERS += \
     focalsearch.h \
     fs_node.h \
     mdd.h \
-    multiagent_search_inteface.h \
+    multiagent_search_interface.h \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \

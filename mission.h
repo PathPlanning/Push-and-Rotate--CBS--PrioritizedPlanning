@@ -17,7 +17,7 @@
 #include "focalsearch.h"
 #include "scipp.h"
 #include "xmllogger.h"
-#include "multiagent_search_inteface.h"
+#include "multiagent_search_interface.h"
 #include "testing_results.h"
 #include <algorithm>
 

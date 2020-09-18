@@ -11,7 +11,7 @@
 #include "agent_move.h"
 #include "config.h"
 #include "multiagent_search_result.h"
-#include "multiagent_search_inteface.h"
+#include "multiagent_search_interface.h"
 
 class PushAndRotate : public MultiagentSearchInterface
 {
