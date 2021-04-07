@@ -20,11 +20,18 @@ class ConflictBasedSearch : public MultiagentSearchInterface
         ConflictBasedSearch();
         ConflictBasedSearch(SearchType* Search);
         ~ConflictBasedSearch(void);
+        void clear() override;
         MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &agentSet) override;
         template<typename Iter>
         static ConflictSet findConflict(const std::vector<Iter> &starts, const std::vector<Iter> &ends,
                                         int agentId = -1, bool findAllConflicts = false,
                                         bool withCardinalConflicts = false, const std::vector<MDD> &mdds = std::vector<MDD>());
+
+        std::set<CBSNode> open;
+        std::list<CBSNode> close;
+        std::set<CBSNode, bool (*)(const CBSNode&, const CBSNode&)> focal;
+        std::multiset<double> sumLb;
+
     private:
         std::list<Node> getNewPath(const Map &map, const AgentSet &agentSet, const Agent &agent,
                                    const Constraint &constraint, const ConstraintsSet &constraints,

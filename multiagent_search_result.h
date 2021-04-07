@@ -13,6 +13,7 @@ struct MultiagentSearchResult
     double                          time;
     double                          AvgLLExpansions = 0;
     double                          AvgLLNodes = 0;
+    double                          cost = 0;
     int                             HLExpansions = 0;
     int                             HLNodes = 0;
 

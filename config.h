@@ -7,7 +7,7 @@ class Config
 {
     public:
         Config();
-        Config(const Config& orig);
+        //Config(const Config& orig);
         ~Config();
         bool getConfig(const char *FileName);
 

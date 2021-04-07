@@ -56,7 +56,7 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
         if (sresult.numberofsteps % 100000 == 0) {
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-            if (elapsedMilliseconds > 10000) {
+            if (elapsedMilliseconds > 300000) {
                 break;
             }
         }

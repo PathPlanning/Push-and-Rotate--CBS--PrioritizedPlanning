@@ -16,7 +16,7 @@ public:
         agentsPaths.clear();
     }
 
-protected:
+//protected:
     std::vector<std::vector<Node>>  agentsPaths;
 };
 

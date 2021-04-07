@@ -12,6 +12,10 @@ template<typename SearchType>
 ConflictBasedSearch<SearchType>::ConflictBasedSearch (SearchType *Search)
 {
     search = Search;
+    auto focalCmp = [](const CBSNode &lhs, const CBSNode &rhs) {
+        return lhs.hc < rhs.hc || lhs.hc == rhs.hc && lhs < rhs;
+    };
+    focal = std::set<CBSNode, bool (*)(const CBSNode&, const CBSNode&)>(focalCmp);
 }
 
 template<typename SearchType>
@@ -19,6 +23,16 @@ ConflictBasedSearch<SearchType>::~ConflictBasedSearch()
 {
     if (search)
         delete search;
+}
+
+template<typename SearchType>
+void ConflictBasedSearch<SearchType>::clear()
+{
+    agentsPaths.clear();
+    open.clear();
+    close.clear();
+    focal.clear();
+    sumLb.clear();
 }
 
 template<typename SearchType>
@@ -197,56 +211,54 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         search->getPerfectHeuristic(map, agentSet);
     }
 
-    auto focalCmp = [](const CBSNode &lhs, const CBSNode &rhs) {
-        return lhs.hc < rhs.hc || lhs.hc == rhs.hc && lhs < rhs;
-    };
-    std::set<CBSNode, decltype(focalCmp)> focal(focalCmp);
-    std::multiset<double> sumLb;
-
     CBSNode root;
     int agentCount = agentSet.getAgentCount();
-    std::vector<std::list<Node>::iterator> starts(agentCount), ends(agentCount);
-    std::vector<MDD> mdds;
-    for (int i = 0; i < agentSet.getAgentCount(); ++i) {
-        Agent agent = agentSet.getAgent(i);
-        Astar<> astar(false, false);
-        SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
-                                                        agent.getGoal_i(), agent.getGoal_j());
-        if (!searchResult.pathfound) {
-            std::cout << "fail" << std::endl;
-        }
-        root.cost += searchResult.pathlength;
-        root.paths[i] = *searchResult.lppath;
+    if (open.empty() && focal.empty()) {
+        std::vector<std::list<Node>::iterator> starts(agentCount), ends(agentCount);
+        std::vector<MDD> mdds;
+        for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+            Agent agent = agentSet.getAgent(i);
+            Astar<> astar(false, false);
+            SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
+                                                            agent.getGoal_i(), agent.getGoal_j());
+            if (!searchResult.pathfound) {
+                std::cout << "fail" << std::endl;
+            }
+            root.cost += searchResult.pathlength;
+            root.paths[i] = *searchResult.lppath;
 
-        if (config.withCardinalConflicts) {
-            root.mdds[i] = MDD(map, agentSet, search, i, searchResult.pathlength);
+            if (config.withCardinalConflicts) {
+                root.mdds[i] = MDD(map, agentSet, search, i, searchResult.pathlength);
+            }
+
+            starts[i] = root.paths[i].begin();
+            ends[i] = root.paths[i].end();
+            mdds.push_back(root.mdds[i]);
+            if (config.withFocalSearch) {
+                root.lb[i] = searchResult.minF;
+                root.sumLb += searchResult.minF;
+            }
         }
 
-        starts[i] = root.paths[i].begin();
-        ends[i] = root.paths[i].end();
-        mdds.push_back(root.mdds[i]);
-        if (config.withFocalSearch) {
-            root.lb[i] = searchResult.minF;
-            root.sumLb += searchResult.minF;
+        if (config.storeConflicts) {
+            root.conflictSet = findConflict<std::list<Node>::iterator>(starts, ends, -1, true,
+                                                                       config.withCardinalConflicts, mdds);
+            if (config.withFocalSearch) {
+                root.hc = root.conflictSet.getConflictingPairsCount();
+                sumLb.insert(root.sumLb);
+            }
         }
-    }
 
-    if (config.storeConflicts) {
-        root.conflictSet = findConflict<std::list<Node>::iterator>(starts, ends, -1, true,
-                                                                   config.withCardinalConflicts, mdds);
-        if (config.withFocalSearch) {
-            root.hc = root.conflictSet.getConflictingPairsCount();
-            sumLb.insert(root.sumLb);
-        }
+        open.insert(root);
     }
 
     MultiagentSearchResult result(false);
-    std::set<CBSNode> open = {root};
-    std::list<CBSNode> close;
     std::vector<int> LLExpansions, LLNodes;
 
     int t = 0;
     while (!open.empty() || !focal.empty()) {
+        //std::cout << t << std::endl;
+
         ++t;
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
@@ -330,6 +342,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
                 result.AvgLLExpansions = (double)std::accumulate(LLExpansions.begin(), LLExpansions.end(), 0) / LLExpansions.size();
                 result.AvgLLNodes = (double)std::accumulate(LLNodes.begin(), LLNodes.end(), 0) / LLNodes.size();
             }
+            result.cost = cur.cost;
 
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();

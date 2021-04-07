@@ -5,6 +5,7 @@
 #include "agent_set.h"
 #include "push_and_rotate.h"
 #include "conflict_based_search.h"
+#include "anytime_cbs.h"
 #include "prioritized_planning.h"
 #include "config.h"
 #include "isearch.h"

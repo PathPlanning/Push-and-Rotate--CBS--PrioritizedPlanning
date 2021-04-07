@@ -109,6 +109,8 @@ void Mission::createAlgorithm()
         } else if (config.lowLevel == CN_SP_ST_ZSCIPP) {
             multiagentSearch = new PrioritizedPlanning<ZeroSCIPP<>>(new ZeroSCIPP<>(config.focalW, config.genSuboptFromOpt));
         }
+    } else if (config.searchType == CN_ST_ACBS) {
+        multiagentSearch = new AnytimeCBS(new ConflictBasedSearch<Astar<>>(new Astar<>(true)));
     }
 }
 

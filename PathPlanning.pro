@@ -23,6 +23,7 @@ QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
 SOURCES += \
     agent.cpp \
     agent_set.cpp \
+    anytime_cbs.cpp \
     conflict_avoidance_table.cpp \
     conflict_based_search.cpp \
     conflict_set.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     agent.h \
     agent_move.h \
     agent_set.h \
+    anytime_cbs.h \
     cbs_node.h \
     conflict.h \
     conflict_avoidance_table.h \

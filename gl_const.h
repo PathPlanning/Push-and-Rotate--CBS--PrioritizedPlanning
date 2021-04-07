@@ -116,11 +116,13 @@
     #define CNS_ST_PP                   "prioritized_planning"
     #define CNS_ST_ECBS                 "ecbs"
     #define CNS_ST_ECBS_CT              "ecbs-ct"
+    #define CNS_ST_ACBS                 "anytime_cbs"
 
     #define CN_ST_CBS                   0
     #define CN_ST_PR                    1
     #define CN_ST_PP                    2
     #define CN_ST_ECBS_CT               3
+    #define CN_ST_ACBS                  4
 
     #define CN_SP_ST 0
 
