@@ -333,20 +333,25 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
             }
             result.agentsPaths = &agentsPaths;
             result.pathfound = true;
-            result.HLExpansions = close.size();
-            result.HLNodes = open.size() + close.size() + focal.size();
+            result.HLExpansions = {double(close.size())};
+            result.HLNodes = {double(open.size() + close.size() + focal.size())};
             if (LLExpansions.empty()) {
-                result.AvgLLExpansions = 0;
-                result.AvgLLNodes = 0;
+                result.AvgLLExpansions = {0};
+                result.AvgLLNodes = {0};
             } else {
-                result.AvgLLExpansions = (double)std::accumulate(LLExpansions.begin(), LLExpansions.end(), 0) / LLExpansions.size();
-                result.AvgLLNodes = (double)std::accumulate(LLNodes.begin(), LLNodes.end(), 0) / LLNodes.size();
+                result.AvgLLExpansions = {(double)std::accumulate(LLExpansions.begin(), LLExpansions.end(), 0) / LLExpansions.size()};
+                result.AvgLLNodes = {(double)std::accumulate(LLNodes.begin(), LLNodes.end(), 0) / LLNodes.size()};
             }
-            result.cost = cur.cost;
+            result.cost = {cur.cost};
+            result.focalW = {config.focalW};
+
+            std::pair<int, int> costs = result.getCosts();
+            result.makespan = {double(costs.first)};
+            result.flowtime = {double(costs.second)};
 
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-            result.time = static_cast<double>(elapsedMilliseconds) / 1000;
+            result.time = {static_cast<double>(elapsedMilliseconds) / 1000};
             break;
         }
 
@@ -377,6 +382,9 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
                 if (child.pathFound && config.withBypassing && cur.cost == child.cost &&
                         conflictSet.getConflictCount() > child.conflictSet.getConflictCount()) {
                     open.insert(child);
+                    if (config.withFocalSearch) {
+                        sumLb.insert(child.sumLb);
+                    }
                     bypass = true;
                     break;
                 }

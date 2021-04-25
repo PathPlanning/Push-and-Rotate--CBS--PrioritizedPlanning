@@ -30,6 +30,10 @@ double Astar<NodeType>::metric(int x1, int y1, int x2, int y2) {
 
 template<typename NodeType>
 void Astar<NodeType>::getPerfectHeuristic(const Map &map, const AgentSet &agentSet) {
+    if (!perfectHeuristic.empty()) {
+        return;
+    }
+
     std::unordered_set<int> visited;
     ISearch<> search(false);
     for (int i = 0; i < agentSet.getAgentCount(); ++i) {

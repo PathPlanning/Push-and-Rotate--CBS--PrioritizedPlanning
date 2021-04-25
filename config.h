@@ -36,6 +36,7 @@ class Config
         bool            genSuboptFromOpt = false;
         bool            saveAggregatedResults = true;
         double          focalW = 1.0;
+        int             agentsStep = 1;
 
     private:
         bool getValueFromText(tinyxml2::XMLElement *elem, const char *name, const char *typeName, void *field);

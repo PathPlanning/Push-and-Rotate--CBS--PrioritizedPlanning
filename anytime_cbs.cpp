@@ -22,9 +22,16 @@ MultiagentSearchResult AnytimeCBS::startSearch(const Map &map, const Config &con
     MultiagentSearchResult result(false);
     Config curConfig = config;
     curConfig.LogParams = nullptr;
+
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::vector<std::vector<Node>> agentsPaths;
-    for (int i = 0; i <= 10 && curConfig.focalW > 1.0; ++i) {
+
+    search->search->perfectHeuristic.clear();
+    if (config.withPerfectHeuristic) {
+        search->search->getPerfectHeuristic(map, agentSet);
+    }
+
+    while (curConfig.focalW > 1.0) {
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
             break;
@@ -34,21 +41,27 @@ MultiagentSearchResult AnytimeCBS::startSearch(const Map &map, const Config &con
         if (!newResult.pathfound) {
             break;
         }
-        result = newResult;
+
+        result += newResult;
+        result.time.back() = (double)std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() / 1000;
+
+        double minF = std::min(*search->sumLb.begin(), (double)result.cost.back());
+        result.focalW.back() = result.cost.back() / minF;
+
         agentsPaths = *(result.agentsPaths);
         search->agentsPaths.clear();
 
         if (search->open.empty() && search->focal.empty()) {
+            result.focalW.back() = 1.0;
             break;
         }
 
-        double minF = *search->sumLb.begin();
-        curConfig.focalW = result.cost / *search->sumLb.begin() - 0.01;
-        if (curConfig.focalW < 1.0 || i == 10) {
+        curConfig.focalW = result.cost.back() / minF - 0.0001;
+        if (curConfig.focalW < 1.0) {
             curConfig.focalW = 1.0;
         }
 
-        std::cout << result.cost << " " << curConfig.focalW << std::endl;
+        //std::cout << result.cost[0] << " " << curConfig.focalW << std::endl;
 
         auto it = search->focal.begin();
         while (it != search->focal.end()) {

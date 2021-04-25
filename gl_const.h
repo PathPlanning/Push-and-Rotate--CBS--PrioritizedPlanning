@@ -56,6 +56,7 @@
         #define CNS_TAG_AGENTS_RANGE "agents_range"
             #define CNS_TAG_MIN     "min"
             #define CNS_TAG_MAX     "max"
+        #define CNS_TAG_AGENTS_STEP "agents_step"
 
     #define CNS_TAG_LOG             "log"
         #define CNS_TAG_MAPFN       "mapfilename"
@@ -64,6 +65,7 @@
         #define CNS_TAG_PATH        "path"
         #define CNS_TAG_RESULTS     "results"
         #define CNS_TAG_RESULT      "result"
+        #define CNS_TAG_ITERATION   "iteration"
         #define CNS_TAG_SUMMARY     "summary"
         #define CNS_TAG_AGENT       "agent"
         #define CNS_TAG_LPLEVEL     "lplevel"

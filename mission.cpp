@@ -151,7 +151,7 @@ void Mission::startSearch(const std::string &agentsFile)
     int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
     int maxAgents = config.maxAgents == -1 ? agentSet.getAgentCount() : config.maxAgents;
     TestingResults res;
-    for (int i = minAgents; i <= maxAgents; ++i) {
+    for (int i = minAgents; i <= maxAgents; i += config.agentsStep) {
         AgentSet curAgentSet;
         for (int j = 0; j < i; ++j) {
             Agent agent = agentSet.getAgent(j);
@@ -169,28 +169,27 @@ void Mission::startSearch(const std::string &agentsFile)
         }
 
         agentsPaths = *(sr.agentsPaths);
-        std::pair<int, int> costs = getCosts();
-        int makespan = costs.first;
-        int flowtime = costs.second;
 
-        res.data[CNS_TAG_ATTR_MAKESPAN][i] = makespan;
-        res.data[CNS_TAG_ATTR_FLOWTIME][i] = flowtime;
+        res.data[CNS_TAG_ATTR_MAKESPAN][i] = sr.makespan;
+        res.data[CNS_TAG_ATTR_FLOWTIME][i] = sr.flowtime;
         res.data[CNS_TAG_ATTR_TIME][i] = sr.time;
         res.data[CNS_TAG_ATTR_HLE][i] = sr.HLExpansions;
         res.data[CNS_TAG_ATTR_HLN][i] = sr.HLNodes;
         res.data[CNS_TAG_ATTR_LLE][i] = sr.AvgLLExpansions;
         res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
+        res.data[CNS_TAG_FOCAL_W][i] = sr.focalW;
 
         if (config.singleExecution) {
-            saveAgentsPathsToLog(agentsFile, sr.time, makespan, flowtime,
-                                 sr.HLExpansions, sr.HLNodes, sr.AvgLLExpansions, sr.AvgLLNodes);
+            saveAgentsPathsToLog(agentsFile, sr.time.back(), sr.makespan.back(), sr.flowtime.back(),
+                                 sr.HLExpansions.back(), sr.HLNodes.back(),
+                                 sr.AvgLLExpansions.back(), sr.AvgLLNodes.back());
         }
         if (!checkCorrectness()) {
             std::cout << "Search returned incorrect results!" << std::endl;
             break;
         }
         std::cout << "Found solution for " << i << " agents. Time: " <<
-                    sr.time << ", flowtime: " << flowtime << ", makespan: " << makespan << std::endl;
+                    sr.time.back() << ", flowtime: " << sr.flowtime.back() << ", makespan: " << sr.makespan.back() << std::endl;
     }
     testingResults.push_back(res);
 }
@@ -281,7 +280,7 @@ void Mission::saveAggregatedResultsToLog() {
         for (auto res : testingResults) {
             if (res.data[CNS_TAG_ATTR_TIME].find(i) != res.data[CNS_TAG_ATTR_TIME].end()) {
                 for (auto key : keys) {
-                    sums[key] += res.data[key][i];
+                    sums[key] += res.data[key][i].back();
                 }
                 ++successCount;
             }
@@ -291,7 +290,7 @@ void Mission::saveAggregatedResultsToLog() {
         }
         successCounts[i] = successCount;
         for (auto key : keys) {
-            aggRes.data[key][i] = sums[key] / successCount;
+            aggRes.data[key][i] = {sums[key] / successCount};
         }
     }
     logger->writeToLogAggregatedResults(successCounts, aggRes);

@@ -887,7 +887,11 @@ MultiagentSearchResult PushAndRotate::startSearch(const Map &map, const Config &
     if (result.pathfound) {
         result.agentsMoves = &agentsMoves;
         result.agentsPaths = &agentsPaths;
-        result.time = static_cast<double>(elapsedMilliseconds) / 1000;
+        result.time = {static_cast<double>(elapsedMilliseconds) / 1000};
+
+        std::pair<int, int> costs = result.getCosts();
+        result.makespan = {double(costs.first)};
+        result.flowtime = {double(costs.second)};
     }
     return result;
 }

@@ -32,6 +32,8 @@ class ConflictBasedSearch : public MultiagentSearchInterface
         std::set<CBSNode, bool (*)(const CBSNode&, const CBSNode&)> focal;
         std::multiset<double> sumLb;
 
+        SearchType*                     search;
+
     private:
         std::list<Node> getNewPath(const Map &map, const AgentSet &agentSet, const Agent &agent,
                                    const Constraint &constraint, const ConstraintsSet &constraints,
@@ -50,7 +52,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
                            std::vector<int> &LLExpansions, std::vector<int> &LLNodes, CBSNode *parentPtr);
 
 
-        SearchType*                     search;
+
 };
 
 template<typename SearchType>

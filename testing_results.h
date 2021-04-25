@@ -8,13 +8,14 @@
 
 struct TestingResults {
     TestingResults() {
-        data[CNS_TAG_ATTR_TIME] = std::map<int, double>();
-        data[CNS_TAG_ATTR_MAKESPAN] = std::map<int, double>();
-        data[CNS_TAG_ATTR_FLOWTIME] = std::map<int, double>();
-        data[CNS_TAG_ATTR_LLE] = std::map<int, double>();
-        data[CNS_TAG_ATTR_LLN] = std::map<int, double>();
-        data[CNS_TAG_ATTR_HLE] = std::map<int, double>();
-        data[CNS_TAG_ATTR_HLN] = std::map<int, double>();
+        data[CNS_TAG_ATTR_TIME] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_MAKESPAN] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_FLOWTIME] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_LLE] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_LLN] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_HLE] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_HLN] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_FOCAL_W] = std::map<int, std::vector<double>>();
     }
 
     std::vector<std::string> getKeys() {
@@ -25,7 +26,7 @@ struct TestingResults {
         return keys;
     }
 
-    std::map<std::string, std::map<int, double>> data;
+    std::map<std::string, std::map<int, std::vector<double>>> data;
 };
 
 #endif // TESTING_RESULTS_H
