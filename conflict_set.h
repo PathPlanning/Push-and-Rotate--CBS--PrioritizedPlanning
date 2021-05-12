@@ -22,7 +22,7 @@ public:
     std::vector<Conflict> getCardinalConflicts();
     int getMatchingHeuristic();
     int getConflictingPairsCount();
-private:
+//private:
     std::vector<Conflict> cardinal, semiCardinal, nonCardinal;
 };
 

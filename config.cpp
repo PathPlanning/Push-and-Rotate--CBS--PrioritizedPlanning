@@ -109,6 +109,9 @@ bool Config::getConfig(const char *FileName)
     } else if (value == CNS_ST_ACBS) {
         searchType = CN_ST_ACBS;
         withFocalSearch = true;
+    } else if (value == CNS_ST_AECBS) {
+        searchType = CN_ST_AECBS;
+        withFocalSearch = true;
     } else if (value == CNS_ST_PR) {
         searchType = CN_ST_PR;
     } else if (value == CNS_ST_PP) {

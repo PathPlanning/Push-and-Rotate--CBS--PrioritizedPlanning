@@ -31,6 +31,18 @@ void ConstraintsSet::addConstraint(Constraint &constraint) {
     }
 }
 
+void ConstraintsSet::removeConstraint(Constraint &constraint) {
+    if (constraint.prev_i == -1) {
+        if (constraint.goalNode) {
+            goalNodeConstraints.erase(constraint);
+        } else {
+            nodeConstraints.erase(constraint);
+        }
+    } else {
+        edgeConstraints.erase(constraint);
+    }
+}
+
 void ConstraintsSet::removeNodeConstraint(int i, int j, int time, int agentId) {
     nodeConstraints.erase(Constraint(i, j, time, agentId));
 }
@@ -41,6 +53,10 @@ void ConstraintsSet::removeGoalNodeConstraint(int i, int j, int time, int agentI
 
 void ConstraintsSet::removeEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) {
     edgeConstraints.erase(Constraint(i, j, time, agentId, prevI, prevJ));
+}
+
+void ConstraintsSet::removeLastPositiveConstraint() {
+    positiveConstraints.pop_back();
 }
 
 ConstraintsSet ConstraintsSet::getAgentConstraints(int agentId) const {

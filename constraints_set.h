@@ -15,11 +15,13 @@ public:
     void addEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ);
     void addPositiveConstraint(int i, int j, int time, int agentId, int prevI = -1, int prevJ = -1);
     void addConstraint(Constraint &constraint);
+    void removeConstraint(Constraint &constraint);
     template<typename Iter> void addAgentPath(Iter start, Iter end, int agentId);
 
     void removeNodeConstraint(int i, int j, int time, int agentId);
     void removeGoalNodeConstraint(int i, int j, int time, int agentId);
     void removeEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ);
+    void removeLastPositiveConstraint();
     template<typename Iter> void removeAgentPath(Iter start, Iter end, int agentId);
 
     ConstraintsSet getAgentConstraints(int agentId) const;

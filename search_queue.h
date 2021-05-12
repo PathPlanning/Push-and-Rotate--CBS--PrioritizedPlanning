@@ -18,8 +18,10 @@ public:
     bool insert(const Map& map, NodeType node, bool withTime,
                 bool withOld = false, NodeType old = NodeType(-1, -1));
     void erase(const Map& map, NodeType node, bool withTime);
-    void moveByThreshold(SearchQueue<NodeType>& other, double threshold, const Map& map, std::multiset<double>& otherF,
-                         bool withTime = false);
+    void moveByUpperBound(SearchQueue<NodeType>& other, double threshold,
+        const Map& map, std::multiset<double>& otherF, bool withTime = false);
+    void moveByLowerBound(SearchQueue<NodeType>& other, double threshold,
+        const Map& map, std::multiset<double>& FValues, bool withTime = false);
     NodeType getByIndex(const Map& map, NodeType node, bool withTime);
     NodeType getFront() const;
     bool empty() const;

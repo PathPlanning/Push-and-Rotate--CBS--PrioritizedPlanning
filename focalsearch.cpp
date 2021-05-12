@@ -22,13 +22,16 @@ NodeType FocalSearch<NodeType>::getCur(const Map& map) {
         if (!focalF.empty()) {
             minF = std::min(minF, *focalF.begin());
         }
-        this->open.moveByThreshold(focal, minF * focalW, map, focalF, this->withTime);
+        this->open.moveByUpperBound(focal, minF * focalW, map, focalF, this->withTime);
     }
-
     NodeType cur = focal.getFront();
+    return cur;
+}
+
+template<typename NodeType>
+void FocalSearch<NodeType>::removeCur(const NodeType& cur, const Map& map) {
     focal.erase(map, cur, this->withTime);
     focalF.erase(focalF.find(cur.F));
-    return cur;
 }
 
 template<typename NodeType>
@@ -72,6 +75,16 @@ template<typename NodeType>
 void FocalSearch<NodeType>::addFutureConflicts(NodeType &neigh, const ConflictAvoidanceTable &CAT) {
     neigh.futureConflictsCount = CAT.getFutureConflictsCount(neigh, neigh.g);
     neigh.hc += neigh.futureConflictsCount;
+}
+
+template<typename NodeType>
+void FocalSearch<NodeType>::updateFocalW(double newFocalW, const Map& map) {
+    focalW = newFocalW;
+    if (focal.empty()) {
+        return;
+    }
+    double minF = *focalF.begin();
+    this->focal.moveByLowerBound(this->open, minF * focalW, map, focalF, this->withTime);
 }
 
 template class FocalSearch<FSNode>;

@@ -6,11 +6,15 @@
 #include "scipp_node.h"
 
 template <typename NodeType = SCIPPNode>
-class SCIPP : public SIPP<NodeType>, FocalSearch<NodeType>
+class SCIPP : public SIPP<NodeType>, public FocalSearch<NodeType>
 {
 public:
     SCIPP(double FocalW = 1.0, double HW = 1.0, bool BT = true) :
         Astar<NodeType>(true, HW, BT), SIPP<NodeType>(HW, BT), FocalSearch<NodeType>(true, FocalW, HW, BT) {}
+    SCIPP(SCIPP& other) = default;
+    SCIPP& operator=(SCIPP& other) = default;
+    SCIPP(SCIPP&& other) = default;
+    SCIPP& operator=(SCIPP&& other) = default;
     virtual ~SCIPP();
 
 protected:

@@ -17,8 +17,10 @@
 - planner - используемый алгоритм. Может принимать следующие значения:
     1. cbs - Conflict based search
     2. ecbs - Enhanced conflict based search. В алгоритме на верхнем уровне используется вторичная эвристика h3 из [статьи](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875). Поиск нижнего уровня зависит от параметра low_level.
-    3. push_and_rotate - Push and rotate
-    4. prioritized_planning - Prioritized planning
+    3. anytime_cbs - CBS с фокальным поиском на верхнем уровне и оптимальным алгоритмом на верхнем уровне (astar или sipp), как описано в [статье](https://www.ijcai.org/Proceedings/2018/0199.pdf)
+    4. anytime_ecbs - ECBS с фокальным поиском на верхнем уровне и нижнем уровне. Для обновления focal_w на нижнем уровне списки OPEN, CLOSE и FOCAL, полученные в поисках нижнего уровня сохраняются.
+    5. push_and_rotate - Push and rotate
+    6. prioritized_planning - Prioritized planning
 - low_level - алгоритм, используемый в поиске нижнего уровня в алгоритмах CBS, ECBS и Prioritized planning. Может принимать следующие значения:
     1. astar - алгоритм [A*](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf)
     2. sipp - алгоритм [SIPP](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) (дискретная версия для четырехсвязной сетки)

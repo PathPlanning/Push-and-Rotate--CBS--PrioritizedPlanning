@@ -9,9 +9,6 @@ ISearch<NodeType>::ISearch(bool WithTime)
 }
 
 template<typename NodeType>
-ISearch<NodeType>::~ISearch(void) {}
-
-template<typename NodeType>
 int ISearch<NodeType>::T = 0;
 
 template<typename NodeType>
@@ -34,7 +31,7 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
         agentId = agentSet.getAgentId(start_i, start_j);
     }
 
-    if (withCAT) {
+    if (withCAT && freshStart) {
         open = SearchQueue<NodeType>([](const NodeType &lhs, const NodeType &rhs) {
             return std::tuple<int, int, int, int, int>(lhs.F, lhs.conflictsCount, -lhs.g, lhs.i, lhs.j) <
                     std::tuple<int, int, int, int, int>(rhs.F, rhs.conflictsCount, -rhs.g, rhs.i, rhs.j);
@@ -62,23 +59,32 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
         }
 
         cur = getCur(map);
-        close[cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime)] = cur;
 
-        NodeType *curPtr = &(close.find(cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime))->second);
+        /*if (withTime && agentId == 6 && cur.i == 55 && cur.j == 207) {
+            std::cout << cur.i << " " << cur.j << " " << cur.g << " " << cur.conflictsCount << std::endl;
+        }*/
+
+        bool goalNode = false;
         if ((isGoal != nullptr && isGoal(NodeType(start_i, start_j), cur, map, agentSet)) ||
-            (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j)) {
+            (isGoal == nullptr && cur.i == goal_i && cur.j == goal_j))
+        {
+            goalNode = true;
             if (!constraints.hasFutureConstraint(cur.i, cur.j, cur.g, agentId) &&
-                checkGoal(cur, goalTime, agentId, constraints)) {
-                if (!freshStart) {
-                    freshStart = true;
-                } else {
-                    sresult.pathfound = true;
-                    break;
-                }
-            } else {
-                subtractFutureConflicts(cur);
+                checkGoal(cur, goalTime, agentId, constraints))
+            {
+                sresult.pathfound = true;
+                break;
             }
         }
+
+        removeCur(cur, map);
+
+        if (goalNode) {
+            subtractFutureConflicts(cur);
+        }
+
+        close[cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime)] = cur;
+        NodeType *curPtr = &(close.find(cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime))->second);
 
         if (maxTime == -1 || cur.g < maxTime) {
             std::list<NodeType> successors = findSuccessors(cur, map, goal_i, goal_j, agentId, occupiedNodes,
@@ -162,8 +168,12 @@ bool ISearch<NodeType>::checkOpenEmpty() {
 template<typename NodeType>
 NodeType ISearch<NodeType>::getCur(const Map& map) {
     NodeType cur = open.getFront();
-    open.erase(map, cur, withTime);
     return cur;
+}
+
+template<typename NodeType>
+void ISearch<NodeType>::removeCur(const NodeType& cur, const Map& map) {
+    open.erase(map, cur, withTime);
 }
 
 template<typename NodeType>

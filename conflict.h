@@ -9,7 +9,7 @@ struct Conflict {
     bool edgeConflict;
     bool conflictFound;
 
-    Conflict(bool ConflictFound) {
+    Conflict(bool ConflictFound = false) {
         conflictFound = ConflictFound;
     }
 

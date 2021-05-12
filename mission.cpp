@@ -110,7 +110,17 @@ void Mission::createAlgorithm()
             multiagentSearch = new PrioritizedPlanning<ZeroSCIPP<>>(new ZeroSCIPP<>(config.focalW, config.genSuboptFromOpt));
         }
     } else if (config.searchType == CN_ST_ACBS) {
-        multiagentSearch = new AnytimeCBS(new ConflictBasedSearch<Astar<>>(new Astar<>(true)));
+        if (config.lowLevel == CN_SP_ST_ASTAR) {
+            multiagentSearch = new AnytimeCBS<Astar<>>(new ConflictBasedSearch<Astar<>>(new Astar<>(true)));
+        } else if (config.lowLevel == CN_SP_ST_SIPP) {
+            multiagentSearch = new AnytimeCBS<SIPP<>>(new ConflictBasedSearch<SIPP<>>(new SIPP<>()));
+        }
+    } else if (config.searchType == CN_ST_AECBS) {
+        if (config.lowLevel == CN_SP_ST_FS) {
+            multiagentSearch = new AnytimeCBS<FocalSearch<>>(new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW)));
+        } else if (config.lowLevel == CN_SP_ST_SCIPP) {
+            multiagentSearch = new AnytimeCBS<SCIPP<>>(new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW)));
+        }
     }
 }
 
@@ -178,6 +188,7 @@ void Mission::startSearch(const std::string &agentsFile)
         res.data[CNS_TAG_ATTR_LLE][i] = sr.AvgLLExpansions;
         res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
         res.data[CNS_TAG_FOCAL_W][i] = sr.focalW;
+        res.data[CNS_TAG_ATTR_TN][i] = sr.totalNodes;
 
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, sr.time.back(), sr.makespan.back(), sr.flowtime.back(),

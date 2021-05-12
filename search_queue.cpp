@@ -38,7 +38,7 @@ NodeType SearchQueue<NodeType>::getByIndex(const Map& map, NodeType node, bool w
 }
 
 template<typename NodeType>
-void SearchQueue<NodeType>::moveByThreshold(SearchQueue<NodeType>& other, double threshold, const Map& map,
+void SearchQueue<NodeType>::moveByUpperBound(SearchQueue<NodeType>& other, double threshold, const Map& map,
                                   std::multiset<double>& otherF, bool withTime) {
     auto it = sortByKey.begin();
     for (it; it != sortByKey.end() && it->F <= threshold; ++it) {
@@ -47,6 +47,23 @@ void SearchQueue<NodeType>::moveByThreshold(SearchQueue<NodeType>& other, double
         sortByIndex.erase(it->convolution(map.getMapWidth(), map.getMapHeight(), withTime));
     }
     sortByKey.erase(sortByKey.begin(), it);
+}
+
+template<typename NodeType>
+void SearchQueue<NodeType>::moveByLowerBound(SearchQueue<NodeType>& other, double threshold, const Map& map,
+    std::multiset<double>& FValues, bool withTime)
+{
+    auto it = sortByKey.begin();
+    while (it != sortByKey.end()) {
+        if (it->F > threshold) {
+            other.insert(map, *it, withTime);
+            sortByIndex.erase(it->convolution(map.getMapWidth(), map.getMapHeight(), withTime));
+            FValues.erase(it->F);
+            it = sortByKey.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 template<typename NodeType>

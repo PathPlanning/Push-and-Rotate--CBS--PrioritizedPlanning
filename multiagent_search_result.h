@@ -19,6 +19,7 @@ struct MultiagentSearchResult
     std::vector<double>             focalW;
     std::vector<double>             flowtime;
     std::vector<double>             makespan;
+    std::vector<double>             totalNodes;
 
     MultiagentSearchResult(bool Pathfound = false) {
         pathfound = Pathfound;
@@ -38,6 +39,7 @@ struct MultiagentSearchResult
         focalW.insert(focalW.end(), other.focalW.begin(), other.focalW.end());
         flowtime.insert(flowtime.end(), other.flowtime.begin(), other.flowtime.end());
         makespan.insert(makespan.end(), other.makespan.begin(), other.makespan.end());
+        totalNodes.insert(totalNodes.end(), other.totalNodes.begin(), other.totalNodes.end());
         return *this;
     }
 

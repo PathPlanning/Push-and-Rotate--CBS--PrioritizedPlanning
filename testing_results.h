@@ -16,6 +16,7 @@ struct TestingResults {
         data[CNS_TAG_ATTR_HLE] = std::map<int, std::vector<double>>();
         data[CNS_TAG_ATTR_HLN] = std::map<int, std::vector<double>>();
         data[CNS_TAG_FOCAL_W] = std::map<int, std::vector<double>>();
+        data[CNS_TAG_ATTR_TN] = std::map<int, std::vector<double>>();
     }
 
     std::vector<std::string> getKeys() {

@@ -25,7 +25,8 @@ MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &m
     // std::cout << agentSet.getAgentCount() << std::endl;
 
     if (config.withPerfectHeuristic) {
-        search->getPerfectHeuristic(map, agentSet);
+        getPerfectHeuristic(map, agentSet);
+        search->setPerfectHeuristic(&perfectHeuristic);
     }
 
     std::vector<int> order;

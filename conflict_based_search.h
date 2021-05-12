@@ -27,31 +27,48 @@ class ConflictBasedSearch : public MultiagentSearchInterface
                                         int agentId = -1, bool findAllConflicts = false,
                                         bool withCardinalConflicts = false, const std::vector<MDD> &mdds = std::vector<MDD>());
 
-        std::set<CBSNode> open;
-        std::list<CBSNode> close;
-        std::set<CBSNode, bool (*)(const CBSNode&, const CBSNode&)> focal;
+        std::set<CBSNode<SearchType>> open;
+        std::list<CBSNode<SearchType>> close;
+        std::set<CBSNode<SearchType>, bool (*)(const CBSNode<SearchType>&, const CBSNode<SearchType>&)> focal;
         std::multiset<double> sumLb;
 
         SearchType*                     search;
+
+        void createNode(const Map &map, const AgentSet &agentSet, const Config &config,
+            const Conflict &conflict, std::vector<int> &costs,
+            ConstraintsSet &constraints, int id1,
+            const Node &pos1, const Node &pos2,
+            std::vector<std::list<Node>::iterator> &starts,
+            std::vector<std::list<Node>::iterator> &ends,
+            ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
+            std::vector<MDD> &mdds, std::vector<double> &lb,
+            std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
+            CBSNode<SearchType> *parentPtr,
+            CBSNode<SearchType> &node,
+            SearchType *search, bool updateNode);
+
+        void getState(const std::vector<int> &costs, int &oldCost,
+            const std::vector<std::list<Node>::iterator> &starts, std::list<Node>::iterator& oldStart,
+            const std::vector<std::list<Node>::iterator> &ends, std::list<Node>::iterator& oldEnd,
+            const std::vector<MDD> &mdds, MDD& oldMDD,
+            const std::vector<double> &lb, double& oldLb,
+            int agentId, bool withMDD, bool withLb);
+
+        void setState(std::vector<int> &costs, int oldCost,
+            std::vector<std::list<Node>::iterator> &starts, std::list<Node>::iterator oldStart,
+            std::vector<std::list<Node>::iterator> &ends, std::list<Node>::iterator oldEnd,
+            std::vector<MDD> &mdds, const MDD& oldMDD,
+            std::vector<double> &lb, double oldLb,
+            int agentId, bool withMDD, bool withLb);
 
     private:
         std::list<Node> getNewPath(const Map &map, const AgentSet &agentSet, const Agent &agent,
                                    const Constraint &constraint, const ConstraintsSet &constraints,
                                    const std::list<Node>::iterator pathStart,
                                    const std::list<Node>::iterator pathEnd,
-                                   bool withCAT, const ConflictAvoidanceTable &CAT,
-                                   std::vector<double> &lb, std::vector<int> &LLExpansions, std::vector<int> &LLNodes);
-        CBSNode createNode(const Map &map, const AgentSet &agentSet, const Config &config,
-                           const Conflict &conflict, const std::vector<int> &costs,
-                           ConstraintsSet &constraints, int id1, int id2,
-                           const Node &pos1, const Node &pos2,
-                           std::vector<std::list<Node>::iterator> &starts,
-                           std::vector<std::list<Node>::iterator> &ends,
-                           ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
-                           std::vector<MDD> &mdds, std::vector<double> &lb,
-                           std::vector<int> &LLExpansions, std::vector<int> &LLNodes, CBSNode *parentPtr);
-
-
+                                   bool withCAT, const ConflictAvoidanceTable &CAT, std::vector<double> &lb,
+                                   std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
+                                   SearchType *search, bool freshStart);
 
 };
 

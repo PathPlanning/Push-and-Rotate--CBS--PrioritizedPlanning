@@ -23,7 +23,11 @@ class ISearch
 {
     public:
         ISearch(bool WithTime = false);
-        virtual ~ISearch(void);
+        //virtual ~ISearch(void);
+        ISearch(ISearch& other) = default;
+        ISearch& operator=(ISearch& other) = default;
+        ISearch(ISearch&& other) = default;
+        ISearch& operator=(ISearch&& other) = default;
         SearchResult startSearch(const Map &map, const AgentSet &agentSet,
                                  int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
@@ -42,14 +46,16 @@ class ISearch
 
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
 
-        std::unordered_map<std::pair<NodeType, NodeType>, int, NodePairHash> getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
-
         // void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
         virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
 
+        virtual void updateFocalW(double FocalW, const Map &map) {};
+
+        virtual int getSize() {return open.size() + close.size();};
+
         static int T;
 
-    protected:
+    //protected:
         //CODE HERE
         //Try to split class functionality to the methods that can be re-used in successors classes,
         //e.g. classes that realize A*, JPS, Theta* algorithms
@@ -85,6 +91,7 @@ class ISearch
         virtual bool canStay() { return withTime; }
         virtual int getFocalSize() { return 0; }
         virtual NodeType getCur(const Map& map);
+        virtual void removeCur(const NodeType& cur, const Map& map);
         virtual void subtractFutureConflicts(NodeType &node) {}
         virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();

@@ -4,11 +4,13 @@
 #include <vector>
 #include <unordered_map>
 #include <list>
+#include <memory>
 #include "node.h"
 #include "constraint.h"
 #include "mdd.h"
 #include "conflict_set.h"
 
+template <typename SearchType = Astar<>>
 struct CBSNode
 {
     static int curId;
@@ -26,6 +28,9 @@ struct CBSNode
     int                                         H, G;
     bool                                        hasPositiveConstraint;
     bool                                        pathFound;
+    Conflict                                    conflict;
+    std::shared_ptr<SearchType>                 search;
+    std::vector<CBSNode*>                       children;
 
     CBSNode(CBSNode *p = nullptr, int Cost = 0) {
         parent = p;
@@ -41,7 +46,6 @@ struct CBSNode
     CBSNode(bool PathFound) {
         pathFound = PathFound;
     }
-
 
     bool operator< (const CBSNode &other) const {
         return G < other.G || (G == other.G && id < other.id);

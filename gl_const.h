@@ -87,6 +87,7 @@
     #define CNS_TAG_ATTR_HLN            "HL_nodes"
     #define CNS_TAG_ATTR_LLE            "LL_avg_expansions"
     #define CNS_TAG_ATTR_LLN            "LL_avg_nodes"
+    #define CNS_TAG_ATTR_TN             "total_nodes"
     #define CNS_TAG_ATTR_FILENAME       "filename"
     #define CNS_TAG_ATTR_X              "x"
     #define CNS_TAG_ATTR_Y              "y"
@@ -119,12 +120,14 @@
     #define CNS_ST_ECBS                 "ecbs"
     #define CNS_ST_ECBS_CT              "ecbs-ct"
     #define CNS_ST_ACBS                 "anytime_cbs"
+    #define CNS_ST_AECBS                "anytime_ecbs"
 
     #define CN_ST_CBS                   0
     #define CN_ST_PR                    1
     #define CN_ST_PP                    2
     #define CN_ST_ECBS_CT               3
     #define CN_ST_ACBS                  4
+    #define CN_ST_AECBS                 5
 
     #define CN_SP_ST 0
 

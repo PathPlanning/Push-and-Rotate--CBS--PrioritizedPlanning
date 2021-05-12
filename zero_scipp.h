@@ -11,6 +11,10 @@ public:
     ZeroSCIPP(double Weight = 1.0, bool GenSuboptFromOpt = false, double HW = 1.0, bool BT = true) :
         Astar<NodeType>(true, HW, BT),
         SIPP<NodeType>(HW, BT), weight(Weight), genSuboptFromOpt(GenSuboptFromOpt)  {}
+    ZeroSCIPP(ZeroSCIPP& other) = default;
+    ZeroSCIPP& operator=(ZeroSCIPP& other) = default;
+    ZeroSCIPP(ZeroSCIPP&& other) = default;
+    ZeroSCIPP& operator=(ZeroSCIPP&& other) = default;
     virtual ~ZeroSCIPP();
 
 protected:

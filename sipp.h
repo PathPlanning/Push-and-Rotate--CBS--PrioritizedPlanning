@@ -10,6 +10,10 @@ class SIPP : virtual public Astar<NodeType>
 {
 public:
     SIPP(double HW = 1.0, bool BT = true) : Astar<NodeType>(true, HW, BT) {}
+    SIPP(SIPP& other) = default;
+    SIPP& operator=(SIPP& other) = default;
+    SIPP(SIPP&& other) = default;
+    SIPP& operator=(SIPP&& other) = default;
     virtual ~SIPP() {}
 
 protected:
