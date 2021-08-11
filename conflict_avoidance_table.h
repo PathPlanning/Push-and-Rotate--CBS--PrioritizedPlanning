@@ -18,15 +18,19 @@ public:
                       const std::list<Node>::const_iterator& end);
     void removeAgentPath(const std::list<Node>::const_iterator& start,
                          const std::list<Node>::const_iterator& end);
-    int getAgentsCount(const Node &node) const;
+    int getAgentsCount(const Node &node, const Node &prev) const;
     int getFirstSoftConflict(const Node & node, int startTime, int endTime) const;
     int getFutureConflictsCount(const Node & node, int time) const;
     void getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node, const Node &prevNode,
                                                           int startTime, int endTime, bool binary) const;
+    int getEdgeAgentsCount(const Node &node, const Node &prev) const;
+    void addGoalNode(const Node &node);
+    void removeGoalNode(const Node &node);
 
 private:
     std::map<std::tuple<int, int, int>, int> nodeAgentsCount;
     std::map<std::tuple<int, int, int, int, int>, int> edgeAgentsCount;
+    std::map<std::pair<int, int>, int> goalNodeAgentsCount;
 };
 
 #endif // CONFLICTAVOIDANCETABLE_H

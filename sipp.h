@@ -36,6 +36,9 @@ protected:
     virtual bool canStay() override { return false; }
     virtual bool withZeroConflicts() { return false; }
     virtual void updateEndTimeBySoftConflicts(NodeType &node, const ConflictAvoidanceTable &CAT);
+    virtual void createNeighborsByEdges(const NodeType &cur, NodeType &neigh,
+                                        std::list<NodeType> &successors, int agentId,
+                                        const ConstraintsSet &constraints, const ConflictAvoidanceTable &CAT);
 };
 
 #endif // SIPP_H

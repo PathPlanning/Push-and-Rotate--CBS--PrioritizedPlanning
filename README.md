@@ -20,7 +20,7 @@ The main file contains two sections `map` and `options`:
     1. cbs - Conflict based search
     2. ecbs - Enhanced conflict based search. In the high level search secondary heuristic h3 from the [article](https://www.aaai.org/ocs/index.php/SOCS/SOCS14/paper/viewFile/8911/8875) is used. Low level search depends on the low_level option
     3. anytime_cbs - CBS with anytime focal search on high level and some optimal algorithm (astar or sipp) on low level, as described in [the article](https://www.ijcai.org/Proceedings/2018/0199.pdf)
-    4. anytime_ecbs - ECBS with anytime focal search on high and low level. To update focalW on low level OPEN, CLOSE and FOCAL lists for all low level searches are saved.
+    4. anytime_ecbs - ECBS with anytime focal search on high and low level. To update focal_w on low level OPEN, CLOSE and FOCAL lists for all low level searches are saved.
     5. push_and_rotate - Push and rotate
     6. prioritized_planning - Prioritized planning
 - low_level - algorithm, applied in the low level search in CBS, ECBS and Prioritized planning algorithms. Can take following values:
@@ -38,6 +38,7 @@ The main file contains two sections `map` and `options`:
 - with_disjoint_splitting - use disjoint splitting. Described [here](http://idm-lab.org/bib/abstracts/papers/icaps19a.pdf), can be `true` or `false`, considered for CBS and ECBS algorithms. When using this option, with_card_conf option is set to `true`. Optional parameter, default value is false
 - focal_w - weight used in ECBS high level search and in Focal search and SCIPP low level searches for construction of the FOCAL list. Also f-values of optimal nodes in zero_scipp algorithm are multiplied by this value. In any case it is garantied that cost of the found solution will not exceed the optimal cost more than in focal_w times. Optional parameter, default value is 1.0
 - gen_subopt_from_opt - generate suboptimal successors from optimal nodes in zero_scipp alogrithm. Can be `true` or `false`, considered for low_level = `zero_scipp`. Optional parameter, default value is `false`
+- use_cat_at_root - consider trajectories of previous agents, while planning the initial solution in root nodes. Can be `true` or `false`, when set `false` individual trajectories in root node are computed independently, otherwise algorithm tries to avoid conflicts as much as allowed by suboptimality factor. Optional parameter, default value is `true`. Ignored for anytime-algorithms
 
 - pp_order - specifies a method of agents priorities definition for Prioritized Planning. Can take following values:
     - 0 - agents are considered in the same order as in the input file

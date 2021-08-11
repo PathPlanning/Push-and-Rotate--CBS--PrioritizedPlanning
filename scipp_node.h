@@ -14,6 +14,17 @@ struct SCIPPNode : public SIPPNode, FSNode
 
     SCIPPNode(const Node &other) : Node(other) {}
 
+    virtual int convolution(int width, int height, bool withTime = true) const {
+        int cantor = (hc + startTime) * (hc + startTime + 1) / 2 + hc;
+        int res = withTime ? width * height * cantor : 0;
+        return res + i * width + j;
+    }
+
+    bool operator< (const SCIPPNode &other) const {
+        return std::tuple<int, int, int, int, int, int>(F, -g, hc, i, j, -startTime) <
+                std::tuple<int, int, int, int, int, int>(other.F, -other.g, other.hc, other.i, other.j, -other.startTime);
+    }
+
 };
 
 #endif

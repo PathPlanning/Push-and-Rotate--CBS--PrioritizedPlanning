@@ -19,8 +19,8 @@ struct SIPPNode : virtual public Node
     }
 
     bool operator< (const SIPPNode &other) const {
-        return std::tuple<int, int, int, int, int>(F, -g, -startTime, i, j) <
-                std::tuple<int, int, int, int, int>(other.F, -other.g, -other.startTime, other.i, other.j);
+        return std::tuple<int, int, int, int, int>(F, -g, i, j, -startTime) <
+                std::tuple<int, int, int, int, int>(other.F, -other.g, other.i, other.j, -other.startTime);
     }
 
 };

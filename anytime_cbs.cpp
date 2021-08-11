@@ -197,6 +197,20 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map, const
     }
     search->agentsPaths = agentsPaths;
     result.agentsPaths = &search->agentsPaths;
+    result.finalTotalNodes = 0;
+    for (auto& node : search->open) {
+        result.finalTotalNodes += node.search.get()->getSize();
+    }
+    for (auto& node : search->close) {
+        if (node.search != nullptr) {
+            result.finalTotalNodes += node.search.get()->getSize();
+        }
+    }
+    for (auto& node : search->focal) {
+        if (node.search != nullptr) {
+            result.finalTotalNodes += node.search.get()->getSize();
+        }
+    }
     return result;
 }
 

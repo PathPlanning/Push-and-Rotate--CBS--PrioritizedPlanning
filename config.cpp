@@ -160,6 +160,7 @@ bool Config::getConfig(const char *FileName)
     getValueFromText(algorithm, CNS_TAG_WITH_DS, "bool", &withDisjointSplitting);
     getValueFromText(algorithm, CNS_TAG_FOCAL_W, "double", &focalW);
     getValueFromText(algorithm, CNS_TAG_SFO, "bool", &genSuboptFromOpt);
+    getValueFromText(algorithm, CNS_TAG_RC, "bool", &useCatAtRoot);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;

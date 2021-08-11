@@ -36,15 +36,28 @@ void SIPP<NodeType>::createSuccessorsFromNode(const NodeType &cur, NodeType &nei
                     neigh.startTime = softConflictIntervals[i].first;
                     neigh.endTime = (i == softConflictIntervals.size() - 1) ? interval.second : softConflictIntervals[i + 1].first - 1;
                     neigh.conflictsCount = softConflictIntervals[i].second;
-                    setNeighG(cur, neigh, agentId, constraints);
+                    createNeighborsByEdges(cur, neigh, successors, agentId, constraints, CAT);
+                    /*setNeighG(cur, neigh, agentId, constraints);
                     this->setHC(neigh, cur, CAT, isGoal);
                     if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
                         neigh.F = neigh.g + neigh.H;
                         successors.push_back(neigh);
-                    }
+                    }*/
                 }
             }
         }
+    }
+}
+
+template<typename NodeType>
+void SIPP<NodeType>::createNeighborsByEdges(const NodeType &cur, NodeType &neigh,
+    std::list<NodeType> &successors, int agentId,
+    const ConstraintsSet &constraints, const ConflictAvoidanceTable &CAT)
+{
+    setNeighG(cur, neigh, agentId, constraints);
+    if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
+        neigh.F = neigh.g + neigh.H;
+        successors.push_back(neigh);
     }
 }
 

@@ -29,7 +29,7 @@ ConflictBasedSearch<SearchType>::~ConflictBasedSearch()
 template<typename SearchType>
 void ConflictBasedSearch<SearchType>::clear()
 {
-    agentsPaths.clear();
+    MultiagentSearchInterface::clear();
     open.clear();
     close.clear();
     focal.clear();
@@ -283,12 +283,26 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
     if (open.empty() && focal.empty()) {
         std::vector<std::list<Node>::iterator> starts(agentCount), ends(agentCount);
         std::vector<MDD> mdds;
+        ConflictAvoidanceTable CAT;
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
             Agent agent = agentSet.getAgent(i);
-            Astar<> astar(false, false);
-            astar.setPerfectHeuristic(&perfectHeuristic);
-            SearchResult searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
+            SearchResult searchResult;
+
+            if (config.withCAT && config.useCatAtRoot &&
+                !(config.searchType == CN_ST_ACBS || config.searchType == CN_ST_AECBS))
+            {
+                searchResult = search->startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
+                                                   agent.getGoal_i(), agent.getGoal_j(), nullptr,
+                                                   true, true, 0, -1, -1, {}, {}, true, CAT);
+                if (searchResult.pathfound) {
+                    CAT.addAgentPath(searchResult.lppath->begin(), searchResult.lppath->end());
+                }
+            } else {
+                Astar<> astar(false, false);
+                astar.setPerfectHeuristic(&perfectHeuristic);
+                searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
                                                             agent.getGoal_i(), agent.getGoal_j());
+            }
             if (!searchResult.pathfound) {
                 std::cout << "fail" << std::endl;
             }
@@ -463,10 +477,13 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         /*std::cout << t << " " << cur.paths.begin()->first << " " <<
             conflict.id1 << " " << conflict.id2 << " " << conflict.pos1.i << " " << conflict.pos1.j << " " <<
             conflict.pos2.i << " " << conflict.pos2.j << " " << conflict.time << " " <<
-            open.size() + close.size() + focal.size() << std::endl;
+            open.size() + close.size() + focal.size() << " " <<
+            conflictSet.nonCardinal.size() << " " << cur.cost << " " << cur.id << " ";
 
         if (cur.search != nullptr) {
             std::cout << cur.search.get()->getSize() << std::endl;
+        } else {
+            std::cout << std::endl;
         }*/
 
         CBSNode<SearchType> child1, child2;
@@ -483,6 +500,16 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         if (child2.pathFound) {
             children.push_back(child2);
         }
+
+        /*if (t == 4) {
+            for (auto& node : child2.paths[12]) {
+                std::cout << node.i << " " << node.j << std::endl;
+            }
+            std::cout << std::endl;
+            for (auto& node : root.paths[12]) {
+                std::cout << node.i << " " << node.j << std::endl;
+            }
+        }*/
 
         /*for (auto child : children) {
             for (auto c : constraints.nodeConstraints) {

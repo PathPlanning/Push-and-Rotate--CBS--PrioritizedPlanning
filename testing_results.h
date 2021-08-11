@@ -28,6 +28,7 @@ struct TestingResults {
     }
 
     std::map<std::string, std::map<int, std::vector<double>>> data;
+    std::map<int, int> finalTotalNodes;
 };
 
 #endif // TESTING_RESULTS_H

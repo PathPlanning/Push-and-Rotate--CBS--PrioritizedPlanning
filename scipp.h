@@ -25,6 +25,9 @@ protected:
     void addStartNode(NodeType &node, const Map &map, const ConflictAvoidanceTable &CAT) override;
     void setHC(NodeType &neigh, const NodeType &cur,
                const ConflictAvoidanceTable &CAT, bool isGoal) override;
+    void createNeighborsByEdges(const NodeType &cur, NodeType &neigh,
+        std::list<NodeType> &successors, int agentId,
+        const ConstraintsSet &constraints, const ConflictAvoidanceTable &CAT) override;
 };
 
 #endif // SCIPP_H

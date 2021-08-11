@@ -9,6 +9,10 @@ void ConflictAvoidanceTable::addNode(const Node &node) {
     }
 }
 
+void ConflictAvoidanceTable::addGoalNode(const Node &node) {
+    goalNodeAgentsCount[std::make_pair(node.i, node.j)] = node.g;
+}
+
 void ConflictAvoidanceTable::addEdge(const Node &node, const Node &prev) {
     auto tuple = std::make_tuple(prev.i, prev.j, node.i, node.j, node.g);
     if (edgeAgentsCount.find(tuple) == edgeAgentsCount.end()) {
@@ -21,7 +25,11 @@ void ConflictAvoidanceTable::addEdge(const Node &node, const Node &prev) {
 void ConflictAvoidanceTable::addAgentPath(const std::list<Node>::const_iterator& start,
                                           const std::list<Node>::const_iterator& end) {
     for (auto it = start; it != end; ++it) {
-        addNode(*it);
+        if (std::next(it) == end) {
+            addGoalNode(*it);
+        } else {
+            addNode(*it);
+        }
         if (it != start && *it != *std::prev(it)) {
             addEdge(*it, *std::prev(it));
         }
@@ -37,6 +45,10 @@ void ConflictAvoidanceTable::removeNode(const Node &node) {
     }
 }
 
+void ConflictAvoidanceTable::removeGoalNode(const Node &node) {
+    goalNodeAgentsCount.erase(std::make_pair(node.i, node.j));
+}
+
 void ConflictAvoidanceTable::removeEdge(const Node &node, const Node &prev) {
     auto tuple = std::make_tuple(prev.i, prev.j, node.i, node.j, node.g);
     if (edgeAgentsCount[tuple] == 1) {
@@ -49,20 +61,41 @@ void ConflictAvoidanceTable::removeEdge(const Node &node, const Node &prev) {
 void ConflictAvoidanceTable::removeAgentPath(const std::list<Node>::const_iterator& start,
                                              const std::list<Node>::const_iterator& end) {
     for (auto it = start; it != end; ++it) {
-        removeNode(*it);
+        if (std::next(it) == end) {
+            removeGoalNode(*it);
+        } else {
+            removeNode(*it);
+        }
         if (it != start && *it != *std::prev(it)) {
             removeEdge(*it, *std::prev(it));
         }
     }
 }
 
-int ConflictAvoidanceTable::getAgentsCount(const Node &node) const {
+int ConflictAvoidanceTable::getAgentsCount(const Node &node, const Node &prev) const {
     int res = 0;
-    auto tuple = std::make_tuple(node.i, node.j, node.g);
-    if (nodeAgentsCount.find(tuple) != nodeAgentsCount.end()) {
-        res = nodeAgentsCount.at(tuple);
+    auto nodeTuple = std::make_tuple(node.i, node.j, node.g);
+    if (nodeAgentsCount.find(nodeTuple) != nodeAgentsCount.end()) {
+        res += nodeAgentsCount.at(nodeTuple);
+    }
+    auto edgeTuple = std::make_tuple(node.i, node.j, prev.i, prev.j, node.g);
+    if (edgeAgentsCount.find(edgeTuple) != edgeAgentsCount.end()) {
+        res += edgeAgentsCount.at(edgeTuple);
+    }
+
+    auto it = goalNodeAgentsCount.find(std::make_pair(node.i, node.j));
+    if (it != goalNodeAgentsCount.end() && it->second <= node.g) {
+        ++res;
     }
     return res;
+}
+
+int ConflictAvoidanceTable::getEdgeAgentsCount(const Node &node, const Node &prev) const {
+    auto edgeTuple = std::make_tuple(node.i, node.j, prev.i, prev.j, node.g);
+    if (edgeAgentsCount.find(edgeTuple) != edgeAgentsCount.end()) {
+        return edgeAgentsCount.at(edgeTuple);
+    }
+    return 0;
 }
 
 int ConflictAvoidanceTable::getFirstSoftConflict(const Node & node, int startTime, int endTime) const {
@@ -75,6 +108,7 @@ int ConflictAvoidanceTable::getFirstSoftConflict(const Node & node, int startTim
 }
 
 int ConflictAvoidanceTable::getFutureConflictsCount(const Node & node, int time) const {
+    return 0;
     int res = 0;
     auto it = nodeAgentsCount.upper_bound(std::make_tuple(node.i, node.j, time));
     for (; it != nodeAgentsCount.end() && std::get<0>(it->first) == node.i
@@ -94,7 +128,7 @@ void ConflictAvoidanceTable::getSoftConflictIntervals(std::vector<std::pair<int,
         agentsCount[std::get<2>(nodeIt->first)] = nodeIt->second;
     }
 
-    auto edgeIt = edgeAgentsCount.lower_bound(std::make_tuple(node.i, node.j, prevNode.i, prevNode.j, startTime));
+    /*auto edgeIt = edgeAgentsCount.lower_bound(std::make_tuple(node.i, node.j, prevNode.i, prevNode.j, startTime));
     auto edgeEnd = edgeAgentsCount.upper_bound(std::make_tuple(node.i, node.j, prevNode.i, prevNode.j, endTime));
     for (edgeIt; edgeIt != edgeEnd; ++edgeIt) {
         int time = std::get<4>(edgeIt->first);
@@ -102,7 +136,7 @@ void ConflictAvoidanceTable::getSoftConflictIntervals(std::vector<std::pair<int,
             agentsCount[std::get<4>(edgeIt->first)] = 0;
         }
         agentsCount[std::get<4>(edgeIt->first)] += edgeIt->second;
-    }
+    }*/
 
     int count = 0, prevTime = startTime - 1, beg = -1;
     for (auto it = agentsCount.begin(); it != agentsCount.end(); ++it) {
@@ -124,5 +158,20 @@ void ConflictAvoidanceTable::getSoftConflictIntervals(std::vector<std::pair<int,
     }
     if (prevTime < endTime) {
         res.push_back(std::make_pair(prevTime + 1, 0));
+    }
+
+    auto it = goalNodeAgentsCount.find(std::make_pair(node.i, node.j));
+    if (it != goalNodeAgentsCount.end()) {
+        int i;
+        for (i = 0; i < res.size() && res[i].first < it->second; ++i) {}
+        if (i == res.size() || res[i].first > it->second) {
+            if (i > 0) {
+                res.insert(res.begin() + i, std::make_pair(it->second, res[i - 1].second + 1));
+                ++i;
+            }
+        }
+        for (i; i < res.size(); ++i) {
+            res[i].second += 1;
+        }
     }
 }

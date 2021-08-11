@@ -46,6 +46,7 @@
         #define CNS_TAG_FOCAL_W     "focal_w"
         #define CNS_TAG_WEIGHT      "weight"
         #define CNS_TAG_SFO         "gen_subopt_from_opt"
+        #define CNS_TAG_RC          "use_cat_at_root"
         #define CNS_TAG_AR          "aggregated_results"
         #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"

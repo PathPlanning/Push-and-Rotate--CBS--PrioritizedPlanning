@@ -189,6 +189,7 @@ void Mission::startSearch(const std::string &agentsFile)
         res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
         res.data[CNS_TAG_FOCAL_W][i] = sr.focalW;
         res.data[CNS_TAG_ATTR_TN][i] = sr.totalNodes;
+        res.finalTotalNodes[i] = sr.finalTotalNodes;
 
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, sr.time.back(), sr.makespan.back(), sr.flowtime.back(),

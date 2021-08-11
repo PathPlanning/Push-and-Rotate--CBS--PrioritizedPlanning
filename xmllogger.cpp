@@ -208,6 +208,7 @@ void XmlLogger::writeToLogAggregatedResults(std::map<int, int>& successCount,
         XMLElement *result = doc.NewElement(CNS_TAG_RESULT);
         result->SetAttribute(CNS_TAG_ATTR_COUNT, pair.first);
         result->SetAttribute(CNS_TAG_ATTR_SC, pair.second);
+        result->SetAttribute(CNS_TAG_ATTR_TN, res.finalTotalNodes[pair.first]);
         for (int i = 0; i < res.data[CNS_TAG_FOCAL_W][pair.first].size(); ++i) {
             XMLElement *iteration = doc.NewElement(CNS_TAG_ITERATION);
             for (auto key : keys) {

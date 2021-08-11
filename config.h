@@ -35,6 +35,7 @@ class Config
         bool            withFocalSearch = false;
         bool            genSuboptFromOpt = false;
         bool            saveAggregatedResults = true;
+        bool            useCatAtRoot = true;
         double          focalW = 1.0;
         int             agentsStep = 1;
 

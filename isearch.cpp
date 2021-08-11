@@ -60,8 +60,9 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
 
         cur = getCur(map);
 
-        /*if (withTime && agentId == 6 && cur.i == 55 && cur.j == 207) {
-            std::cout << cur.i << " " << cur.j << " " << cur.g << " " << cur.conflictsCount << std::endl;
+        /*if (withTime && agentId == 12 && cur.i == 7 && cur.j == 42) {
+            std::cout << cur.i << " " << cur.j << " " << cur.g << " " << cur.F << " " <<
+                         cur.conflictsCount << " " << cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime) << std::endl;
         }*/
 
         bool goalNode = false;
@@ -140,7 +141,7 @@ std::list<NodeType> ISearch<NodeType>::findSuccessors(const NodeType &curNode, c
                     map.CellIsTraversable(newi, newj, occupiedNodes)) {
                 int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
                 NodeType neigh(newi, newj, nullptr, curNode.g + 1, newh);
-                neigh.conflictsCount = CAT.getAgentsCount(neigh);
+                neigh.conflictsCount = CAT.getAgentsCount(neigh, curNode);
                 createSuccessorsFromNode(curNode, neigh, successors, agentId, constraints, CAT,
                                          neigh.i == goal_i && neigh.j == goal_j);
             }
