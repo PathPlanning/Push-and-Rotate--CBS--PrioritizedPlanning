@@ -285,6 +285,7 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         std::vector<MDD> mdds;
         ConflictAvoidanceTable CAT;
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+            Astar<> astar(false, false);
             Agent agent = agentSet.getAgent(i);
             SearchResult searchResult;
 
@@ -298,7 +299,6 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
                     CAT.addAgentPath(searchResult.lppath->begin(), searchResult.lppath->end());
                 }
             } else {
-                Astar<> astar(false, false);
                 astar.setPerfectHeuristic(&perfectHeuristic);
                 searchResult = astar.startSearch(map, agentSet, agent.getStart_i(), agent.getStart_j(),
                                                             agent.getGoal_i(), agent.getGoal_j());
