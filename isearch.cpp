@@ -12,13 +12,17 @@ template<typename NodeType>
 int ISearch<NodeType>::T = 0;
 
 template<typename NodeType>
+int ISearch<NodeType>::P = 0;
+
+template<typename NodeType>
 SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agentSet,
                                   int start_i, int start_j, int goal_i, int goal_j,
                                   bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&),
                                   bool freshStart, bool returnPath, int startTime, int goalTime, int maxTime,
                                   const std::unordered_set<Node, NodeHash> &occupiedNodes,
                                   const ConstraintsSet &constraints,
-                                  bool withCAT, const ConflictAvoidanceTable &CAT)
+                                  bool withCAT, const ConflictAvoidanceTable &CAT,
+                                  std::chrono::steady_clock::time_point globalBegin, int globalTimeLimit)
 {
     sresult.pathfound = false;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -58,12 +62,15 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
             }
         }
 
-        cur = getCur(map);
+        if (sresult.numberofsteps % 1000 == 0 && globalTimeLimit != -1) {
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - globalBegin).count();
+            if (elapsedMilliseconds > globalTimeLimit) {
+                break;
+            }
+        }
 
-        /*if (withTime && agentId == 12 && cur.i == 7 && cur.j == 42) {
-            std::cout << cur.i << " " << cur.j << " " << cur.g << " " << cur.F << " " <<
-                         cur.conflictsCount << " " << cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime) << std::endl;
-        }*/
+        cur = getCur(map);
 
         bool goalNode = false;
         if ((isGoal != nullptr && isGoal(NodeType(start_i, start_j), cur, map, agentSet)) ||
@@ -103,8 +110,6 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-
-    T += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 
     sresult.time = static_cast<double>(elapsedMilliseconds) / 1000;
     sresult.nodescreated = open.size() + close.size() + getFocalSize();

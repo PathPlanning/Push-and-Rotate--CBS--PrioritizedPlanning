@@ -14,14 +14,17 @@ struct FSNode : virtual public Node
     FSNode(const Node &other) : Node(other) {}
 
     virtual int convolution(int width, int height, bool withTime = true) const {
-        int cantor = (hc + g) * (hc + g + 1) / 2 + hc;
-        int res = withTime ? width * height * cantor : 0;
+        int res = withTime ? width * height * g : 0;
         return res + i * width + j;
     }
 
     bool operator< (const FSNode &other) const {
         return std::tuple<int, int, int, int, int>(F, -g, hc, i, j) <
                 std::tuple<int, int, int, int, int>(other.F, -other.g, other.hc, other.i, other.j);
+    }
+
+    virtual int getHC() const override {
+        return hc;
     }
 };
 

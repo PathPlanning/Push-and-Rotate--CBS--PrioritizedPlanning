@@ -16,6 +16,9 @@ public:
     virtual ~FocalSearch() {}
     virtual void updateFocalW(double newFocalW, const Map& map) override;
     virtual int getSize() override {return this->open.size() + this->close.size() + focal.size();};
+
+    static int Time;
+
 protected:
     bool checkOpenEmpty() override;
     NodeType getCur(const Map& map) override;
@@ -29,9 +32,22 @@ protected:
     virtual void subtractFutureConflicts(NodeType &node) override { node.hc -= node.futureConflictsCount; }
     virtual void addFutureConflicts(NodeType &neigh, const ConflictAvoidanceTable &CAT);
 
+    virtual void addTime(int time) { Time += time; };
+
     SearchQueue<NodeType> focal;
     std::multiset<double> focalF;
     double focalW;
+
+    virtual void checkFocal() {
+        return;
+        std::multiset<double> realFocalF;
+        for (auto it = focal.sortByKey.begin(); it != focal.sortByKey.end(); ++it) {
+            realFocalF.insert(it->F);
+        }
+        if (realFocalF != focalF) {
+            std::cout << "qqqqqqqqqq" << std::endl;
+        }
+    };
 };
 
 #endif // FOCALSEARCH_H

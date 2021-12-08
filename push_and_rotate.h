@@ -19,7 +19,9 @@ class PushAndRotate : public MultiagentSearchInterface
         PushAndRotate();
         PushAndRotate(ISearch<>* Search);
         ~PushAndRotate(void);
-        MultiagentSearchResult startSearch(const Map &Map, const Config &config, AgentSet &AgentSet) override;
+        MultiagentSearchResult startSearch(const Map &Map, const Config &config, AgentSet &AgentSet,
+            std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+            int globalTimeLimit = -1) override;
         void clear() override;
     private:
         bool solve(const Map &map, const Config &config, AgentSet &AgentSet, std::chrono::steady_clock::time_point start);

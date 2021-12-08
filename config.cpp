@@ -139,6 +139,8 @@ bool Config::getConfig(const char *FileName)
         lowLevel = CN_SP_ST_FS;
     } else if (lowLevelSearch == CNS_SP_ST_SCIPP) {
         lowLevel = CN_SP_ST_SCIPP;
+    } else if (lowLevelSearch == CNS_SP_ST_FLPASTAR) {
+        lowLevel = CN_SP_ST_FLPASTAR;
     } else {
         std::cout << "Error! Low level search '" << lowLevelSearch << "' is unknown." << std::endl;
         return false;

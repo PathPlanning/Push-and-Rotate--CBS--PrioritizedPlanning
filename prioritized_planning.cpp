@@ -20,7 +20,11 @@ PrioritizedPlanning<SearchType>::~PrioritizedPlanning()
 }
 
 template <typename SearchType>
-MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &map, const Config &config, AgentSet &agentSet) {
+MultiagentSearchResult PrioritizedPlanning<SearchType>::startSearch(const Map &map,
+    const Config &config, AgentSet &agentSet,
+    std::chrono::steady_clock::time_point globalBegin,
+    int globalTimeLimit)
+{
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     // std::cout << agentSet.getAgentCount() << std::endl;
 

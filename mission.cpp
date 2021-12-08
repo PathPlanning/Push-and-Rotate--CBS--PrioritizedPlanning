@@ -98,6 +98,8 @@ void Mission::createAlgorithm()
             multiagentSearch = new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW));
         } else if (config.lowLevel == CN_SP_ST_SCIPP) {
             multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
+        } else if (config.lowLevel == CN_SP_ST_FLPASTAR) {
+            multiagentSearch = new ConflictBasedSearch<FocalLPAStar<FLPANode>>(new FocalLPAStar<FLPANode>(config.focalW));
         }
     } else if (config.searchType == CN_ST_PP) {
         if (config.lowLevel == CN_SP_ST_ASTAR) {

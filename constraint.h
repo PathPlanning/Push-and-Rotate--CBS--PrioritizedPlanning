@@ -28,15 +28,17 @@ struct Constraint
 
     bool operator== (const Constraint &other) const {
         return i == other.i && j == other.j && time == other.time &&
-                prev_i == other.prev_i && prev_j == other.prev_j && goalNode == other.goalNode;
+            prev_i == other.prev_i && prev_j == other.prev_j &&
+            goalNode == other.goalNode && agentId == other.agentId;
     }
     bool operator!= (const Constraint &other) const {
         return !(*this == other);
     }
 
     bool operator< (const Constraint &other) const {
-        return std::tuple<int, int, int, int, int, bool>(i, j, prev_i, prev_j, time, goalNode) <
-               std::tuple<int, int, int, int, int, bool>(other.i, other.j, other.prev_i, other.prev_j, other.time, other.goalNode);
+        return std::tuple<int, int, int, int, int, bool, int>(i, j, prev_i, prev_j, time, goalNode, agentId) <
+            std::tuple<int, int, int, int, int, bool, int>(
+                other.i, other.j, other.prev_i, other.prev_j, other.time, other.goalNode, other.agentId);
     }
 };
 

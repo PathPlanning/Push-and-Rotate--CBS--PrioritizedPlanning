@@ -36,7 +36,9 @@ class ISearch
                                  const std::unordered_set<Node, NodeHash> &occupiedNodes =
                                        std::unordered_set<Node, NodeHash>(),
                                  const ConstraintsSet &constraints = ConstraintsSet(),
-                                 bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
+                                 bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable(),
+                                 std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+                                 int globalTimeLimit = -1);
 
         virtual std::list<NodeType> findSuccessors(const NodeType &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
                                                const std::unordered_set<Node, NodeHash> &occupiedNodes =
@@ -54,6 +56,7 @@ class ISearch
         virtual int getSize() {return open.size() + close.size();};
 
         static int T;
+        static int P;
 
     //protected:
         //CODE HERE
@@ -96,6 +99,11 @@ class ISearch
         virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();
         virtual void clearLists();
+        void processConstraint(const Constraint& contraint, const Map &map,
+            int goal_i, int goal_j, int agentId,
+            const std::unordered_set<Node, NodeHash> &occupiedNodes,
+            const ConstraintsSet &constraints,
+            bool withCAT, const ConflictAvoidanceTable &CAT) { return; };
 
         SearchResult                        sresult;
         std::list<Node>                     lppath, hppath;
@@ -105,6 +113,9 @@ class ISearch
         std::unordered_map<int, NodeType>   close;
         bool                                withTime;
         //need to define open, close;
+
+        virtual void checkFocal() {return;};
+        virtual void addTime(int time) {return;};
 
 };
 

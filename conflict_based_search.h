@@ -11,6 +11,7 @@
 #include "conflict_avoidance_table.h"
 #include "mdd.h"
 #include "conflict_set.h"
+#include "focal_lpa_star.h"
 #include <numeric>
 
 template <typename SearchType = Astar<>>
@@ -21,7 +22,9 @@ class ConflictBasedSearch : public MultiagentSearchInterface
         ConflictBasedSearch(SearchType* Search);
         ~ConflictBasedSearch(void);
         void clear() override;
-        MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &agentSet) override;
+        MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &agentSet,
+           std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+           int globalTimeLimit = -1);
         template<typename Iter>
         static ConflictSet findConflict(const std::vector<Iter> &starts, const std::vector<Iter> &ends,
                                         int agentId = -1, bool findAllConflicts = false,
@@ -33,6 +36,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
         std::multiset<double> sumLb;
 
         SearchType*                     search;
+        std::vector<SearchType>         rootSearches;
 
         void createNode(const Map &map, const AgentSet &agentSet, const Config &config,
             const Conflict &conflict, std::vector<int> &costs,
@@ -45,7 +49,9 @@ class ConflictBasedSearch : public MultiagentSearchInterface
             std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
             CBSNode<SearchType> *parentPtr,
             CBSNode<SearchType> &node,
-            SearchType *search, bool updateNode);
+            SearchType *search, bool updateNode,
+            std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+            int globalTimeLimit = -1);
 
         void getState(const std::vector<int> &costs, int &oldCost,
             const std::vector<std::list<Node>::iterator> &starts, std::list<Node>::iterator& oldStart,
@@ -68,7 +74,9 @@ class ConflictBasedSearch : public MultiagentSearchInterface
                                    const std::list<Node>::iterator pathEnd,
                                    bool withCAT, const ConflictAvoidanceTable &CAT, std::vector<double> &lb,
                                    std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
-                                   SearchType *search, bool freshStart);
+                                   SearchType *search, bool freshStart,
+                                   std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+                                   int globalTimeLimit = -1);
 
 };
 

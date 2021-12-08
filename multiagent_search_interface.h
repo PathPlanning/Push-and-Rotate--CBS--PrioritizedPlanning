@@ -13,7 +13,9 @@ class MultiagentSearchInterface
 {
 public:
     virtual ~MultiagentSearchInterface(void) {}
-    virtual MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet) = 0;
+    virtual MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet,
+        std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+        int globalTimeLimit = -1) = 0;
     virtual void clear() {
         agentsPaths.clear();
         perfectHeuristic.clear();
@@ -27,6 +29,8 @@ public:
         std::unordered_set<int> visited;
         ISearch<> search(false);
         for (int i = 0; i < agentSet.getAgentCount(); ++i) {
+            //std::cout << i << std::endl;
+
             visited.clear();
             Node goal = Node(agentSet.getAgent(i).getGoal_i(), agentSet.getAgent(i).getGoal_j());
             std::queue<Node> queue;

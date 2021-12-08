@@ -1,6 +1,9 @@
 #include "focalsearch.h"
 
 template<typename NodeType>
+int FocalSearch<NodeType>::Time = 0;
+
+template<typename NodeType>
 FocalSearch<NodeType>::FocalSearch(bool WithTime, double FocalW, double HW, bool BT) :
     Astar<NodeType>(WithTime, HW, BT) {
     auto focalCmp = [](const NodeType &lhs, const NodeType &rhs) {
@@ -31,6 +34,7 @@ NodeType FocalSearch<NodeType>::getCur(const Map& map) {
 template<typename NodeType>
 void FocalSearch<NodeType>::removeCur(const NodeType& cur, const Map& map) {
     focal.erase(map, cur, this->withTime);
+    auto it = focalF.find(cur.F);
     focalF.erase(focalF.find(cur.F));
 }
 
@@ -39,6 +43,7 @@ bool FocalSearch<NodeType>::updateFocal(const NodeType& neigh, const Map& map) {
     NodeType old = focal.getByIndex(map, neigh, this->withTime);
     if (old.i != -1) {
         if (focal.insert(map, neigh, this->withTime, true, old)) {
+            auto it = focalF.find(old.F);
             focalF.erase(focalF.find(old.F));
             focalF.insert(neigh.F);
         }

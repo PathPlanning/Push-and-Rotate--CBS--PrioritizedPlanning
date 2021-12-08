@@ -28,6 +28,7 @@ SOURCES += \
     conflict_based_search.cpp \
     conflict_set.cpp \
     constraints_set.cpp \
+    focal_lpa_star.cpp \
     focalsearch.cpp \
     mdd.cpp \
     prioritized_planning.cpp \
@@ -58,6 +59,8 @@ HEADERS += \
     conflict_set.h \
     constraint.h \
     constraints_set.h \
+    flpa_node.h \
+    focal_lpa_star.h \
     focalsearch.h \
     fs_node.h \
     mdd.h \

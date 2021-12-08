@@ -122,6 +122,7 @@
     #define CNS_ST_ECBS_CT              "ecbs-ct"
     #define CNS_ST_ACBS                 "anytime_cbs"
     #define CNS_ST_AECBS                "anytime_ecbs"
+    #define CNS_ST_AECBS                "anytime_ecbs"
 
     #define CN_ST_CBS                   0
     #define CN_ST_PR                    1
@@ -137,6 +138,7 @@
         #define CNS_SP_ST_SIPP          "sipp"
         #define CNS_SP_ST_ZSCIPP        "zero_scipp"
         #define CNS_SP_ST_SCIPP         "scipp"
+        #define CNS_SP_ST_FLPASTAR      "focal_lpastar"
 
         #define CN_SP_ST_ASTAR          0
         #define CN_SP_ST_TIME_ASTAR     1
@@ -144,6 +146,7 @@
         #define CN_SP_ST_SIPP           3
         #define CN_SP_ST_ZSCIPP         4
         #define CN_SP_ST_SCIPP          5
+        #define CN_SP_ST_FLPASTAR      6
 
 
     #define CN_SP_AD 1 //AllowDiagonal

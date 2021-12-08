@@ -21,7 +21,9 @@ public:
     PrioritizedPlanning();
     PrioritizedPlanning(SearchType* Search);
     ~PrioritizedPlanning(void);
-    MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet) override;
+    MultiagentSearchResult startSearch(const Map &map, const Config &config, AgentSet &AgentSet,
+        std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
+        int globalTimeLimit = -1) override;
 
 private:
     SearchType*                      search;

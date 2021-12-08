@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 #include <tuple>
+#include "gl_const.h"
 
 struct Node
 {
@@ -17,7 +18,7 @@ struct Node
         parent = p;
         g = g_;
         H = H_;
-        F = g_ + H_;
+        F = (g_ == CN_INFINITY) ? g_ : g_ + H_;
         conflictsCount = ConflictsCount;
     }
 
@@ -35,6 +36,10 @@ struct Node
     virtual int convolution(int width, int height, bool withTime = false) const {
         int res = withTime ? width * height * g : 0;
         return res + i * width + j;
+    }
+
+    virtual int getHC() const {
+        return 0;
     }
 };
 
