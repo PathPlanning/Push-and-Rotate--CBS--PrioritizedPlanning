@@ -35,6 +35,14 @@ void AnytimeCBS<SearchType>::setChildren(std::list<CBSNode<SearchType>>& nodeSet
 }
 
 template<typename SearchType>
+void AnytimeCBS<SearchType>::setRemoveSubtree(CBSNode<SearchType>* root) {
+    root->remove = true;
+    for (CBSNode<SearchType>* child : root->children) {
+        setRemoveSubtree(child);
+    }
+}
+
+template<typename SearchType>
 void AnytimeCBS<SearchType>::updateNode(const Map &map, const AgentSet &agentSet, const Config &config,
     std::vector<int> &costs,
     ConstraintsSet &constraints,
@@ -43,6 +51,7 @@ void AnytimeCBS<SearchType>::updateNode(const Map &map, const AgentSet &agentSet
     ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
     std::vector<MDD> &mdds, std::vector<double> &lb,
     std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
+    std::list<CBSNode<SearchType>>& open,
     CBSNode<SearchType>* node, double focalW,
     std::chrono::steady_clock::time_point globalBegin, int globalTimeLimit)
 {
@@ -72,19 +81,42 @@ void AnytimeCBS<SearchType>::updateNode(const Map &map, const AgentSet &agentSet
         this->search->createNode(map, agentSet, config, node->conflict, costs, constraints,
             agentId, node->conflict.pos2, node->conflict.pos1, starts, ends,
             CAT, conflictSet, mdds, lb, LLExpansions, LLNodes, node->parent, *node,
-            node->search.get(), true, globalBegin, globalTimeLimit);
+            node->search.get(), true, false, globalBegin, globalTimeLimit);
         pathFound = node->pathFound;
     }
 
+    bool removeSubtree = false;
     if (pathFound) {
         if (node->children.empty()) {
             search->sumLb.erase(search->sumLb.find(oldSumLb));
             search->sumLb.insert(node->sumLb);
         }
-        for (CBSNode<SearchType>* child : node->children) {
-            updateNode(map, agentSet, config, costs, constraints, starts, ends,
-                CAT, node->conflictSet, mdds, lb, LLExpansions, LLNodes,
-                child, focalW, globalBegin, globalTimeLimit);
+
+        if (config.cutIrrelevantConflicts && !node->children.empty() && !isRoot) {
+            auto& conflict = node->newConflict;
+
+            int time;
+            std::list<Node>::iterator it1;
+            for (time = 0, it1 = starts[conflict.id1];
+                 time < conflict.time && std::next(it1) != ends[conflict.id1];
+                 ++time, ++it1) {}
+            std::list<Node>::iterator it2;
+            for (time = 0, it2 = starts[conflict.id2];
+                 time < conflict.time && std::next(it2) != ends[conflict.id2];
+                 ++time, ++it2) {}
+            Node realPos1 = *it1;
+            Node realPos2 = *it2;
+            removeSubtree = !conflict.edgeConflict && (*it1 != conflict.pos1 || *it2 != conflict.pos2) ||
+                conflict.edgeConflict && (*it1 != conflict.pos2 || *it2 != conflict.pos1 ||
+                    *std::prev(it1) != conflict.pos1 || *std::prev(it2) != conflict.pos2);
+        }
+
+        if (!removeSubtree) {
+            for (CBSNode<SearchType>* child : node->children) {
+                updateNode(map, agentSet, config, costs, constraints, starts, ends,
+                    CAT, node->conflictSet, mdds, lb, LLExpansions, LLNodes, open,
+                    child, focalW, globalBegin, globalTimeLimit);
+            }
         }
     }
 
@@ -99,6 +131,18 @@ void AnytimeCBS<SearchType>::updateNode(const Map &map, const AgentSet &agentSet
         }
     }
 
+    if (removeSubtree) {
+        if (config.withFocalSearch) {
+            this->search->sumLb.insert(node->sumLb);
+        }
+        open.push_back(*node);
+        for (size_t i = 0; i < node->parent->children.size(); ++i) {
+            if (node->parent->children[i] == node) {
+                node->parent->children[i] = &open.back();
+            }
+        }
+        setRemoveSubtree(node);
+    }
 }
 
 template<typename SearchType>
@@ -124,15 +168,21 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map,
         search->getPerfectHeuristic(map, agentSet);
         search->search->setPerfectHeuristic(&search->perfectHeuristic);
     }
+    search->bestKnownCost = CN_INFINITY;
 
     search->search->updateFocalW(config.focalW, map);
-
+    int iter = 0;
     while (curConfig.focalW > 1.0) {
+        /*if (iter == 2) {
+            break;
+        }*/
+
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
             break;
         }
 
+        std::cout << search->open.size() << " " << search->close.size() << std::endl;
         MultiagentSearchResult newResult = search->startSearch(map, curConfig, agentSet, begin, config.maxTime);
         if (!newResult.pathfound) {
             break;
@@ -158,9 +208,17 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map,
             curConfig.focalW = 1.0;
         }
 
+        search->bestKnownCost = std::min(result.cost.back(), search->bestKnownCost);
+
         std::cout << newResult.cost[0] << " " << curConfig.focalW << std::endl;
 
         search->search->updateFocalW(curConfig.focalW, map);
+
+        if ((++iter) % config.restartFrequency == 0) {
+            search->clear();
+            search->search->clearLists();
+            continue;
+        }
 
         if (config.searchType == CN_ST_AECBS) {
             std::list<CBSNode<SearchType>> open;
@@ -227,8 +285,39 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map,
             }
 
             updateNode(map, agentSet, curConfig, costs, constraints, starts, ends,
-                CAT, root->conflictSet, mdds, lb, LLExpansions, LLNodes, root, curConfig.focalW,
+                CAT, root->conflictSet, mdds, lb, LLExpansions, LLNodes, open, root, curConfig.focalW,
                 begin, config.maxTime);
+
+            /*this->search->close.erase(std::remove_if(this->search->close.begin(), this->search->close.end(), [](const CBSNode<SearchType>& node) {
+                return node.remove;
+            }), this->search->close.end());*/
+
+            auto closeIt = this->search->close.begin();
+            while (closeIt != this->search->close.end()) {
+                if (closeIt->remove) {
+                    closeIt = this->search->close.erase(closeIt);
+                } else {
+                    ++closeIt;
+                }
+            }
+
+            /*open.erase(std::remove_if(open.begin(), open.end(), [&](const CBSNode<SearchType>& node) {
+                if (node.remove) {
+                    this->search->sumLb.erase(this->search->sumLb.find(node.sumLb));
+                    return true;
+                }
+                return false;
+            }), open.end());*/
+
+            auto openIt = open.begin();
+            while (openIt != open.end()) {
+                if (openIt->remove) {
+                    this->search->sumLb.erase(this->search->sumLb.find(openIt->sumLb));
+                    openIt = open.erase(openIt);
+                } else {
+                    ++openIt;
+                }
+            }
 
             for (const auto& node : open) {
                 if (node.pathFound) {
@@ -284,3 +373,4 @@ template class AnytimeCBS<FocalSearch<>>;
 template class AnytimeCBS<SIPP<>>;
 template class AnytimeCBS<SCIPP<>>;
 template class AnytimeCBS<ZeroSCIPP<>>;
+template class AnytimeCBS<ReplanningFocalSearch<>>;

@@ -1,4 +1,4 @@
-#ifndef FOCALLPASTAR_H
+/*#ifndef FOCALLPASTAR_H
 #define FOCALLPASTAR_H
 
 #include "searchresult.h"
@@ -6,7 +6,7 @@
 #include "constraints_set.h"
 #include "conflict_avoidance_table.h"
 #include "search_queue.h"
-#include "flpa_node.h"
+#include "lpa_node.h"
 #include "constraint.h"
 #include <list>
 #include <vector>
@@ -20,16 +20,16 @@
 #include <queue>
 
 
-template <typename NodeType = FLPANode>
-class FocalLPAStar
+template <typename NodeType = LPANode>
+class LPAStar
 {
 public:
-    FocalLPAStar();
-    FocalLPAStar(FocalLPAStar& other) = default;
-    FocalLPAStar& operator=(FocalLPAStar& other) = default;
-    FocalLPAStar(FocalLPAStar&& other) = default;
-    FocalLPAStar& operator=(FocalLPAStar&& other) = default;
-    FocalLPAStar(double FocalW = 1.0, double HW = 1.0, bool BT = true);
+    LPAStar();
+    LPAStar(LPAStar& other) = default;
+    LPAStar& operator=(LPAStar& other) = default;
+    LPAStar(LPAStar&& other) = default;
+    LPAStar& operator=(LPAStar&& other) = default;
+    LPAStar(double FocalW = 1.0, double HW = 1.0, bool BT = true);
     SearchResult startSearch(const Map &map, const AgentSet &agentSet,
                              int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                              bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
@@ -42,9 +42,7 @@ public:
                              std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
                              int globalTimeLimit = -1);
 
-    virtual std::list<NodeType> findSuccessors(const NodeType &curNode, const Map &map,
-                                           int start_i = 0, int start_j = 0,
-                                           int goal_i = 0, int goal_j = 0, int agentId = -1,
+    virtual std::list<NodeType> findSuccessors(const NodeType &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
                                            const std::unordered_set<Node, NodeHash> &occupiedNodes =
                                                  std::unordered_set<Node, NodeHash>(),
                                            const ConstraintsSet &constraints = ConstraintsSet(),
@@ -59,8 +57,7 @@ public:
     //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
 
     // void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
-    virtual double computeHFromCellToCell(int cur_i, int cur_j, int fin_i, int fin_j);
-    virtual double computeHFromCellToCellNew(int start_i, int start_j, int cur_i, int cur_j, int fin_i, int fin_j);
+    virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j);
 
     virtual void updateFocalW(double FocalW, const Map &map) {};
 
@@ -104,7 +101,7 @@ public:
     double manhattanDistance(int x1, int y1, int x2, int y2);
     double metric(int x1, int y1, int x2, int y2);
     void processConstraint(const Constraint& constraint, const Map &map,
-        int start_i, int start_j, int goal_i, int goal_j, int agentId,
+        int goal_i, int goal_j, int agentId,
         const std::unordered_set<Node, NodeHash> &occupiedNodes,
         const ConstraintsSet &constraints,
         bool withCAT, const ConflictAvoidanceTable &CAT);
@@ -120,12 +117,10 @@ public:
     std::multiset<double> focalF;
     double focalW;
     bool secondPhase;
-    double maxFocalF;
     std::unordered_map<std::pair<Node, Node>, int, NodePairHash>* perfectHeuristic = nullptr;
     int goalG;
-    std::set<int> goalTimes;
     //std::unordered_map<int, std::set<int>> nodeTimes;
     //need to define open, close;
 };
 
-#endif // FOCALLPASTAR_H
+#endif // FOCALLPASTAR_H*/

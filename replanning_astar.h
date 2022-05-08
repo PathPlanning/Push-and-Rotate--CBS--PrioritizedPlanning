@@ -1,5 +1,6 @@
-#ifndef ISEARCH_H
-#define ISEARCH_H
+#ifndef REPLANNINGASTAR_H
+#define REPLANNINGASTAR_H
+
 #include "ilogger.h"
 #include "searchresult.h"
 #include "constraint.h"
@@ -7,6 +8,8 @@
 #include "conflict_avoidance_table.h"
 #include "search_queue.h"
 #include "zero_scipp_node.h"
+#include "replanning_astar_node.h"
+#include "replanning_fs_node.h"
 #include <list>
 #include <vector>
 #include <math.h>
@@ -17,17 +20,18 @@
 #include <algorithm>
 #include <unordered_set>
 #include <queue>
+#include <cassert>
 
 template <typename NodeType = Node>
-class ISearch
+class ReplanningAStar
 {
     public:
-        ISearch(bool WithTime = false);
+        ReplanningAStar(bool WithTime = false);
         //virtual ~ISearch(void);
-        ISearch(ISearch& other) = default;
-        ISearch& operator=(ISearch& other) = default;
-        ISearch(ISearch&& other) = default;
-        ISearch& operator=(ISearch&& other) = default;
+        ReplanningAStar(ReplanningAStar& other) = default;
+        ReplanningAStar& operator=(ReplanningAStar& other) = default;
+        ReplanningAStar(ReplanningAStar&& other) = default;
+        ReplanningAStar& operator=(ReplanningAStar&& other) = default;
         SearchResult startSearch(const Map &map, const AgentSet &agentSet,
                                  int start_i, int start_j, int goal_i = 0, int goal_j = 0,
                                  bool (*isGoal)(const Node&, const Node&, const Map&, const AgentSet&) = nullptr,
@@ -49,11 +53,11 @@ class ISearch
         //static int convolution(int i, int j, const Map &map, int time = 0, bool withTime = false);
 
         // void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
-        virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) {return 0;}
+        virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j);
 
         virtual void updateFocalW(double FocalW, const Map &map) {};
 
-        virtual int getSize() {return open.size() + close.size();};
+        virtual int getSize() {return sortByIndex.size();};
 
         static int T;
         static int P;
@@ -81,7 +85,7 @@ class ISearch
 
         virtual void makePrimaryPath(Node &curNode, int endTime);//Makes path using back pointers
         virtual void makeSecondaryPath(const Map &map);//Makes another type of path(sections or points)
-        virtual void setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
+        //virtual void setEndTime(NodeType& node, int start_i, int start_j, int startTime, int agentId, const ConstraintsSet &constraints);
         virtual void setHC(NodeType &neigh, const NodeType &cur,
                            const ConflictAvoidanceTable &CAT, bool isGoal) {}
         virtual void createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
@@ -95,28 +99,64 @@ class ISearch
         virtual int getFocalSize() { return 0; }
         virtual NodeType getCur(const Map& map);
         virtual void removeCur(const NodeType& cur, const Map& map);
+        virtual void removeUnexpandedNode(const NodeType& node);
         virtual void subtractFutureConflicts(NodeType &node) {}
-        virtual bool updateFocal(const NodeType& neigh, const Map& map);
         virtual double getMinFocalF();
         virtual void clearLists();
-        void processConstraint(const Constraint& contraint, const Map &map,
+        virtual std::list<NodeType> findPredecessors(const NodeType &curNode, const Map &map, int goal_i = 0, int goal_j = 0, int agentId = -1,
+            const std::unordered_set<Node, NodeHash> &occupiedNodes =
+                  std::unordered_set<Node, NodeHash>(),
+            const ConstraintsSet &constraints = ConstraintsSet(),
+            bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
+        void fillParents(NodeType &node, const Map &map,
+            int goal_i, int goal_j, int agentId,
+            const std::unordered_set<Node, NodeHash> &occupiedNodes,
+            const ConstraintsSet &constraints,
+            bool withCAT, const ConflictAvoidanceTable &CAT);
+        NodeType* getBestParentPtr(NodeType &node, const Map &map,
+            int goal_i, int goal_j, int agentId,
+            const std::unordered_set<Node, NodeHash> &occupiedNodes,
+            const ConstraintsSet &constraints,
+            bool withCAT, const ConflictAvoidanceTable &CAT);
+        virtual void updateNode(NodeType &node, const Map &map,
+            int goal_i, int goal_j, int agentId,
+            const std::unordered_set<Node, NodeHash> &occupiedNodes,
+            const ConstraintsSet &constraints,
+            bool withCAT, const ConflictAvoidanceTable &CAT,
+            std::queue<NodeType>& queue, std::unordered_set<int>& addedNodesConv);
+        virtual void processConstraint(const Constraint& constraint, const Map &map,
             int start_i, int start_j, int goal_i, int goal_j, int agentId,
             const std::unordered_set<Node, NodeHash> &occupiedNodes,
             const ConstraintsSet &constraints,
-            bool withCAT, const ConflictAvoidanceTable &CAT) { return; };
+            bool withCAT, const ConflictAvoidanceTable &CAT);
+        virtual int getPredConflictsCount(
+            const NodeType& node, const NodeType& pred,
+            const ConflictAvoidanceTable& CAT) const;
+        void setPerfectHeuristic(std::unordered_map<std::pair<Node, Node>, int, NodePairHash>* PerfectHeuristic) {
+            perfectHeuristic = PerfectHeuristic;
+        }
+
+        double manhattanDistance(int x1, int y1, int x2, int y2);
+        double metric(int x1, int y1, int x2, int y2);
 
         SearchResult                        sresult;
         std::list<Node>                     lppath, hppath;
         double                              hweight;//weight of h-value
         bool                                breakingties;//flag that sets the priority of nodes in addOpen function when their F-values is equal
-        SearchQueue<NodeType>               open;
-        std::unordered_map<int, NodeType>   close;
+        std::set<NodeType>                  open;
+        std::unordered_map<int, NodeType>   sortByIndex;
+        std::unordered_multiset<int>        closeConv;
         bool                                withTime;
+        std::unordered_map<std::pair<Node, Node>, int, NodePairHash>* perfectHeuristic = nullptr;
+        int                                 goalG = -1;
+        int                                 goalI = -1;
+        int                                 goalJ = -1;
+        //std::unordered_set<int>             removedConvs;
+        //std::unordered_map<int, int>        predsCount;
         //need to define open, close;
 
         virtual void checkFocal() {return;};
         virtual void addTime(int time) {return;};
 };
 
-
-#endif
+#endif // REPLANNINGASTAR_H

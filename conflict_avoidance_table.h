@@ -24,6 +24,7 @@ public:
     void getSoftConflictIntervals(std::vector<std::pair<int, int>> &res, const Node & node, const Node &prevNode,
                                                           int startTime, int endTime, bool binary) const;
     int getEdgeAgentsCount(const Node &node, const Node &prev) const;
+    int getNodeAgentsCount(const Node &node) const;
     void addGoalNode(const Node &node);
     void removeGoalNode(const Node &node);
 

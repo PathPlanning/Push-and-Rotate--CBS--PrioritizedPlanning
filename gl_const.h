@@ -47,6 +47,9 @@
         #define CNS_TAG_WEIGHT      "weight"
         #define CNS_TAG_SFO         "gen_subopt_from_opt"
         #define CNS_TAG_RC          "use_cat_at_root"
+        #define CNS_TAG_RFS         "restart_frequency"
+        #define CNS_TAG_LL_RFS      "low_level_restart_frequency"
+        #define CNS_TAG_CIC         "cut_irrelevant_conflicts"
         #define CNS_TAG_AR          "aggregated_results"
         #define CNS_TAG_LOW_LEVEL   "low_level"
         #define CNS_TAG_PP_ORDER    "pp_order"
@@ -139,6 +142,8 @@
         #define CNS_SP_ST_ZSCIPP        "zero_scipp"
         #define CNS_SP_ST_SCIPP         "scipp"
         #define CNS_SP_ST_FLPASTAR      "focal_lpastar"
+        #define CNS_SP_ST_RASTAR        "replanning_astar"
+        #define CNS_SP_ST_RFS           "replanning_focal_search"
 
         #define CN_SP_ST_ASTAR          0
         #define CN_SP_ST_TIME_ASTAR     1
@@ -146,7 +151,9 @@
         #define CN_SP_ST_SIPP           3
         #define CN_SP_ST_ZSCIPP         4
         #define CN_SP_ST_SCIPP          5
-        #define CN_SP_ST_FLPASTAR      6
+        #define CN_SP_ST_FLPASTAR       6
+        #define CN_SP_ST_RASTAR         7
+        #define CN_SP_ST_RFS            8
 
 
     #define CN_SP_AD 1 //AllowDiagonal

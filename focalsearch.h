@@ -16,6 +16,7 @@ public:
     virtual ~FocalSearch() {}
     virtual void updateFocalW(double newFocalW, const Map& map) override;
     virtual int getSize() override {return this->open.size() + this->close.size() + focal.size();};
+    void clearLists() override;
 
     static int Time;
 
@@ -25,7 +26,6 @@ protected:
     virtual void removeCur(const NodeType& cur, const Map& map) override;
     bool updateFocal(const NodeType& neigh, const Map& map) override;
     double getMinFocalF() override;
-    void clearLists() override;
     virtual void setHC(NodeType &neigh, const NodeType &cur,
                        const ConflictAvoidanceTable &CAT, bool isGoal) override;
     virtual int getFocalSize() override { return focal.size(); }

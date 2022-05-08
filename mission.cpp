@@ -5,6 +5,8 @@
 #include "gl_const.h"
 #include <iostream>
 #include <numeric>
+//#include <QElapsedTimer>
+#include <processthreadsapi.h>
 
 Mission::Mission()
 {
@@ -100,6 +102,10 @@ void Mission::createAlgorithm()
             multiagentSearch = new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW));
         } else if (config.lowLevel == CN_SP_ST_FLPASTAR) {
             multiagentSearch = new ConflictBasedSearch<FocalLPAStar<FLPANode>>(new FocalLPAStar<FLPANode>(config.focalW));
+        } else if (config.lowLevel == CN_SP_ST_RASTAR) {
+            multiagentSearch = new ConflictBasedSearch<ReplanningAStar<ReplanningAstarNode>>(new ReplanningAStar<ReplanningAstarNode>(true));
+        } else if (config.lowLevel == CN_SP_ST_RFS) {
+            multiagentSearch = new ConflictBasedSearch<ReplanningFocalSearch<ReplanningFSNode>>(new ReplanningFocalSearch<ReplanningFSNode>(true, config.focalW));
         }
     } else if (config.searchType == CN_ST_PP) {
         if (config.lowLevel == CN_SP_ST_ASTAR) {
@@ -122,6 +128,8 @@ void Mission::createAlgorithm()
             multiagentSearch = new AnytimeCBS<FocalSearch<>>(new ConflictBasedSearch<FocalSearch<>>(new FocalSearch<>(true, config.focalW)));
         } else if (config.lowLevel == CN_SP_ST_SCIPP) {
             multiagentSearch = new AnytimeCBS<SCIPP<>>(new ConflictBasedSearch<SCIPP<>>(new SCIPP<>(config.focalW)));
+        } else if (config.lowLevel == CN_SP_ST_RFS) {
+            multiagentSearch = new AnytimeCBS<ReplanningFocalSearch<>>(new ConflictBasedSearch<ReplanningFocalSearch<>>(new ReplanningFocalSearch<>(true, config.focalW)));
         }
     }
 }
@@ -158,6 +166,20 @@ bool Mission::checkAgentsCorrectness(const std::string &agentsFile) {
     return true;
 }
 
+double get_cpu_time(){
+    FILETIME a,b,c,d;
+    if (GetProcessTimes(GetCurrentProcess(),&a,&b,&c,&d) != 0){
+        //  Returns total user time.
+        //  Can be tweaked to include kernel times as well.
+        return
+            (double)(d.dwLowDateTime |
+            ((unsigned long long)d.dwHighDateTime << 32)) * 0.0000001;
+    }else{
+        //  Handle error
+        return 0;
+    }
+}
+
 void Mission::startSearch(const std::string &agentsFile)
 {
     int minAgents = config.singleExecution ? config.maxAgents : config.minAgents;
@@ -171,7 +193,29 @@ void Mission::startSearch(const std::string &agentsFile)
         }
 
         multiagentSearch->clear();
+
+        std::chrono::steady_clock::time_point chrono_begin = std::chrono::steady_clock::now();
+        std::clock_t c_start = std::clock();
+
+        //QElapsedTimer timer;
+        //timer.start();
+
+        double begin = get_cpu_time();
+
         sr = multiagentSearch->startSearch(map, config, curAgentSet);
+
+        //std::cout << "QElapsedTimer: " << timer.elapsed() << std::endl;
+
+        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        std::cout << "Chrono time: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - chrono_begin).count() << std::endl;
+
+        std::clock_t c_end = std::clock();
+        std::cout << "Clock time: " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << std::endl;
+
+        double end = get_cpu_time();
+        double elapsed = (end - begin);
+        std::cout << "GetProcessTimes: " << elapsed << std::endl;
+
         if (!sr.pathfound) {
             std::cout << "Failed to find solution for " << i << " agents" << std::endl;
             if (config.singleExecution) {

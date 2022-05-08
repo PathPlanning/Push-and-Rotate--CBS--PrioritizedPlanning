@@ -8,11 +8,12 @@
 struct Node
 {
     int     i, j; //grid cell coordinates
-    int  F, g, H; //f-, g- and h-values of the search node
+    int     g; //f-, g- and h-values of the search node
+    double  F, H;
     Node    *parent; //backpointer to the predecessor node (e.g. the node which g-value was used to set the g-velue of the current node)
     int     conflictsCount;
 
-    Node(int x = 0, int y = 0, Node *p = nullptr, int g_ = 0, int H_ = 0, int ConflictsCount = 0) {
+    Node(int x = 0, int y = 0, Node *p = nullptr, int g_ = 0, double H_ = 0, int ConflictsCount = 0) {
         i = x;
         j = y;
         parent = p;
@@ -30,7 +31,7 @@ struct Node
     }
     bool operator< (const Node &other) const {
         return std::tuple<int, int, int, int>(F, -g, i, j) <
-                std::tuple<int, int, int, int>(other.F, -other.g, other.i, other.j);
+            std::tuple<int, int, int, int>(other.F, -other.g, other.i, other.j);
     }
 
     virtual int convolution(int width, int height, bool withTime = false) const {

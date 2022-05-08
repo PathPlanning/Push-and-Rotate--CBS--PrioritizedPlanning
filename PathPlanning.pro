@@ -30,9 +30,12 @@ SOURCES += \
     constraints_set.cpp \
     focal_lpa_star.cpp \
     focalsearch.cpp \
+    lpa_star.cpp \
     mdd.cpp \
     prioritized_planning.cpp \
     push_and_rotate.cpp \
+    replanning_astar.cpp \
+    replanning_focal_search.cpp \
     scipp.cpp \
     search_queue.cpp \
     sipp.cpp \
@@ -63,11 +66,17 @@ HEADERS += \
     focal_lpa_star.h \
     focalsearch.h \
     fs_node.h \
+    lpa_node.h \
+    lpa_star.h \
     mdd.h \
     multiagent_search_interface.h \
     multiagent_search_result.h \
     prioritized_planning.h \
     push_and_rotate.h \
+    replanning_astar.h \
+    replanning_astar_node.h \
+    replanning_focal_search.h \
+    replanning_fs_node.h \
     scipp.h \
     scipp_node.h \
     search_queue.h \

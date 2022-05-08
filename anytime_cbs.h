@@ -18,6 +18,7 @@ private:
         ConflictAvoidanceTable &CAT, ConflictSet &conflictSet,
         std::vector<MDD> &mdds, std::vector<double> &lb,
         std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
+        std::list<CBSNode<SearchType>>& open,
         CBSNode<SearchType>* node, double focalW,
         std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
         int globalTimeLimit = -1);
@@ -29,6 +30,7 @@ public:
         std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
         int globalTimeLimit = -1) override;
     void setChildren(std::list<CBSNode<SearchType>>& nodeSet);
+    void setRemoveSubtree(CBSNode<SearchType>* root);
 
     void clear() override;
 };

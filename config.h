@@ -31,11 +31,15 @@ class Config
         bool            withBypassing = false;
         bool            withMatchingHeuristic = false;
         bool            storeConflicts = false;
-        bool            withDisjointSplitting;
+        bool            withDisjointSplitting = false;
         bool            withFocalSearch = false;
         bool            genSuboptFromOpt = false;
         bool            saveAggregatedResults = true;
         bool            useCatAtRoot = true;
+        int             restartFrequency = 1000;
+        int             lowLevelRestartFrequency = 10000000;
+        bool            withReplanning = false;
+        bool            cutIrrelevantConflicts = false;
         double          focalW = 1.0;
         int             agentsStep = 1;
 

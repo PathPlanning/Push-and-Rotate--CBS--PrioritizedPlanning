@@ -29,8 +29,10 @@ struct CBSNode
     bool                                        hasPositiveConstraint;
     bool                                        pathFound;
     Conflict                                    conflict;
+    Conflict                                    newConflict;
     std::shared_ptr<SearchType>                 search;
     std::vector<CBSNode*>                       children;
+    bool                                        remove = false;
 
     CBSNode(CBSNode *p = nullptr, int Cost = 0) {
         parent = p;
@@ -41,6 +43,7 @@ struct CBSNode
         pathFound = true;
         hc = 0;
         sumLb = 0;
+        remove = false;
     }
 
     CBSNode(bool PathFound) {

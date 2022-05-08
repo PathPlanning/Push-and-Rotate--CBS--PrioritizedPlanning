@@ -21,6 +21,7 @@
 #include "multiagent_search_interface.h"
 #include "testing_results.h"
 #include "focal_lpa_star.h"
+#include "replanning_astar.h"
 #include <algorithm>
 
 //That's the wrap up class that first creates all the needed objects (Map, Search etc.)

@@ -12,6 +12,8 @@
 #include "mdd.h"
 #include "conflict_set.h"
 #include "focal_lpa_star.h"
+#include "replanning_astar.h"
+#include "replanning_focal_search.h"
 #include <numeric>
 
 template <typename SearchType = Astar<>>
@@ -37,6 +39,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
 
         SearchType*                     search;
         std::vector<SearchType>         rootSearches;
+        int                             bestKnownCost = CN_INFINITY;
 
         void createNode(const Map &map, const AgentSet &agentSet, const Config &config,
             const Conflict &conflict, std::vector<int> &costs,
@@ -49,7 +52,7 @@ class ConflictBasedSearch : public MultiagentSearchInterface
             std::vector<int> &LLExpansions, std::vector<int> &LLNodes,
             CBSNode<SearchType> *parentPtr,
             CBSNode<SearchType> &node,
-            SearchType *search, bool updateNode,
+            SearchType *search, bool updateNode, bool forceRestart,
             std::chrono::steady_clock::time_point globalBegin = std::chrono::steady_clock::time_point(),
             int globalTimeLimit = -1);
 

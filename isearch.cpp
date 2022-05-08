@@ -37,8 +37,8 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
 
     if (withCAT && freshStart) {
         open = SearchQueue<NodeType>([](const NodeType &lhs, const NodeType &rhs) {
-            return std::tuple<int, int, int, int, int>(lhs.F, lhs.conflictsCount, -lhs.g, lhs.i, lhs.j) <
-                    std::tuple<int, int, int, int, int>(rhs.F, rhs.conflictsCount, -rhs.g, rhs.i, rhs.j);
+            return std::tuple<double, int, int, int, int>(lhs.F, lhs.conflictsCount, -lhs.g, lhs.i, lhs.j) <
+                    std::tuple<double, int, int, int, int>(rhs.F, rhs.conflictsCount, -rhs.g, rhs.i, rhs.j);
         });
     }
 
@@ -108,12 +108,16 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
         }
     }
 
+    //std::cout << agentId << " " << sresult.numberofsteps << std::endl;
+
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 
     sresult.time = static_cast<double>(elapsedMilliseconds) / 1000;
     sresult.nodescreated = open.size() + close.size() + getFocalSize();
     sresult.nodesexpanded = close.size();
+
+    //std::cout << agentId << " " << sresult.nodesexpanded << std::endl;
 
     if (sresult.pathfound) {
         sresult.pathlength = cur.g;

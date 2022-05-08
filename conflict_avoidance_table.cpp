@@ -90,6 +90,19 @@ int ConflictAvoidanceTable::getAgentsCount(const Node &node, const Node &prev) c
     return res;
 }
 
+int ConflictAvoidanceTable::getNodeAgentsCount(const Node &node) const {
+    int res = 0;
+    auto nodeTuple = std::make_tuple(node.i, node.j, node.g);
+    if (nodeAgentsCount.find(nodeTuple) != nodeAgentsCount.end()) {
+        res += nodeAgentsCount.at(nodeTuple);
+    }
+    auto it = goalNodeAgentsCount.find(std::make_pair(node.i, node.j));
+    if (it != goalNodeAgentsCount.end() && it->second <= node.g) {
+        ++res;
+    }
+    return res;
+}
+
 int ConflictAvoidanceTable::getEdgeAgentsCount(const Node &node, const Node &prev) const {
     auto edgeTuple = std::make_tuple(node.i, node.j, prev.i, prev.j, node.g);
     if (edgeAgentsCount.find(edgeTuple) != edgeAgentsCount.end()) {

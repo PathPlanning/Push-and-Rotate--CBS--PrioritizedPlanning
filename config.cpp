@@ -41,6 +41,12 @@ bool Config::getConfig(const char *FileName)
         return false;
     }
 
+    for (tinyxml2::XMLElement* child = options->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
+    {
+        auto name = child->Name();
+        std::cout << name << std::endl;
+    }
+
     LogParams = new std::string[3];
     LogParams[CN_LP_PATH] = "";
     LogParams[CN_LP_NAME] = "";
@@ -141,15 +147,25 @@ bool Config::getConfig(const char *FileName)
         lowLevel = CN_SP_ST_SCIPP;
     } else if (lowLevelSearch == CNS_SP_ST_FLPASTAR) {
         lowLevel = CN_SP_ST_FLPASTAR;
+    } else if (lowLevelSearch == CNS_SP_ST_RASTAR) {
+        lowLevel = CN_SP_ST_RASTAR;
+    } else if (lowLevelSearch == CNS_SP_ST_RFS) {
+        lowLevel = CN_SP_ST_RFS;
     } else {
         std::cout << "Error! Low level search '" << lowLevelSearch << "' is unknown." << std::endl;
         return false;
     }
 
-    if (searchType == CN_ST_CBS && !withFocalSearch && lowLevel != CN_SP_ST_ASTAR && lowLevel != CN_SP_ST_SIPP) {
+    if (searchType == CN_ST_CBS && !withFocalSearch &&
+        lowLevel != CN_SP_ST_ASTAR && lowLevel != CN_SP_ST_SIPP &&
+        lowLevel != CN_SP_ST_FLPASTAR && lowLevel != CN_SP_ST_RASTAR &&
+        lowLevel != CN_SP_ST_RFS)
+    {
         std::cout << "Warning! Specified low level search can not be used in this algorithm. Using A* instead." << std::endl;
         lowLevel = CN_SP_ST_ASTAR;
     }
+
+    withReplanning = (lowLevel == CN_SP_ST_FLPASTAR || lowLevel == CN_SP_ST_RASTAR || lowLevel == CN_SP_ST_RFS);
 
     getValueFromText(algorithm, CNS_TAG_WITH_CAT, "bool", &withCAT);
     getValueFromText(algorithm, CNS_TAG_WITH_PH, "bool", &withPerfectHeuristic);
@@ -163,6 +179,9 @@ bool Config::getConfig(const char *FileName)
     getValueFromText(algorithm, CNS_TAG_FOCAL_W, "double", &focalW);
     getValueFromText(algorithm, CNS_TAG_SFO, "bool", &genSuboptFromOpt);
     getValueFromText(algorithm, CNS_TAG_RC, "bool", &useCatAtRoot);
+    getValueFromText(algorithm, CNS_TAG_RFS, "int", &restartFrequency);
+    getValueFromText(algorithm, CNS_TAG_LL_RFS, "int", &lowLevelRestartFrequency);
+    getValueFromText(algorithm, CNS_TAG_CIC, "bool", &cutIrrelevantConflicts);
 
     parallelizePaths1 = parallelizePaths1 || parallelizePaths2;
     storeConflicts = withFocalSearch || withBypassing || withMatchingHeuristic || withDisjointSplitting;
@@ -171,12 +190,16 @@ bool Config::getConfig(const char *FileName)
 }
 
 bool Config::getValueFromText(tinyxml2::XMLElement *elem, const char *name, const char *typeName, void *field) {
-    tinyxml2::XMLElement *child;
-    child = elem->FirstChildElement(name);
+    auto elemName = elem->Name();
+
+    //tinyxml2::XMLElement *child;
+    auto child = elem->FirstChildElement(name);
     if (!child) {
         std::cout << "Warning! No '" << name << "' tag found in XML file! Using deafult value." << std::endl;
         return false;
     }
+
+    auto childText = child->GetText();
 
     tinyxml2::XMLError res;
     if (typeName == "int") {

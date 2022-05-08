@@ -45,18 +45,25 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
         });
     }*/
 
-    if (freshStart && sortByIndex.empty()) {
+    bool debug = agentId == 33 && this->lppath.size() == 19;
+
+    if (freshStart) {
         clearLists();
         sresult.numberofsteps = 0;
         cur = NodeType(start_i, start_j, nullptr, CN_INFINITY,
-                 computeHFromCellToCell(start_i, start_j, goal_i, goal_j));
+                 computeHFromCellToCellNew(start_i, start_i, start_i, start_j, goal_i, goal_j));
         cur.time = startTime;
         //setEndTime(cur, start_i, start_j, startTime, agentId, constraints);
         addStartNode(cur, map, CAT);
         addSuboptimalNode(cur, map, CAT);
         goalG = CN_INFINITY;
         secondPhase = true;
+        maxFocalF = CN_INFINITY;
     }
+
+    FLPANode goalNode(goal_i, goal_j);
+
+    sresult.numberofsteps = 0;
 
     while(!checkOpenEmpty()) {
         ++sresult.numberofsteps;
@@ -68,7 +75,36 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
             }
         }
 
+        auto it = sortByIndex.find(19280);
+        if (it != sortByIndex.end()) {
+            auto val = it->second;
+            int t = 0;
+            ++t;
+        }
+
+        if (sresult.numberofsteps == 10576) {
+            int t = 0;
+            ++t;
+        }
+
         cur = getCur(map);
+
+        for (int time : goalTimes) {
+            goalNode.time = time;
+            auto it = sortByIndex.find(goalNode.convolution(map.getMapWidth(), map.getMapHeight(), withTime));
+            if (it != sortByIndex.end() && it->second < cur &&
+                it->second.g == it->second.rhs && it->second.rhs != CN_INFINITY &&
+                !constraints.hasFutureConstraint(goal_i, goal_j, time, agentId))
+            {
+                goalG = it->second.g;
+                sresult.pathfound = true;
+                break;
+            }
+        }
+        if (sresult.pathfound) {
+            break;
+        }
+
         if (focal.size() == 8) {
             NodeType n1 = *focal.begin();
             NodeType n2 = *(std::next(focal.begin()));
@@ -77,10 +113,40 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
             }
         }
 
+        if (agentId == 11) {
+            int t = 0;
+            ++t;
+        }
+
+        if (agentId == 11 && cur.i == 31 && cur.j == 15 && cur.time == 12) {
+            int t = 0;
+            ++t;
+        }
+
+        if (agentId == 11 && cur.i == 21 && cur.j == 13 && cur.time == 26) {
+            int t = 0;
+            ++t;
+        }
+
+        if (cur.parent == nullptr && (cur.i != start_i || cur.j != start_j)) {
+            int t = 0;
+            ++t;
+        }
+
         //removeCur(cur, map);
 
+        /*if (debug) {
+            std::cout << cur.i << " " << cur.j << " " << cur.g << std::endl;
+
+            if (cur.i == 12 && cur.j == 11 && cur.g == 1000000000) {
+                int t = 0;
+                ++t;
+            }
+
+        }*/
+
         if (maxTime == -1 || cur.g < maxTime) {
-            std::list<NodeType> successors = findSuccessors(cur, map,
+            std::list<NodeType> successors = findSuccessors(cur, map, start_i, start_j,
                 goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
 
             bool updateSuccessors = true;
@@ -88,7 +154,7 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
             if (cur.g > cur.rhs) {
                 cur.g = cur.rhs;
                 sortByIndex[cur.convolution(map.getMapWidth(), map.getMapHeight(), withTime)].g = cur.rhs;
-                focalF.erase(cur.F);
+                focalF.erase(focalF.find(cur.F));
                 focal.erase(cur);
                 secondPhase = true;
             } else {
@@ -108,6 +174,7 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
             if (cur.i == goal_i && cur.j == goal_j &&
                 !constraints.hasFutureConstraint(cur.i, cur.j, cur.time, agentId))
             {
+                goalTimes.insert(cur.time);
                 goalG = cur.rhs;
                 if (cur.rhs != CN_INFINITY) {
                     sresult.pathfound = true;
@@ -122,6 +189,8 @@ SearchResult FocalLPAStar<NodeType>::startSearch(const Map &map, const AgentSet 
             }
         }
     }
+
+    std::cout << agentId << " " << sresult.numberofsteps << std::endl;
 
     /*if (agentId == 9) {
         if (sortByIndex.find(2600) != sortByIndex.end() && sortByIndex[2600].hc > 0) {
@@ -171,6 +240,7 @@ double FocalLPAStar<NodeType>::manhattanDistance(int x1, int y1, int x2, int y2)
 template<typename NodeType>
 double FocalLPAStar<NodeType>::metric(int x1, int y1, int x2, int y2) {
     return manhattanDistance(x1, y1, x2, y2);
+    //return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 template<typename NodeType>
@@ -183,6 +253,19 @@ double FocalLPAStar<NodeType>::computeHFromCellToCell(int i1, int j1, int i2, in
         }
     }
     return metric(i1, j1, i2, j2) * this->hweight;
+}
+
+template<typename NodeType>
+double FocalLPAStar<NodeType>::computeHFromCellToCellNew(int starti, int startj, int i1, int j1, int i2, int j2)
+{
+    if (this->perfectHeuristic != nullptr) {
+        auto it = this->perfectHeuristic->find(std::make_pair(NodeType(i1, j1), NodeType(i2, j2)));
+        if (it != this->perfectHeuristic->end()) {
+            return it->second;
+        }
+    }
+    return metric(i1, j1, i2, j2) * this->hweight;
+        //0.001 / (std::min(std::abs(i1 - starti), std::abs(j1 - j2)) + 1);
 }
 
 int addWithInfinityCheck(int lhs, int rhs)
@@ -205,8 +288,8 @@ void FocalLPAStar<NodeType>::updateNode(NodeType &node, const Map &map, const No
     auto it = sortByIndex.find(conv);
 
     if (it == sortByIndex.end()) {
-        bestG = prevNode.g + 1;
-        bestHC = prevNode.hc + CAT.getAgentsCount(node, prevNode);
+        bestG = addWithInfinityCheck(prevNode.g, 1);
+        bestHC = addWithInfinityCheck(prevNode.hc, CAT.getAgentsCount(node, prevNode));
         //nodeTimes[node.convolution(map.getMapWidth(), map.getMapHeight(), false)].insert(node.time);
     } else {
         if (!ignorePreds) {
@@ -217,8 +300,8 @@ void FocalLPAStar<NodeType>::updateNode(NodeType &node, const Map &map, const No
                 int prevConv = pred.convolution(map.getMapWidth(), map.getMapHeight(), withTime);
                 auto prevIt = sortByIndex.find(prevConv);
                 if (prevIt != sortByIndex.end() && prevIt->second.g < bestG) {
-                    bestG = prevIt->second.g + 1;
-                    bestHC = prevIt->second.hc + CAT.getAgentsCount(node, pred);
+                    bestG = addWithInfinityCheck(prevIt->second.g, 1);
+                    bestHC = addWithInfinityCheck(prevIt->second.hc, CAT.getAgentsCount(node, pred));
                 }
             }
         }
@@ -226,7 +309,7 @@ void FocalLPAStar<NodeType>::updateNode(NodeType &node, const Map &map, const No
         curG = it->second.g;
         curHC = it->second.hc;
         if (focal.find(it->second) != focal.end()) {
-            focalF.erase(it->second.F);
+            focalF.erase(focalF.find(it->second.F));
             focal.erase(it->second);
         } if (open.find(it->second) != open.end()) {
             open.erase(it->second);
@@ -249,7 +332,7 @@ void FocalLPAStar<NodeType>::updateNode(NodeType &node, const Map &map, const No
 
 template<typename NodeType>
 void FocalLPAStar<NodeType>::processConstraint(const Constraint& constraint, const Map &map,
-    int goal_i, int goal_j, int agentId,
+    int start_i, int start_j, int goal_i, int goal_j, int agentId,
     const std::unordered_set<Node, NodeHash> &occupiedNodes,
     const ConstraintsSet &constraints,
     bool withCAT, const ConflictAvoidanceTable &CAT)
@@ -260,13 +343,28 @@ void FocalLPAStar<NodeType>::processConstraint(const Constraint& constraint, con
     secondPhase = false;
 
     NodeType node(constraint.i, constraint.j, nullptr, constraint.time,
-        computeHFromCellToCell(constraint.i, constraint.j, goal_i, goal_j));
-    node.time = constraint.time;
+        computeHFromCellToCellNew(start_i, start_j, constraint.i, constraint.j, goal_i, goal_j));
+
+    std::vector<int> times;
 
     updateNode(node, map, node, goal_i, goal_j, agentId, occupiedNodes,
         constraints, withCAT, CAT, constraint.prev_i == -1);
+
+    if (!focalF.empty() && !this->open.empty() && open.begin()->F < *focalF.begin()) {
+        auto it = focal.begin();
+        while (it != focal.end()) {
+            if (it->F > open.begin()->F * focalW) {
+                open.insert(*it);
+                focalF.erase(focalF.find(it->F));
+                it = focal.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
     if (constraint.prev_i == -1) {
-        std::list<NodeType> successors = findSuccessors(node, map,
+        std::list<NodeType> successors = findSuccessors(node, map, start_i, start_j,
             goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
         for (auto& neigh : successors) {
             updateNode(neigh, map, node, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
@@ -276,7 +374,7 @@ void FocalLPAStar<NodeType>::processConstraint(const Constraint& constraint, con
 
 template<typename NodeType>
 std::list<NodeType> FocalLPAStar<NodeType>::findSuccessors(const NodeType &curNode, const Map &map,
-                                        int goal_i, int goal_j, int agentId,
+                                        int start_i, int start_j, int goal_i, int goal_j, int agentId,
                                         const std::unordered_set<Node, NodeHash> &occupiedNodes,
                                         const ConstraintsSet &constraints,
                                         bool withCAT, const ConflictAvoidanceTable &CAT)
@@ -287,7 +385,7 @@ std::list<NodeType> FocalLPAStar<NodeType>::findSuccessors(const NodeType &curNo
             int newi = curNode.i + di, newj = curNode.j + dj;
             if ((di == 0 || dj == 0) && (canStay() || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
                     map.CellIsTraversable(newi, newj, occupiedNodes)) {
-                int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
+                double newh = computeHFromCellToCellNew(start_i, start_j, newi, newj, goal_i, goal_j);
                 NodeType neigh(newi, newj, nullptr, addWithInfinityCheck(curNode.g, 1), newh);
                 //neigh.conflictsCount = CAT.getAgentsCount(neigh, curNode);
                 neigh.time = curNode.time + 1;
@@ -430,6 +528,11 @@ void FocalLPAStar<NodeType>::fillParents(NodeType &node, const Map &map,
         return;
     }
 
+    if (agentId == 11 && node.i == 25 && node.j == 15) {
+        int t = 0;
+        ++t;
+    }
+
     auto predecessors = findPredecessors(node, map, goal_i, goal_j, agentId, occupiedNodes,
         constraints, withCAT, CAT);
     NodeType* bestPtr;
@@ -437,8 +540,16 @@ void FocalLPAStar<NodeType>::fillParents(NodeType &node, const Map &map,
     for (auto& pred : predecessors) {
         int prevConv = pred.convolution(map.getMapWidth(), map.getMapHeight(), withTime);
         auto it = sortByIndex.find(prevConv);
+
+        if (it != sortByIndex.end()) {
+            auto& val = it->second;
+            int t = 0;
+            ++t;
+        }
+
         if (it != sortByIndex.end() && it->second.g + 1 == node.g) {
-            int newHC = it->second.hc + CAT.getAgentsCount(node, pred);
+            int newHC = std::max(it->second.hc, CAT.getNodeAgentsCount(it->second)) +
+                CAT.getAgentsCount(node, pred);
             if (newHC < bestHC) {
                 bestHC = newHC;
                 bestPtr = &it->second;

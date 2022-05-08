@@ -3,7 +3,7 @@
 template<typename NodeType>
 Astar<NodeType>::Astar(bool WithTime, double HW, bool BT)
 {
-    this->hweight = HW;
+    this->hweight = 1;
     this->breakingties = BT;
     this->withTime = WithTime;
 }
