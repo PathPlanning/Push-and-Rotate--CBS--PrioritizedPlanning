@@ -148,6 +148,7 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
                                       const std::vector<std::vector<Node>>& agentsPaths,
                                       const std::string &agentsFile, double time,
                                       double makespan, double flowtime,
+                                      int HLExpansionsStart, int HLNodesStart,
                                       int HLExpansions, int HLNodes,
                                       double LLExpansions, double LLNodes) {
     XMLElement *log = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG);
@@ -163,6 +164,8 @@ void XmlLogger::writeToLogAgentsPaths(const AgentSet& agentSet,
     summaryElement->SetAttribute(CNS_TAG_ATTR_FLOWTIME, flowtime);
     summaryElement->SetAttribute(CNS_TAG_ATTR_HLE, HLExpansions);
     summaryElement->SetAttribute(CNS_TAG_ATTR_HLN, HLNodes);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_HLES, HLExpansionsStart);
+    summaryElement->SetAttribute(CNS_TAG_ATTR_HLNS, HLNodesStart);
     summaryElement->SetAttribute(CNS_TAG_ATTR_LLE, LLExpansions);
     summaryElement->SetAttribute(CNS_TAG_ATTR_LLN, LLNodes);
     log->InsertEndChild(summaryElement);
@@ -209,6 +212,10 @@ void XmlLogger::writeToLogAggregatedResults(std::map<int, int>& successCount,
         result->SetAttribute(CNS_TAG_ATTR_COUNT, pair.first);
         result->SetAttribute(CNS_TAG_ATTR_SC, pair.second);
         result->SetAttribute(CNS_TAG_ATTR_TN, res.finalTotalNodes[pair.first]);
+        result->SetAttribute(CNS_TAG_ATTR_FHLN, res.finalHLNodes[pair.first]);
+        result->SetAttribute(CNS_TAG_ATTR_FHLE, res.finalHLExpansions[pair.first]);
+        result->SetAttribute(CNS_TAG_ATTR_FHLNS, res.finalHLNodesStart[pair.first]);
+        result->SetAttribute(CNS_TAG_ATTR_FHLES, res.finalHLExpansionsStart[pair.first]);
         for (int i = 0; i < res.data[CNS_TAG_FOCAL_W][pair.first].size(); ++i) {
             XMLElement *iteration = doc.NewElement(CNS_TAG_ITERATION);
             for (auto key : keys) {

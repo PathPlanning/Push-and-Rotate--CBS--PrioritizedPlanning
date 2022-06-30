@@ -295,6 +295,10 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
     CBSNode<SearchType> root;
     int agentCount = agentSet.getAgentCount();
     MultiagentSearchResult result(false);
+    result.HLNodesStart = {double(open.size() + close.size() + focal.size())};
+    result.HLExpansionsStart = {double(close.size())};
+    result.HLNodes = result.HLNodesStart;
+    result.HLExpansions = result.HLExpansionsStart;
 
     if (open.empty() && focal.empty()) {
         std::vector<std::list<Node>::iterator> starts(agentCount), ends(agentCount);
@@ -396,6 +400,8 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         ++t;
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
+            result.HLExpansions = {double(close.size())};
+            result.HLNodes = {double(open.size() + close.size() + focal.size())};
             result.pathfound = false;
             break;
         }
@@ -403,6 +409,8 @@ MultiagentSearchResult ConflictBasedSearch<SearchType>::startSearch(const Map &m
         if (globalTimeLimit != -1 &&
             std::chrono::duration_cast<std::chrono::milliseconds>(now - globalBegin).count() > config.maxTime)
         {
+            result.HLExpansions = {double(close.size())};
+            result.HLNodes = {double(open.size() + close.size() + focal.size())};
             result.pathfound = false;
             return result;
         }

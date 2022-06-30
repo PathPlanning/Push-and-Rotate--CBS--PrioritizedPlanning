@@ -57,6 +57,7 @@ void SIPP<NodeType>::createNeighborsByEdges(const NodeType &cur, NodeType &neigh
     setNeighG(cur, neigh, agentId, constraints);
     if (neigh.g <= cur.endTime + 1 && neigh.g <= neigh.endTime) {
         neigh.F = neigh.g + neigh.H;
+        neigh.conflictsCount = CAT.getAgentsCount(neigh, cur);
         successors.push_back(neigh);
     }
 }

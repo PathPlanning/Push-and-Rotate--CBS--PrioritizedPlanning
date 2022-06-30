@@ -21,6 +21,7 @@ class ILogger
                                            const std::string &agentsFile, double time,
                                            double makespan, double flowtime,
                                            int HLExpansions, int HLNodes,
+                                           int HLExpansionsStart, int HLNodesStart,
                                            double LLExpansions, double LLNodes) = 0;
         virtual void writeToLogNotFound() = 0;
         virtual void writeToLogAggregatedResults(std::map<int, int>& successCount,

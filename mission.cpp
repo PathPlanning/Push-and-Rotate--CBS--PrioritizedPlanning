@@ -6,7 +6,7 @@
 #include <iostream>
 #include <numeric>
 //#include <QElapsedTimer>
-#include <processthreadsapi.h>
+//#include <processthreadsapi.h>
 
 Mission::Mission()
 {
@@ -122,6 +122,8 @@ void Mission::createAlgorithm()
             multiagentSearch = new AnytimeCBS<Astar<>>(new ConflictBasedSearch<Astar<>>(new Astar<>(true)));
         } else if (config.lowLevel == CN_SP_ST_SIPP) {
             multiagentSearch = new AnytimeCBS<SIPP<>>(new ConflictBasedSearch<SIPP<>>(new SIPP<>()));
+        } else if (config.lowLevel == CN_SP_ST_RASTAR) {
+            multiagentSearch = new AnytimeCBS<ReplanningAStar<ReplanningAstarNode>>(new ConflictBasedSearch<ReplanningAStar<ReplanningAstarNode>>(new ReplanningAStar<ReplanningAstarNode>()));
         }
     } else if (config.searchType == CN_ST_AECBS) {
         if (config.lowLevel == CN_SP_ST_FS) {
@@ -166,7 +168,7 @@ bool Mission::checkAgentsCorrectness(const std::string &agentsFile) {
     return true;
 }
 
-double get_cpu_time(){
+/*double get_cpu_time(){
     FILETIME a,b,c,d;
     if (GetProcessTimes(GetCurrentProcess(),&a,&b,&c,&d) != 0){
         //  Returns total user time.
@@ -178,7 +180,7 @@ double get_cpu_time(){
         //  Handle error
         return 0;
     }
-}
+}*/
 
 void Mission::startSearch(const std::string &agentsFile)
 {
@@ -200,7 +202,7 @@ void Mission::startSearch(const std::string &agentsFile)
         //QElapsedTimer timer;
         //timer.start();
 
-        double begin = get_cpu_time();
+        //double begin = get_cpu_time();
 
         sr = multiagentSearch->startSearch(map, config, curAgentSet);
 
@@ -212,9 +214,9 @@ void Mission::startSearch(const std::string &agentsFile)
         std::clock_t c_end = std::clock();
         std::cout << "Clock time: " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << std::endl;
 
-        double end = get_cpu_time();
-        double elapsed = (end - begin);
-        std::cout << "GetProcessTimes: " << elapsed << std::endl;
+        //double end = get_cpu_time();
+        //double elapsed = (end - begin);
+        //std::cout << "GetProcessTimes: " << elapsed << std::endl;
 
         if (!sr.pathfound) {
             std::cout << "Failed to find solution for " << i << " agents" << std::endl;
@@ -231,15 +233,23 @@ void Mission::startSearch(const std::string &agentsFile)
         res.data[CNS_TAG_ATTR_TIME][i] = sr.time;
         res.data[CNS_TAG_ATTR_HLE][i] = sr.HLExpansions;
         res.data[CNS_TAG_ATTR_HLN][i] = sr.HLNodes;
+        res.data[CNS_TAG_ATTR_HLES][i] = sr.HLExpansionsStart;
+        res.data[CNS_TAG_ATTR_HLN][i] = sr.HLNodes;
+        res.data[CNS_TAG_ATTR_HLNS][i] = sr.HLNodesStart;
         res.data[CNS_TAG_ATTR_LLE][i] = sr.AvgLLExpansions;
         res.data[CNS_TAG_ATTR_LLN][i] = sr.AvgLLNodes;
         res.data[CNS_TAG_FOCAL_W][i] = sr.focalW;
         res.data[CNS_TAG_ATTR_TN][i] = sr.totalNodes;
         res.finalTotalNodes[i] = sr.finalTotalNodes;
+        res.finalHLNodes[i] = sr.finalHLNodes;
+        res.finalHLNodesStart[i] = sr.finalHLNodesStart;
+        res.finalHLExpansions[i] = sr.finalHLExpansions;
+        res.finalHLExpansionsStart[i] = sr.finalHLExpansionsStart;
 
         if (config.singleExecution) {
             saveAgentsPathsToLog(agentsFile, sr.time.back(), sr.makespan.back(), sr.flowtime.back(),
                                  sr.HLExpansions.back(), sr.HLNodes.back(),
+                                 sr.HLExpansionsStart.back(), sr.HLNodesStart.back(),
                                  sr.AvgLLExpansions.back(), sr.AvgLLNodes.back());
         }
         if (!checkCorrectness()) {
@@ -358,14 +368,19 @@ void Mission::saveAggregatedResultsToLog() {
 void Mission::saveAgentsPathsToLog(const std::string &agentsFile, double time,
                                    double makespan, double flowtime,
                                    int HLExpansions, int HLNodes,
+                                   int HLExpansionsStart, int HLNodesStart,
                                    double LLExpansions, double LLNodes) {
     logger->writeToLogAgentsPaths(agentSet, agentsPaths, agentsFile, time, makespan, flowtime,
-                                  HLExpansions, HLNodes, LLExpansions, LLNodes);
+                                  HLExpansions, HLNodes, HLExpansionsStart, HLNodesStart, LLExpansions, LLNodes);
     logger->saveLog();
 }
 
 int Mission::getTasksCount() {
     return config.tasksCount;
+}
+
+int Mission::getFirstTask() {
+    return config.firstTask;
 }
 
 std::string Mission::getAgentsFile() {

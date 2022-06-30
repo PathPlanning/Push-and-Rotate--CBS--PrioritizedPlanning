@@ -65,7 +65,7 @@ void ReplanningFocalSearch<NodeType>::updateNode(NodeType &node, const Map &map,
     if (parent != nullptr) {
         int conflictsCount = CAT.getAgentsCount(node, *parent);
         int newHc = parent->hc + conflictsCount;
-        if (it->second.hc == newHc) {
+        if (it->second.hc == newHc) { // || it->second.F < getMinFocalF()) {
             return;
         } else {
             node.conflictsCount = conflictsCount;
@@ -94,9 +94,8 @@ void ReplanningFocalSearch<NodeType>::updateNode(NodeType &node, const Map &map,
         this->closeConv.erase(closeIt);
         if (node.i == goal_i && node.j == goal_j && node.g == this->goalG) {
             this->goalG = -1;
-        } else {
-            processSuccessors = true;
         }
+        processSuccessors = true;
     }
     this->sortByIndex.erase(it);
 
@@ -161,6 +160,20 @@ void ReplanningFocalSearch<NodeType>::removeUnexpandedNode(const NodeType& node)
 }
 
 template<typename NodeType>
+void ReplanningFocalSearch<NodeType>::filterFocalNodes(double minF) {
+    auto it = focal.begin();
+    while (it != focal.end()) {
+        if (it->F > minF * focalW) {
+            this->open.insert(*it);
+            focalF.erase(focalF.find(it->F));
+            it = focal.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+template<typename NodeType>
 void ReplanningFocalSearch<NodeType>::updateFocalW(double newFocalW, const Map& map) {
     focalW = newFocalW;
     if (focal.empty()) {
@@ -179,17 +192,23 @@ void ReplanningFocalSearch<NodeType>::updateFocalW(double newFocalW, const Map& 
     this->open.insert(byIndexIt->second);
     this->goalG = -1;
 
-    auto it = focal.begin();
-    while (it != focal.end()) {
-        if (it->F > minF * focalW) {
-            this->open.insert(*it);
-            focalF.erase(focalF.find(it->F));
-            it = focal.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    filterFocalNodes(minF);
 }
 
+template<typename NodeType>
+void ReplanningFocalSearch<NodeType>::checkMinFChange() {
+    if (focal.empty()) {
+        return;
+    }
+    double minF = *focalF.begin();
+    if (this->open.empty() || this->open.begin()->F >= minF) {
+        return;
+    }
+
+    //std::cout << "Q " << focal.size() << std::endl;
+
+    minF = this->open.begin()->F;
+    filterFocalNodes(minF);
+}
 
 template class ReplanningFocalSearch<ReplanningFSNode>;

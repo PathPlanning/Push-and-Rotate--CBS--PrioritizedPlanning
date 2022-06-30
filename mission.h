@@ -49,11 +49,13 @@ class Mission
         void printSearchResultsToConsole();
         void saveSearchResultsToLog();
         void saveAgentsPathsToLog(const std::string &agentsFile, double time, double makespan, double flowtime,
-                                  int HLExpansions, int HLNodes, double LLExpansions, double LLNodes);
+                                  int HLExpansions, int HLNodes, int HLExpansionsStart, int HLNodesStart,
+                                  double LLExpansions, double LLNodes);
         bool checkCorrectness();
         void saveAggregatedResultsToLog();
         void saveSeparateResultsToLog();
         std::pair<int, int> getCosts();
+        int getFirstTask();
         int getTasksCount();
         std::string getAgentsFile();
         bool getSingleExecution();

@@ -29,6 +29,10 @@ struct TestingResults {
 
     std::map<std::string, std::map<int, std::vector<double>>> data;
     std::map<int, int> finalTotalNodes;
+    std::map<int, int> finalHLNodes;
+    std::map<int, int> finalHLNodesStart;
+    std::map<int, int> finalHLExpansions;
+    std::map<int, int> finalHLExpansionsStart;
 };
 
 #endif // TESTING_RESULTS_H

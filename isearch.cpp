@@ -54,6 +54,11 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
 
     while(!checkOpenEmpty()) {
         ++sresult.numberofsteps;
+
+        /*if (sresult.numberofsteps > 3000) {
+            break;
+        }*/
+
         if (sresult.numberofsteps % 100000 == 0) {
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             int elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
@@ -71,6 +76,15 @@ SearchResult ISearch<NodeType>::startSearch(const Map &map, const AgentSet &agen
         }
 
         cur = getCur(map);
+
+        /*if (agentId == 21 && cur.i == 4 && cur.j == 11 && cur.g == 1) {
+            int t = 0;
+            ++t;
+        }
+
+        if (agentId == 42) {
+            std::cout << cur.i << " " << cur.j << " " << cur.g << std::endl;
+        }*/
 
         bool goalNode = false;
         if ((isGoal != nullptr && isGoal(NodeType(start_i, start_j), cur, map, agentSet)) ||

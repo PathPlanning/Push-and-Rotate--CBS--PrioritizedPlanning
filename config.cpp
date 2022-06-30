@@ -99,7 +99,7 @@ bool Config::getConfig(const char *FileName)
     getValueFromText(options, CNS_TAG_SINGLE_EX, "bool", &singleExecution);
     getValueFromText(options, CNS_TAG_AR, "bool", &saveAggregatedResults);
     getValueFromText(options, CNS_TAG_AGENTS_STEP, "int", &agentsStep);
-
+    getValueFromText(options, CNS_TAG_FIRST_TASK, "int", &firstTask);
 
     algorithm = getChild(root, CNS_TAG_ALG);
     if (!algorithm) {

@@ -26,6 +26,10 @@ public:
 
     void updateFocalW(double newFocalW, const Map& map) override;
 
+    void filterFocalNodes(double minF);
+
+    void checkMinFChange() override;
+
     static int Time;
 
 protected:

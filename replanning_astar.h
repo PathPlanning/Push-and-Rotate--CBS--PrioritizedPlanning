@@ -108,7 +108,7 @@ class ReplanningAStar
                   std::unordered_set<Node, NodeHash>(),
             const ConstraintsSet &constraints = ConstraintsSet(),
             bool withCAT = false, const ConflictAvoidanceTable &CAT = ConflictAvoidanceTable());
-        void fillParents(NodeType &node, const Map &map,
+        bool fillParents(NodeType &node, const Map &map,
             int goal_i, int goal_j, int agentId,
             const std::unordered_set<Node, NodeHash> &occupiedNodes,
             const ConstraintsSet &constraints,
@@ -132,6 +132,9 @@ class ReplanningAStar
         virtual int getPredConflictsCount(
             const NodeType& node, const NodeType& pred,
             const ConflictAvoidanceTable& CAT) const;
+
+        virtual void checkMinFChange() {};
+
         void setPerfectHeuristic(std::unordered_map<std::pair<Node, Node>, int, NodePairHash>* PerfectHeuristic) {
             perfectHeuristic = PerfectHeuristic;
         }

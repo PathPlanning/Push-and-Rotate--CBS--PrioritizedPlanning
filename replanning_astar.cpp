@@ -133,6 +133,11 @@ SearchResult ReplanningAStar<NodeType>::startSearch(const Map &map, const AgentS
     sresult.nodesexpanded += sresult.numberofsteps;
 
     if (sresult.pathfound) {
+        if (!fillParents(cur, map, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT)) {
+            sresult.pathfound = false;
+            return sresult;
+        }
+
         goalG = cur.g;
         sresult.pathlength = cur.g;
         sresult.minF = std::min(double(cur.F), getMinFocalF());
@@ -140,7 +145,6 @@ SearchResult ReplanningAStar<NodeType>::startSearch(const Map &map, const AgentS
         if (returnPath) {
             lppath.clear();
             hppath.clear();
-            fillParents(cur, map, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
             makePrimaryPath(cur, goalTime == -1 ? -1 : goalTime + 1);
             makeSecondaryPath(map);
             sresult.hppath = &hppath; //Here is a constant pointer
@@ -273,9 +277,8 @@ void ReplanningAStar<NodeType>::updateNode(NodeType &node, const Map &map,
         closeConv.erase(closeIt);
         if (node.i == goal_i && node.j == goal_j && node.g == goalG) {
             goalG = -1;
-        } else {
-            processSuccessors = true;
         }
+        processSuccessors = true;
     }
     sortByIndex.erase(it);
 
@@ -370,6 +373,8 @@ void ReplanningAStar<NodeType>::processConstraint(const Constraint& constraint, 
         updateNode(cur, map, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT, queue, addedNodesConv);
         queue.pop();
     }
+
+    checkMinFChange();
 }
 
 template<typename NodeType>
@@ -454,7 +459,7 @@ NodeType* ReplanningAStar<NodeType>::getBestParentPtr(NodeType &node, const Map 
 }
 
 template<typename NodeType>
-void ReplanningAStar<NodeType>::fillParents(NodeType &node, const Map &map,
+bool ReplanningAStar<NodeType>::fillParents(NodeType &node, const Map &map,
     int goal_i, int goal_j, int agentId,
     const std::unordered_set<Node, NodeHash> &occupiedNodes,
     const ConstraintsSet &constraints,
@@ -462,15 +467,21 @@ void ReplanningAStar<NodeType>::fillParents(NodeType &node, const Map &map,
 {
     if (node.g == 0) {
         node.parent = nullptr;
-        return;
+        return true;
     }
 
     NodeType* parent = getBestParentPtr(node, map, goal_i, goal_j, agentId,
         occupiedNodes, constraints, withCAT, CAT);
 
     assert(parent != nullptr);
+
+    if (parent == nullptr) {
+        std::cout << agentId << " " << node.i << " " << node.j << " " << node.g << std::endl;
+        return false;
+    }
+
     node.parent = parent;
-    fillParents(*parent, map, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
+    return fillParents(*parent, map, goal_i, goal_j, agentId, occupiedNodes, constraints, withCAT, CAT);
 }
 
 template<typename NodeType>

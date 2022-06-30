@@ -160,10 +160,6 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map,
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::vector<std::vector<Node>> agentsPaths;
 
-    //ISearch<>::T = 0;
-    //ISearch<>::P = 0;
-    //FocalSearch<>::Time = 0;
-
     if (config.withPerfectHeuristic) {
         search->getPerfectHeuristic(map, agentSet);
         search->search->setPerfectHeuristic(&search->perfectHeuristic);
@@ -183,8 +179,13 @@ MultiagentSearchResult AnytimeCBS<SearchType>::startSearch(const Map &map,
         }
 
         std::cout << search->open.size() << " " << search->close.size() << std::endl;
+
         MultiagentSearchResult newResult = search->startSearch(map, curConfig, agentSet, begin, config.maxTime);
         if (!newResult.pathfound) {
+            result.finalHLNodesStart = newResult.HLNodesStart.back();
+            result.finalHLNodes = newResult.HLNodes.back();
+            result.finalHLExpansionsStart = newResult.HLExpansionsStart.back();
+            result.finalHLExpansions = newResult.HLExpansions.back();
             break;
         }
 
@@ -373,4 +374,5 @@ template class AnytimeCBS<FocalSearch<>>;
 template class AnytimeCBS<SIPP<>>;
 template class AnytimeCBS<SCIPP<>>;
 template class AnytimeCBS<ZeroSCIPP<>>;
+template class AnytimeCBS<ReplanningAStar<ReplanningAstarNode>>;
 template class AnytimeCBS<ReplanningFocalSearch<>>;

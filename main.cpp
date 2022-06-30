@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
                 mission.createAlgorithm();
                 int tasksCount = mission.getSingleExecution() ? 1 : mission.getTasksCount();
                 for (int i = 0; i < tasksCount; ++i) {
-                    std::string agentsFile = mission.getAgentsFile() + "-" + std::to_string(i + 1) + ".xml";
+                    std::string agentsFile = mission.getAgentsFile() + "-" + std::to_string(i + mission.getFirstTask()) + ".xml";
                     if (!mission.getAgents(agentsFile.c_str()))
                         std::cout << "Agent set has not been created! Program halted!" << std::endl;
                     else if (mission.checkAgentsCorrectness(agentsFile)) {
